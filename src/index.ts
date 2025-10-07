@@ -3,7 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/database';
 import nombreGrupoEjemploRouter from './modules/nombre_grupo_ejemplo';
-
+import cardRoutes from "./modules/payments-libelula/routes/cardRoutes";
 // Cargar variables de entorno
 dotenv.config();
 
@@ -11,7 +11,7 @@ dotenv.config();
 const app = express();
 
 // Conectar a MongoDB
-connectDB();
+//connectDB();
 
 // Middlewares globales
 app.use(cors());
@@ -43,6 +43,7 @@ app.get('/api/health', (req: Request, res: Response) => {
 // ============================================
 // Montar tus módulos aquí:
 app.use('/api/nombre_grupo_ejemplo', nombreGrupoEjemploRouter);
+app.use("/api/payments", cardRoutes);
 
 // ============================================
 // Manejo de errores 404
