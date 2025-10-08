@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import ejemploRoutes from './routes/ejemplo.routes';
+//import ejemploRoutes from './routes/ejemplo.routes';
 
 const router = Router();
 
@@ -16,7 +16,7 @@ router.get('/', (req, res) => {
 });
 
 // Montar sub-rutas del módulo
-router.use('/ejemplo', ejemploRoutes);
+//router.use('/ejemplo', ejemploRoutes);
 
 // Puedes agregar más rutas aquí:
 // router.use('/otra-ruta', otraRoutes);
