@@ -2,10 +2,12 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/database';
-import nombreGrupoEjemploRouter from './modules/nombre_grupo_ejemplo';
+import notificationRoutes from "./modules/notification/routes/notificationRoutes";
+import helmet from "helmet";
 
 // Cargar variables de entorno
 dotenv.config();
+import "./config/env";
 
 // Crear aplicación Express
 const app = express();
@@ -17,8 +19,13 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(helmet());
 
-// Ruta raíz
+/*
+Ruta raiz 1: prueben con esta app que esta por defecto, en mi caso en mi
+maquina no funciono y use la otra version de abajo, solo para constatar
+pueden verificarlo, atte:Adrian
+*/
 app.get('/', (req: Request, res: Response) => {
   res.json({
     message: ' API Backend',
@@ -28,6 +35,22 @@ app.get('/', (req: Request, res: Response) => {
     modules: []
   });
 });
+
+
+/*Ruta raíz 2: Con esto seccion cambiada, al visitar http://localhost:5000 
+verás una página HTML con tu mensaje personalizado, no un JSON, atte:Adrian
+/*
+app.get('/', (req: Request, res: Response) => {
+  res.send(`
+    <h1>🚀 Backend del sistema de ofertas y contrataciones en ejecución</h1>
+    <p>El servidor está funcionando correctamente.</p>
+    <p>Versión: 1.0.0</p>
+    <p>Entorno: ${process.env.NODE_ENV}</p>
+    <p>Tiempo: ${new Date().toLocaleString()}</p>
+  `);
+});
+*/
+
 
 // Health check
 app.get('/api/health', (req: Request, res: Response) => {
@@ -42,7 +65,7 @@ app.get('/api/health', (req: Request, res: Response) => {
 // MONTAR MÓDULOS/GRUPOS AQUÍ
 // ============================================
 // Montar tus módulos aquí:
-app.use('/api/nombre_grupo_ejemplo', nombreGrupoEjemploRouter);
+app.use("/api/notifications", notificationRoutes); // nuevo
 
 // ============================================
 // Manejo de errores 404
@@ -62,7 +85,7 @@ app.listen(PORT, () => {
   console.log(` Modo: ${process.env.NODE_ENV}`);
   console.log(` URL: http://localhost:${PORT}`);
   console.log(`\n Módulos cargados:`);
-  console.log(`   - /api/nombre_grupo_ejemplo`);
+  console.log(`   - /api/notifications`);
   console.log(`\n Listo para recibir peticiones!\n`
 
   );
