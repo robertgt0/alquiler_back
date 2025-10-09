@@ -2,8 +2,9 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/database';
-import nombreGrupoEjemploRouter from './modules/nombre_grupo_ejemplo';
 import availabilityRoutes from "./modules/DevCode/routes/availability.routes";
+import overlapRoutes from './modules/DevCode/routes/overlap.routes';
+
 // Cargar variables de entorno
 dotenv.config();
 
@@ -42,8 +43,9 @@ app.get('/api/health', (req: Request, res: Response) => {
 // MONTAR MÓDULOS/GRUPOS AQUÍ
 // ============================================
 // Montar tus módulos aquí:
-app.use('/api/nombre_grupo_ejemplo', nombreGrupoEjemploRouter);
 app.use('/api/devcode', availabilityRoutes)
+app.use('/api/devcode', overlapRoutes);
+
 // ============================================
 // Manejo de errores 404
 // ============================================
