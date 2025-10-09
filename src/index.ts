@@ -44,7 +44,6 @@ app.get('/api/health', (req: Request, res: Response) => {
 // ============================================
 // Montar tus módulos aquí:
 app.use('/api/devcode', availabilityRoutes)
-app.use('/api/devcode', overlapRoutes);
 
 // ============================================
 // Manejo de errores 404
