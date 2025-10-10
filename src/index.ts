@@ -2,68 +2,102 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/database';
-import nombreGrupoEjemploRouter from './modules/nombre_grupo_ejemplo';
+import Ubicacion from './models/Ubicacion';
+import { ubicacionesDefinidas } from './data/ubicacionesData';
+import mongoose from 'mongoose';
 
-// Cargar variables de entorno
 dotenv.config();
-
-// Crear aplicación Express
 const app = express();
+const PORT = process.env.PORT || 5000;
 
-// Conectar a MongoDB
+// CONEXIÓN REAL A MONGODB
 connectDB();
 
-// Middlewares globales
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// Ruta raíz
-app.get('/', (req: Request, res: Response) => {
-  res.json({
-    message: ' API Backend',
-    status: 'OK',
-    version: '1.0.0',
-    timestamp: new Date().toISOString(),
-    modules: []
-  });
+// Health check SIMPLIFICADO
+app.get('/api/health', async (req: Request, res: Response) => {
+  try {
+    // Verificar conexión simple
+    const dbState = mongoose.connection.readyState;
+    const isConnected = dbState === 1; // 1 = connected
+    
+    res.json({
+      status: 'healthy',
+      database: isConnected ? 'connected' : 'disconnected',
+      uptime: process.uptime(),
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'unhealthy', 
+      database: 'error',
+      error: 'Error checking database'
+    });
+  }
 });
 
-// Health check
-app.get('/api/health', (req: Request, res: Response) => {
-  res.json({
-    status: 'healthy',
-    database: 'connected',
-    uptime: process.uptime()
-  });
+// GET ubicaciones - CON DATOS REALES DE MONGODB
+app.get('/api/ubicaciones', async (req: Request, res: Response) => {
+  try {
+    const ubicaciones = await Ubicacion.find().sort({ nombre: 1 });
+    
+    console.log(`📊 Ubicaciones encontradas en MongoDB: ${ubicaciones.length}`);
+    
+    res.json({
+      success: true,
+      data: ubicaciones,
+      count: ubicaciones.length,
+      source: 'mongodb'
+    });
+  } catch (error) {
+    console.error('Error al obtener ubicaciones:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error de base de datos'
+    });
+  }
 });
 
-// ============================================
-// MONTAR MÓDULOS/GRUPOS AQUÍ
-// ============================================
-// Montar tus módulos aquí:
-app.use('/api/nombre_grupo_ejemplo', nombreGrupoEjemploRouter);
-
-// ============================================
-// Manejo de errores 404
-// ============================================
-app.use((req: Request, res: Response) => {
-  res.status(404).json({ 
-    success: false,
-    message: 'Ruta no encontrada',
-    path: req.path
-  });
+// CARGAR datos a MongoDB - VERSIÓN CORREGIDA
+app.post('/api/ubicaciones/cargar-definidas', async (req: Request, res: Response) => {
+  try {
+    console.log('🔄 Cargando datos a MongoDB...');
+    
+    // Limpiar y cargar
+    const deleteResult = await Ubicacion.deleteMany({});
+    console.log(`🗑️ Eliminados: ${deleteResult.deletedCount} documentos`);
+    
+    const insertResult = await Ubicacion.insertMany(ubicacionesDefinidas);
+    console.log(`✅ Insertados: ${insertResult.length} documentos`);
+    
+    const count = await Ubicacion.countDocuments();
+    
+    res.json({
+      success: true,
+      message: 'Datos cargados en MongoDB',
+      deleted: deleteResult.deletedCount,
+      inserted: insertResult.length,
+      total: count
+    });
+    
+  } catch (error) {
+    console.error('❌ Error cargando datos:', error);
+    res.status(500).json({
+      success: false,
+      message: 'No se pudo conectar a MongoDB',
+      solution: 'Configurar IP en MongoDB Atlas: Network Access → Allow access from anywhere'
+    });
+  }
 });
 
-// Iniciar servidor
-const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`\n Servidor corriendo en puerto ${PORT}`);
-  console.log(` Modo: ${process.env.NODE_ENV}`);
-  console.log(` URL: http://localhost:${PORT}`);
-  console.log(`\n Módulos cargados:`);
-  console.log(`   - /api/nombre_grupo_ejemplo`);
-  console.log(`\n Listo para recibir peticiones!\n`
-
-  );
+  console.log(`\n🚀 Servidor listo en http://localhost:${PORT}`);
+  console.log(`\n📍 ACCIÓN REQUERIDA:`);
+  console.log(`   1. Ve a: https://cloud.mongodb.com`);
+  console.log(`   2. Network Access → Add IP Address → Allow access from anywhere`);
+  console.log(`   3. Espera 1-3 minutos`);
+  console.log(`   4. Ejecuta: POST http://localhost:${PORT}/api/ubicaciones/cargar-definidas`);
+  console.log(`\n✅ MongoDB REAL - CERO datos temporales`);
 });
