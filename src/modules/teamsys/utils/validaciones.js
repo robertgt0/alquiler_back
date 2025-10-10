@@ -45,3 +45,30 @@ export function validarImagen(imagen) {
     return false;
   }
 }
+
+export function limpiarInput(valor) {
+  // Si es string → simplemente lo devuelve (no hay peligro)
+  if (typeof valor === 'string') {
+    return valor;
+  }
+
+  // Si es null o undefined → lo devuelve tal cual
+  if (valor === null || valor === undefined) {
+    return valor;
+  }
+
+  // Si es un objeto → lo limpia recursivamente
+  if (typeof valor === 'object') {
+    for (const key in valor) {
+      if (key.startsWith('$') || key.includes('.')) {
+        delete valor[key];
+      } else {
+        valor[key] = limpiarInput(valor[key]);
+      }
+    }
+  }
+
+  return valor;
+}
+
+
