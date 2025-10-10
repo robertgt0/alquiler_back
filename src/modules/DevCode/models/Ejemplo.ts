@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import { EjemploEntity } from '../types';
+import { EjemploEntity } from '../../../types/user';
 
 export interface EjemploDocument extends EjemploEntity, Document {}
 
