@@ -1,8 +1,9 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import connectDB from './config/database';
-import nombreGrupoEjemploRouter from './modules/nombre_grupo_ejemplo';
+import connectDB from './config/database';;
+
+import paginationRouter from './modules/borbotones/routes/pagination.router';
 
 // Cargar variables de entorno
 dotenv.config();
@@ -42,13 +43,14 @@ app.get('/api/health', (req: Request, res: Response) => {
 // MONTAR MÓDULOS/GRUPOS AQUÍ
 // ============================================
 // Montar tus módulos aquí:
-app.use('/api/nombre_grupo_ejemplo', nombreGrupoEjemploRouter);
+app.use('/api/borbotones', paginationRouter); //Historia de usuario P01
+
 
 // ============================================
 // Manejo de errores 404
 // ============================================
 app.use((req: Request, res: Response) => {
-  res.status(404).json({ 
+  res.status(404).json({
     success: false,
     message: 'Ruta no encontrada',
     path: req.path
