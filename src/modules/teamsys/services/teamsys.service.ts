@@ -1,32 +1,22 @@
-import Teamsys from '../models/teamsys';
+import Usuario from '../models/teamsys';
 import { TeamsysEntity } from '../types';
 
-export class TeamsysService {
-  async getAll() {
-    return await Teamsys.find();
+export class UsuarioService {
+  /**
+   * Registrar un nuevo usuario
+   */
+  async registrarUsuario(data: any) {
+    const nuevoUsuario = new Usuario(data);
+    return await nuevoUsuario.save();
   }
 
-  async getById(id: string) {
-    return await Teamsys.findById(id);
+  /**
+   * Verificar si un correo ya existe
+   */
+  async verificarCorreo(correo: string) {
+    const usuario = await Usuario.findOne({ correoElectronico: correo });
+    return !!usuario;
   }
-
-  async create(data: TeamsysEntity) {
-    const item = new Teamsys(data);
-    return await item.save();
-  }
-
-  async update(id: string, data: Partial<TeamsysEntity>) {
-    return await Teamsys.findByIdAndUpdate(id, data, {
-      new: true,
-      runValidators: true,
-    });
-  }
-
-  async delete(id: string) {
-    return await Teamsys.findByIdAndDelete(id);
-  }
-
-  // Agrega más métodos según tu lógica de negocio
 }
 
-export default new TeamsysService();
+export default new UsuarioService();
