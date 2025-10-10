@@ -1,18 +1,9 @@
-import { Router } from 'express';
+
+import { Router } from "express";
+import availabilityRoutes from "./routes/availability.routes";
 
 const router = Router();
 
-// Ruta de bienvenida del módulo
-router.get('/', (req, res) => {
-  res.json({
-    message: '📦 Módulo de Ejemplo',
-    version: '1.0.0',
-    description: 'Este es un módulo de ejemplo para mostrar la estructura',
-    endpoints: {
-      ejemplo: '/api/nombre_grupo_ejemplo/ejemplo'
-    }
-  });
-});
-
+router.use("/availability", availabilityRoutes);
 
 export default router;
