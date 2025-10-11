@@ -1,21 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import { UsuarioDocument } from '../types/index';
 
-// Interfaz TypeScript con ubicación tipo Point
-export interface UsuarioDocument extends Document {
-  nombre: string;
-  apellido?: string;
-  telefono: string;
-  correoElectronico: string;
-  password: string;
-  fotoPerfil?: Buffer; // Binario (imagen)
-  ubicacion?: {
-    type: 'Point';
-    coordinates: [number, number]; // [longitud, latitud]
-  };
-  terminosYCondiciones: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
 
 // Esquema de Mongoose
 const usuarioSchema = new Schema<UsuarioDocument>(
@@ -47,7 +32,7 @@ const usuarioSchema = new Schema<UsuarioDocument>(
       minlength: [6, 'La contraseña debe tener al menos 6 caracteres'],
     },
     fotoPerfil: {
-      type: Buffer, // 👈 binario (imagen)
+      type: Buffer, // binario (imagen)
     },
     ubicacion: {
       type: {

@@ -1,15 +1,16 @@
 import { Request, Response } from 'express';
 import teamsysService from '../services/teamsys.service';
-import { ApiResponse } from '../types';
+import { ApiResponse, UsuarioDocument } from '../types/index';
 import { handleError } from '../errors/errorHandler';
 
+/*obtener todos los registros de usuario */
 export const getAll = async (req: Request, res: Response): Promise<void> => {
   try {
     const data = await teamsysService.getAll();
-    const response: ApiResponse<any> = {
+    const response: ApiResponse<UsuarioDocument[]> = {
       success: true,
       count: data.length,
-      data: data,
+      data,
     };
     res.json(response);
   } catch (error) {
@@ -17,6 +18,7 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+/*obtener usr por id */
 export const getById = async (req: Request, res: Response): Promise<void> => {
   try {
     const data = await teamsysService.getById(req.params.id);
@@ -27,9 +29,9 @@ export const getById = async (req: Request, res: Response): Promise<void> => {
       });
       return;
     }
-    const response: ApiResponse<any> = {
+    const response: ApiResponse<UsuarioDocument> = {
       success: true,
-      data: data,
+      data,
     };
     res.json(response);
   } catch (error) {
@@ -37,12 +39,13 @@ export const getById = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+/*crear nuevo usr */
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
     const data = await teamsysService.create(req.body);
-    const response: ApiResponse<any> = {
+    const response: ApiResponse<UsuarioDocument> = {
       success: true,
-      data: data,
+      data,
       message: 'Registro creado exitosamente'
     };
     res.status(201).json(response);
@@ -51,6 +54,7 @@ export const create = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+/*actualizar un usr existente */
 export const update = async (req: Request, res: Response): Promise<void> => {
   try {
     const data = await teamsysService.update(req.params.id, req.body);
@@ -61,9 +65,9 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       });
       return;
     }
-    const response: ApiResponse<any> = {
+    const response: ApiResponse<UsuarioDocument> = {
       success: true,
-      data: data,
+      data,
       message: 'Registro actualizado exitosamente'
     };
     res.json(response);
@@ -72,6 +76,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+/*eliminaar un usr por id */
 export const remove = async (req: Request, res: Response): Promise<void> => {
   try {
     const data = await teamsysService.delete(req.params.id);

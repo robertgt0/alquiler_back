@@ -2,7 +2,8 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/database';
-import teamsysRouter from './modules/teamsys';
+//import teamsysRouter from './modules/teamsys';
+import userRoutes from './routes/userRoutes';
 
 // Cargar variables de entorno
 dotenv.config();
@@ -42,7 +43,8 @@ app.get('/api/health', (req: Request, res: Response) => {
 // MONTAR MÓDULOS/GRUPOS AQUÍ
 // ============================================
 // Montar tus módulos aquí:
-app.use('/api/teamsys', teamsysRouter);
+//app.use('/api/teamsys', teamsysRouter);
+app.use('/api', userRoutes); // Esto expone /api/teamsys
 
 // ============================================
 // Manejo de errores 404

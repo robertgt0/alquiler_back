@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import teamsysRoutes from './routes/teamsys.routes';
+//import router from './routes/teamsys.routes';
 
 const router = Router();
 
