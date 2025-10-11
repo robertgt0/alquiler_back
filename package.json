@@ -1,7 +1,7 @@
 {
   "name": "alquiler_back",
   "version": "1.0.0",
-  "description": "",
+  "description": "```\r backend/\r ├── src/\r │   ├── config/              # Configuración global (DB, etc)\r │   ├── types/               # Tipos globales compartidos\r │   ├── utils/               # Utilidades globales\r │   ├── middlewares/         # Middlewares globales\r │   ├── modules/             # Módulos/Grupos independientes\r │   │   └── nombre_grupo_ejemplo/  # Ejemplo de módulo\r │   │       ├── config/\r │   │       ├── controllers/\r │   │       ├── routes/\r │   │       ├── services/\r │   │       ├── middlewares/\r │   │       ├── models/\r │   │       ├── types/\r │   │       ├── utils/\r │   │       ├── errors/\r │   │       └── index.ts\r │   └── index.ts             # Punto de entrada principal\r ├── dist/                    # Código compilado\r ├── .env                     # Variables de entorno\r ├── tsconfig.json           # Configuración TypeScript\r └── package.json            # Dependencias\r ```",
   "main": "index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
@@ -22,9 +22,12 @@
   },
   "homepage": "https://github.com/robertgt0/alquiler_back#readme",
   "dependencies": {
+    "axios": "^1.12.2",
+    "body-parser": "^2.2.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
     "mogoose": "^0.0.1-security",
     "mongoose": "^8.19.0"
   },
