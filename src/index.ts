@@ -5,6 +5,8 @@ import connectDB from './config/database';;
 
 import paginationRouter from './modules/borbotones/routes/pagination.router';
 
+import ordenamientoRouter from './modules/borbotones/routes/ordering.routes';
+
 // Cargar variables de entorno
 dotenv.config();
 
@@ -44,7 +46,7 @@ app.get('/api/health', (req: Request, res: Response) => {
 // ============================================
 // Montar tus módulos aquí:
 app.use('/api/borbotones', paginationRouter); //Historia de usuario P01
-
+app.use('/api/borbotones', ordenamientoRouter);//Historia de O01
 
 // ============================================
 // Manejo de errores 404
