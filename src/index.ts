@@ -92,7 +92,6 @@ app.post('/api/ubicaciones/cargar-definidas', async (req: Request, res: Response
 });
 
 // ✅ NUEVO: GET fixers
-// ✅ NUEVO: GET fixers
 app.get('/api/fixers', async (req: Request, res: Response) => {
   try {
     const fixers = await Fixer.find().sort({ nombre: 1 });
@@ -143,6 +142,144 @@ app.post('/api/fixers/cargar-definidos', async (req: Request, res: Response) => 
   }
 });
 
+// ✅ NUEVO: GEOLOCALIZACIÓN - Servicio de cálculo de distancias
+class GeolocationService {
+  // Calcular distancia entre dos puntos (Haversine formula)
+  static calculateDistance(loc1: { lat: number; lng: number }, loc2: { lat: number; lng: number }): number {
+    const R = 6371; // Radio de la Tierra en km
+    const dLat = this.deg2rad(loc2.lat - loc1.lat);
+    const dLng = this.deg2rad(loc2.lng - loc1.lng);
+    
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(this.deg2rad(loc1.lat)) * Math.cos(this.deg2rad(loc2.lat)) *
+      Math.sin(dLng/2) * Math.sin(dLng/2);
+    
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const distance = R * c; // Distancia en km
+    
+    return distance;
+  }
+
+  // Encontrar fixers cercanos
+  static findNearbyFixers(userLocation: { lat: number; lng: number }, fixers: any[], maxDistanceKm: number = 5) {
+    return fixers.filter(fixer => {
+      const fixerLocation = {
+        lat: fixer.posicion.lat,
+        lng: fixer.posicion.lng
+      };
+      const distance = this.calculateDistance(userLocation, fixerLocation);
+      return distance <= maxDistanceKm;
+    });
+  }
+
+  // Encontrar ubicaciones cercanas
+  static findNearbyUbicaciones(userLocation: { lat: number; lng: number }, ubicaciones: any[], maxDistanceKm: number = 2) {
+    return ubicaciones.filter(ubicacion => {
+      const ubicacionLocation = {
+        lat: ubicacion.posicion.lat,
+        lng: ubicacion.posicion.lng
+      };
+      const distance = this.calculateDistance(userLocation, ubicacionLocation);
+      return distance <= maxDistanceKm;
+    });
+  }
+
+  private static deg2rad(deg: number): number {
+    return deg * (Math.PI/180);
+  }
+}
+
+// ✅ NUEVO: GEOLOCALIZACIÓN - Endpoints
+// GET fixers cercanos
+app.get('/api/geolocation/nearby-fixers', async (req: Request, res: Response) => {
+  try {
+    const { lat, lng, radius = 5 } = req.query;
+    
+    if (!lat || !lng) {
+      return res.status(400).json({
+        success: false,
+        message: 'Se requieren coordenadas lat y lng'
+      });
+    }
+
+    const userLocation = {
+      lat: parseFloat(lat as string),
+      lng: parseFloat(lng as string)
+    };
+
+    // Obtener todos los fixers
+    const allFixers = await Fixer.find();
+    
+    // Filtrar fixers cercanos
+    const nearbyFixers = GeolocationService.findNearbyFixers(
+      userLocation, 
+      allFixers, 
+      parseFloat(radius as string)
+    );
+
+    console.log(`📍 Fixers cercanos encontrados: ${nearbyFixers.length} en radio de ${radius}km`);
+
+    res.json({
+      success: true,
+      data: nearbyFixers,
+      count: nearbyFixers.length,
+      userLocation,
+      searchRadius: radius
+    });
+
+  } catch (error) {
+    console.error('Error en geolocalización:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al buscar fixers cercanos'
+    });
+  }
+});
+
+// GET ubicaciones cercanas
+app.get('/api/geolocation/nearby-ubicaciones', async (req: Request, res: Response) => {
+  try {
+    const { lat, lng, radius = 2 } = req.query;
+    
+    if (!lat || !lng) {
+      return res.status(400).json({
+        success: false,
+        message: 'Se requieren coordenadas lat y lng'
+      });
+    }
+
+    const userLocation = {
+      lat: parseFloat(lat as string),
+      lng: parseFloat(lng as string)
+    };
+
+    const allUbicaciones = await Ubicacion.find();
+    const nearbyUbicaciones = GeolocationService.findNearbyUbicaciones(
+      userLocation, 
+      allUbicaciones, 
+      parseFloat(radius as string)
+    );
+
+    console.log(`📍 Ubicaciones cercanas encontradas: ${nearbyUbicaciones.length} en radio de ${radius}km`);
+
+    res.json({
+      success: true,
+      data: nearbyUbicaciones,
+      count: nearbyUbicaciones.length,
+      userLocation,
+      searchRadius: radius
+    });
+
+  } catch (error) {
+    console.error('Error en geolocalización:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al buscar ubicaciones cercanas'
+    });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`\n🚀 Servidor listo en http://localhost:${PORT}`);
   console.log(`\n📍 ENDPOINTS DISPONIBLES:`);
@@ -150,4 +287,7 @@ app.listen(PORT, () => {
   console.log(`   POST http://localhost:${PORT}/api/ubicaciones/cargar-definidas`);
   console.log(`   GET  http://localhost:${PORT}/api/fixers`);
   console.log(`   POST http://localhost:${PORT}/api/fixers/cargar-definidos`);
+  console.log(`\n🎯 GEOLOCALIZACIÓN:`);
+  console.log(`   GET  http://localhost:${PORT}/api/geolocation/nearby-fixers?lat=X&lng=Y&radius=5`);
+  console.log(`   GET  http://localhost:${PORT}/api/geolocation/nearby-ubicaciones?lat=X&lng=Y&radius=2`);
 });
