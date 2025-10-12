@@ -15,7 +15,7 @@ import {
 } from '../controllers/userController';
  
 
-const router = express.Router();
+const router = Router();
 
 router.get('/', getUsers);
 router.get('/:id', getUserById);
