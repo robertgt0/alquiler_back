@@ -1,20 +1,13 @@
+// src/modules/los_vengadores_trabajos/routes/trabajo.routes.ts
 import { Router } from 'express';
-import {
-  getAll,
-  getById,
-  create,
-  update,
-  remove
-} from '../controllers/trabajo.controller';
-import { validateData } from '../middlewares/validate.middleware';
+import { getTrabajosProveedor, getTrabajosCliente } from '../controllers/trabajo.controller';
 
 const router = Router();
 
-// Define las rutas de tu módulo aquí
-router.get('/', getAll);
-router.get('/:id', getById);
-router.post('/', validateData, create);
-router.put('/:id', update);
-router.delete('/:id', remove);
+// Ruta para HU 1.7: Obtener la lista de trabajos para el proveedor logueado
+router.get('/proveedor', getTrabajosProveedor);
+
+// Ruta para HU 1.8: Obtener la lista de trabajos para un cliente específico por su ID
+router.get('/cliente/:clienteId', getTrabajosCliente);
 
 export default router;

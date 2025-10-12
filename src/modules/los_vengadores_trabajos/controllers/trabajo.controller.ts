@@ -1,92 +1,33 @@
-import { Request, Response } from 'express';
-import ejemploService from '../services/trabajo.service';
-import { ApiResponse } from '../types';
-import { handleError } from '../errors/errorHandler';
+// src/modules/los_vengadores_trabajos/controllers/trabajo.controller.ts
+import { Request, Response, NextFunction } from 'express';
+import { getTrabajosProveedorService, getTrabajosClienteService } from '../services/trabajo.service';
+import { TrabajoStatus } from '../models/trabajo.model';
 
-export const getAll = async (req: Request, res: Response): Promise<void> => {
+// Controlador para la HU 1.7 (Vista del Proveedor)
+export const getTrabajosProveedor = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const data = await ejemploService.getAll();
-    const response: ApiResponse<any> = {
-      success: true,
-      count: data.length,
-      data: data,
-    };
-    res.json(response);
-  } catch (error) {
-    handleError(error, res);
+    // Simulación: Más adelante, este ID vendrá de un sistema de autenticación (ej. un token JWT)
+    const proveedorId = 'proveedor1'; 
+    const estado = req.query.estado as TrabajoStatus | undefined;
+    
+    const trabajos = await getTrabajosProveedorService(proveedorId, estado);
+    res.json(trabajos);
+  } catch (err) {
+    // En un futuro, aquí se manejarían los errores de forma más robusta
+    next(err);
   }
 };
 
-export const getById = async (req: Request, res: Response): Promise<void> => {
+// Controlador para la HU 1.8 (Vista del Cliente)
+export const getTrabajosCliente = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const data = await ejemploService.getById(req.params.id);
-    if (!data) {
-      res.status(404).json({
-        success: false,
-        message: 'Registro no encontrado',
-      });
-      return;
-    }
-    const response: ApiResponse<any> = {
-      success: true,
-      data: data,
-    };
-    res.json(response);
-  } catch (error) {
-    handleError(error, res);
-  }
-};
+    // Tomamos el ID del cliente directamente de los parámetros de la URL
+    const { clienteId } = req.params;
+    const estado = req.query.estado as TrabajoStatus | undefined;
 
-export const create = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const data = await ejemploService.create(req.body);
-    const response: ApiResponse<any> = {
-      success: true,
-      data: data,
-      message: 'Registro creado exitosamente'
-    };
-    res.status(201).json(response);
-  } catch (error) {
-    handleError(error, res);
-  }
-};
-
-export const update = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const data = await ejemploService.update(req.params.id, req.body);
-    if (!data) {
-      res.status(404).json({
-        success: false,
-        message: 'Registro no encontrado',
-      });
-      return;
-    }
-    const response: ApiResponse<any> = {
-      success: true,
-      data: data,
-      message: 'Registro actualizado exitosamente'
-    };
-    res.json(response);
-  } catch (error) {
-    handleError(error, res);
-  }
-};
-
-export const remove = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const data = await ejemploService.delete(req.params.id);
-    if (!data) {
-      res.status(404).json({
-        success: false,
-        message: 'Registro no encontrado',
-      });
-      return;
-    }
-    res.json({
-      success: true,
-      message: 'Registro eliminado correctamente',
-    });
-  } catch (error) {
-    handleError(error, res);
+    const trabajos = await getTrabajosClienteService(clienteId, estado);
+    res.json(trabajos);
+  } catch (err) {
+    next(err);
   }
 };
