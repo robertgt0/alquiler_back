@@ -4,21 +4,15 @@ import dotenv from 'dotenv';
 import connectDB from './config/database';
 import nombreGrupoEjemploRouter from './modules/nombre_grupo_ejemplo';
 import cardRoutes from "./modules/payments-libelula/routes/cardRoutes";
-// Cargar variables de entorno
+
 dotenv.config();
 
-// Crear aplicación Express
 const app = express();
 
-// Conectar a MongoDB
-//connectDB();
-
-// Middlewares globales
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Ruta raíz
 app.get('/', (req: Request, res: Response) => {
   res.json({
     message: ' API Backend',
@@ -29,7 +23,6 @@ app.get('/', (req: Request, res: Response) => {
   });
 });
 
-// Health check
 app.get('/api/health', (req: Request, res: Response) => {
   res.json({
     status: 'healthy',
@@ -68,3 +61,5 @@ app.listen(PORT, () => {
 
   );
 });
+
+

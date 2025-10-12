@@ -1,8 +1,7 @@
-// src/modules/payments-libelula/services/cardService.ts
 import fetch from "node-fetch";
 
 const LIBELULA_URL = "https://api.libelula.bo/rest/deuda/registrar";
-const APP_KEY = "TU_APPKEY_DE_LIBELULA"; // ⚠️ tu APPKEY real de pruebas o sandbox
+const APP_KEY = "11bb10ce-68ba-4af1-8eb7-4e6624fed729"; 
 
 export const registrarDeuda = async (payload: any) => {
   try {
@@ -10,22 +9,22 @@ export const registrarDeuda = async (payload: any) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "APP-KEY": APP_KEY, // 👈 algunos endpoints requieren mayúsculas exactas
+        "APP-KEY": APP_KEY,
       },
       body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("❌ Error de Libélula:", errorText);
+      console.error("Error:", errorText);
       throw new Error("Error en la API de Libélula");
     }
 
     const data = await response.json();
-    console.log("✅ Respuesta de Libélula:", data);
+    console.log("Respuesta:", data);
     return data;
   } catch (err) {
-    console.error("❌ Error al conectar con Libélula:", err);
+    console.error("Error:", err);
     throw err;
   }
 };
