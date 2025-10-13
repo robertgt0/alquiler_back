@@ -1,17 +1,20 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import connectDB from './config/database';
+import path from 'path';
+
+// 🔹 MÓDULOS
 import nombreGrupoEjemploRouter from './modules/nombre_grupo_ejemplo';
+import fixerModule from './modules/fixer';
 
-// Cargar variables de entorno
-dotenv.config();
+// ✅ Carga .env (si en el futuro lo usas)
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
-// Crear aplicación Express
 const app = express();
 
-// Conectar a MongoDB
-connectDB();
+// ⛔️ IMPORTANTE: Sin conexión a Mongo (no hay DB por ahora)
+//   -> No importamos connectDB
+//   -> No llamamos connectDB()
 
 // Middlewares globales
 app.use(cors());
@@ -21,11 +24,14 @@ app.use(express.urlencoded({ extended: true }));
 // Ruta raíz
 app.get('/', (req: Request, res: Response) => {
   res.json({
-    message: ' API Backend',
+    message: 'API Backend',
     status: 'OK',
     version: '1.0.0',
     timestamp: new Date().toISOString(),
-    modules: []
+    modules: [
+      '/api/nombre_grupo_ejemplo',
+      '/api/fixers'
+    ]
   });
 });
 
@@ -33,7 +39,7 @@ app.get('/', (req: Request, res: Response) => {
 app.get('/api/health', (req: Request, res: Response) => {
   res.json({
     status: 'healthy',
-    database: 'connected',
+    database: 'disabled', // <- sin DB por ahora
     uptime: process.uptime()
   });
 });
@@ -41,14 +47,14 @@ app.get('/api/health', (req: Request, res: Response) => {
 // ============================================
 // MONTAR MÓDULOS/GRUPOS AQUÍ
 // ============================================
-// Montar tus módulos aquí:
 app.use('/api/nombre_grupo_ejemplo', nombreGrupoEjemploRouter);
+app.use('/api/fixer', fixerModule);
 
 // ============================================
 // Manejo de errores 404
 // ============================================
 app.use((req: Request, res: Response) => {
-  res.status(404).json({ 
+  res.status(404).json({
     success: false,
     message: 'Ruta no encontrada',
     path: req.path
@@ -59,11 +65,7 @@ app.use((req: Request, res: Response) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`\n Servidor corriendo en puerto ${PORT}`);
-  console.log(` Modo: ${process.env.NODE_ENV}`);
   console.log(` URL: http://localhost:${PORT}`);
-  console.log(`\n Módulos cargados:`);
-  console.log(`   - /api/nombre_grupo_ejemplo`);
-  console.log(`\n Listo para recibir peticiones!\n`
-
-  );
+  console.log(` Módulos: /api/nombre_grupo_ejemplo, /api/fixers`);
+  console.log(` 🔌 Base de datos: DESACTIVADA (modo sin DB)`);
 });
