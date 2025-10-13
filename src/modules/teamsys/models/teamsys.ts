@@ -1,7 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { UsuarioDocument } from '../types/index';
 
-
 // Esquema de Mongoose
 const usuarioSchema = new Schema<UsuarioDocument>(
   {
@@ -48,6 +47,20 @@ const usuarioSchema = new Schema<UsuarioDocument>(
     terminosYCondiciones: {
       type: Boolean,
       required: [true, 'Debes aceptar los términos y condiciones'],
+    },
+
+    isValidated: {
+      type: Boolean,
+      default: false, // indica si el usuario validó su cuenta por correo
+    },
+    googleId: {
+      type: String,
+      required: false, // se usa solo para login con Google
+      index: true,
+    },
+    lastActivity: {
+      type: Date,
+      default: null, // registra la última actividad del usuario
     },
   },
   {
