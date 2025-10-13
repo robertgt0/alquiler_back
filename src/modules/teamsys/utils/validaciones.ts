@@ -1,3 +1,5 @@
+
+
 export function validarPassword(password: string): boolean {
   if (typeof password !== "string") return false;
   if (/\s/.test(password)) return false;

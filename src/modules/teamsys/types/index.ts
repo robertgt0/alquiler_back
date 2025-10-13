@@ -43,7 +43,7 @@ export interface UsuarioDocument extends Document {
 export interface CrearUsuarioDto {
   nombre: string;
   correoElectronico: string;
-  telefono: string;
-  password: string;
+  telefono?: string;
+  password?: string;
   terminosYCondiciones: boolean;
 }

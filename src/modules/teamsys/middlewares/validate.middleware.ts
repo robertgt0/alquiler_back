@@ -1,9 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
-import { CrearUsuarioDto } from '../types';
+import { CrearUsuarioDto } from '../types';  
 
 export const validateData = (req: Request, res: Response, next: NextFunction): void => {
+  
+  try{
   const { nombre, correoElectronico, telefono, password, terminosYCondiciones }: CrearUsuarioDto = req.body;
-
+  
   const nombreValido = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{2,50}$/;
   const telefonoValido = /^[1-9][0-9]{7}$/;
   const correoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -30,6 +32,10 @@ export const validateData = (req: Request, res: Response, next: NextFunction): v
 
   if (terminosYCondiciones !== true) {
     res.status(400).json({ success: false, message: 'Debes aceptar los términos y condiciones' });
+    return;
+  }
+  }catch(e){
+    res.status(400).json({ success: false, message: 'modelo de usaurio no valido' });
     return;
   }
 
