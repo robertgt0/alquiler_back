@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import teamsysRoutes from './routes/teamsys.routes';
+import authRoutes from './modules/auth/auth.routes';
 //import router from './routes/teamsys.routes';
 
 const router = Router();
@@ -33,3 +34,5 @@ router.use('/', teamsysRoutes);
 // router.use('/otra-ruta', otraRoutes);
 
 export default router;
+
+app.use('/api/auth', authRoutes);
