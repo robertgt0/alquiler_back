@@ -1,10 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { CrearUsuarioDto } from '../types';  
+import { limpiarInput } from '../utils/validaciones';
 
 export const validateData = (req: Request, res: Response, next: NextFunction): void => {
   
   try{
-  const { nombre, correoElectronico, telefono, password, terminosYCondiciones }: CrearUsuarioDto = req.body;
+  const { nombre, correoElectronico, telefono, password, terminosYCondiciones }: CrearUsuarioDto = limpiarInput(req.body)as CrearUsuarioDto;
   
   const nombreValido = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{2,50}$/;
   const telefonoValido = /^[1-9][0-9]{7}$/;
@@ -22,7 +23,7 @@ export const validateData = (req: Request, res: Response, next: NextFunction): v
 
   if (!telefono || typeof telefono !== 'string'||!telefonoValido.test(telefono)) {
     res.status(400).json({ success: false, message: 'El teléfono es requerido y debe tener 8 digitos y no comenzar con 0' });
-    return;
+    return;g
   }
 
   if (!password || typeof password !== 'string') {
