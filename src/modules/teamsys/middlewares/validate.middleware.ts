@@ -4,18 +4,22 @@ import { CrearUsuarioDto } from '../types';
 export const validateData = (req: Request, res: Response, next: NextFunction): void => {
   const { nombre, correoElectronico, telefono, password, terminosYCondiciones }: CrearUsuarioDto = req.body;
 
-  if (!nombre || typeof nombre !== 'string') {
-    res.status(400).json({ success: false, message: 'El campo nombre es requerido y debe ser texto' });
+  const nombreValido = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{2,50}$/;
+  const telefonoValido = /^[1-9][0-9]{7}$/;
+  const correoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!nombre || typeof nombre !== 'string' || !nombreValido.test(nombre)) {
+    res.status(400).json({ success: false, message: 'El campo nombre es requerido y debe ser texto y debe tener entre 2 y 50 letras' });
     return;
   }
 
-  if (!correoElectronico || typeof correoElectronico !== 'string') {
-    res.status(400).json({ success: false, message: 'El correo electrónico es requerido y debe ser texto' });
+  if (!correoElectronico || typeof correoElectronico !== 'string'|| !correoValido.test(correoElectronico)) {
+    res.status(400).json({ success: false, message: 'El correo electrónico es requerido y corrige si metiste un correo chafa' });
     return;
   }
 
-  if (!telefono || typeof telefono !== 'string') {
-    res.status(400).json({ success: false, message: 'El teléfono es requerido y debe ser texto' });
+  if (!telefono || typeof telefono !== 'string'||!telefonoValido.test(telefono)) {
+    res.status(400).json({ success: false, message: 'El teléfono es requerido y debe tener 8 digitos y no comenzar con 0' });
     return;
   }
 
