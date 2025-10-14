@@ -1,28 +1,33 @@
-import mongoose, { Schema, Document } from 'mongoose';
-import { EjemploEntity } from '../types';
+// src/modules/los_vengadores_trabajos/models/trabajo.model.ts
 
-export interface EjemploDocument extends EjemploEntity, Document {}
+// ✅ ¡Línea añadida! Ahora este tipo se puede importar desde otros archivos.
+export type TrabajoStatus = 'Pendiente' | 'Confirmado' | 'Cancelado' | 'Terminado';
 
-const ejemploSchema = new Schema<EjemploDocument>(
-  {
-    nombre: {
-      type: String,
-      required: [true, 'El nombre es requerido'],
-      trim: true,
-    },
-    descripcion: {
-      type: String,
-      trim: true,
-    },
-    estado: {
-      type: String,
-      enum: ['activo', 'inactivo'],
-      default: 'activo',
-    },
-  },
-  {
-    timestamps: true,
-  }
-);
+// Esta es la estructura que nuestra API devolverá al frontend
+export interface ITrabajoCompleto {
+  _id: string;
+  proveedor: {
+    nombre: string;
+    id: string;
+  };
+  cliente: {
+    nombre: string;
+    id: string;
+  };
+  fecha: string;
+  horaInicio: string;
+  horaFin: string;
+  servicio?: string;
+  estado: TrabajoStatus; // Ahora puede usar el tipo reutilizable
+}
 
-export default mongoose.model<EjemploDocument>('Ejemplo', ejemploSchema);
+// Esta es la estructura de cómo se guarda en la base de datos
+export interface ITrabajoSolicitado {
+  _id: string;
+  id_proveedor: string;
+  id_cliente: string;
+  fecha: string;
+  horaInicio: string;
+  horaFin: string;
+  estado: TrabajoStatus; // Ahora puede usar el tipo reutilizable
+}

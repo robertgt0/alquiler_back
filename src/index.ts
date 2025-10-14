@@ -8,7 +8,7 @@ import losvengadores from './modules/los_vengadores_trabajos';
 // Cargar variables de entorno
 dotenv.config();
 
-// Crear aplicación Express
+// Crear aplicacion Express
 const app = express();
 
 // Conectar a MongoDB
@@ -19,7 +19,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Ruta raíz
+// Ruta raiz
 app.get('/', (req: Request, res: Response) => {
   res.json({
     message: ' API Backend',
@@ -65,7 +65,6 @@ app.listen(PORT, () => {
   console.log(` URL: http://localhost:${PORT}`);
   console.log(`\n Módulos cargados:`);
   console.log(`   - /api/nombre_grupo_ejemplo`);
-  console.log(`\n Listo para recibir peticiones!\n`
-
-  );
+  console.log(`   - /api/vengadores/trabajos`); // iniciar sevidor con con la api
+  console.log(`\n Listo para recibir peticiones!\n`);
 });
