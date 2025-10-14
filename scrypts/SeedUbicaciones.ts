@@ -33,8 +33,21 @@ const ubicacionesIniciales = [
     posicion: { lat: -17.379303, lng: -66.16183 },
     direccion: "Av. Libertador Bolívar, Cochabamba",
     tipo: "estadio"
-  }
-];
+  },
+   {
+    nombre: 'Tiquipaya',
+    posicion: { lat: -17.338727, lng: -66.213081 },
+    direccion: 'Plaza Principal, Tiquipaya, Cochabamba',
+    tipo: 'plaza',
+  },
+  {
+    nombre: 'Sipe Sipe',
+    posicion: { lat: -17.455351, lng: -66.356415 },
+    direccion: 'Cementerio de sipe sipe, Sipe Sipe , Cochabamba',
+    tipo: 'plaza',
+  },
+
+];//sipesipe -17.45535096484791, -66.3564153368733
 
 async function seedUbicaciones() {
   try {
