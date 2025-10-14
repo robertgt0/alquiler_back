@@ -6,6 +6,7 @@ import {
   update,
   remove
 } from '../controllers/teamsys.controller';
+
 import { validateData } from '../middlewares/validate.middleware';
 import { registerUser, loginUser } from '../controllers/teamsys.controller';
 
