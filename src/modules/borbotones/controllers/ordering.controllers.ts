@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-const Usuario = require('../models/Usuarios'); // 👈 nombre corregido (coincide con tu find)
+const Usuario = require('../models/Usuarios'); //nombre corregido (coincide con tu find)
 import Especialidades from "../models/Especialidades";
 
 // Obtener todos los especialistas con diferentes tipos de ordenamiento
