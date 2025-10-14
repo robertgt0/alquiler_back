@@ -5,8 +5,7 @@ import connectDB from './config/database';
 import availabilityRoutes from './modules/DevCode/routes/availability.routes';
 import overlapRoutes from './modules/DevCode/routes/overlap.routes';
 import bookingRoutes from './modules/DevCode/routes/booking.routes';
-
-// Cargar variables de entorno
+import providersRoute from './modules/DevCode/routes/providers.routes'// Cargar variables de entorno
 dotenv.config();
 
 // Crear aplicación Express
@@ -46,8 +45,9 @@ app.get('/api/health', (req: Request, res: Response) => {
 // Montar tus módulos aquí:
 
 app.use('/api/devcode', overlapRoutes);
-app.use('/api/devcode', availabilityRoutes)
-app.use('/api/bookings', bookingRoutes);
+app.use('/api/devcode', availabilityRoutes);
+
+app.use('/api/providers', providersRoute);
 // ============================================
 // Manejo de errores 404
 // ============================================
