@@ -130,5 +130,3 @@ export function limpiarInput(valor) {
   return valor;
 }
   */
-
-

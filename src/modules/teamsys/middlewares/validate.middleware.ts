@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { CrearUsuarioDto } from '../types';
+import { limpiarInput } from '../utils/validaciones';
 
 export const validateData = (req: Request, res: Response, next: NextFunction): void => {
-  const { nombre, correoElectronico, telefono, password, terminosYCondiciones }: CrearUsuarioDto = req.body;
+  const { nombre, correoElectronico, telefono, password, terminosYCondiciones }: CrearUsuarioDto = limpiarInput(req.body)as CrearUsuarioDto;
 
   if (!nombre || typeof nombre !== 'string') {
     res.status(400).json({ success: false, message: 'El campo nombre es requerido y debe ser texto' });
@@ -16,7 +17,7 @@ export const validateData = (req: Request, res: Response, next: NextFunction): v
 
   if (!telefono || typeof telefono !== 'string') {
     res.status(400).json({ success: false, message: 'El teléfono es requerido y debe ser texto' });
-    return;
+    return;g
   }
 
   if (!password || typeof password !== 'string') {

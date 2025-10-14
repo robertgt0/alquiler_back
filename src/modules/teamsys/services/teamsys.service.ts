@@ -50,13 +50,6 @@ export class UsuarioService {
   }
 
   /**
-   * Obtener un usuario por Email
-   */
-  async getByEmail(email: string): Promise<UsuarioDocument | null> {
-    return await Usuario.findOne({correoElectronico: email})
-  }
-
-  /**
    * Crear un nuevo usuario (usado por el controlador)
    */
   async create(data: CrearUsuarioDto): Promise<UsuarioDocument> {
