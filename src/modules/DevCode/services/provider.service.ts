@@ -24,7 +24,7 @@ export const getProviderById = async ( id:string ) => {
 
   // Obtener el proveedor con info pública del usuario
   const provider = await Providder.findById(id)
-    .populate("user", "name lastName email phone role")
+    .populate("user", "name lastName")
     .select("-__v");
 
   if (!provider) {
@@ -36,7 +36,7 @@ export const getProviderById = async ( id:string ) => {
 
   // Obtener citas futuras pendientes del proveedor
   const citas = await Appointment.find({ proveedor: id, estado: "pendiente" })
-    .populate("cliente", "name lastName email phone")
+    .populate("cliente", "name lastName")
     .select("-__v -notas");
 
   return { provider, citas };
