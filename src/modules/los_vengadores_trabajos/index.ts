@@ -1,24 +1,24 @@
+// src/modules/los_vengadores_trabajos/index.ts
+
 import { Router } from 'express';
-import ejemploRoutes from './routes/trabajo.routes';
+import trabajoRoutes from './routes/trabajo.routes';
 
 const router = Router();
 
-// Ruta de bienvenida del módulo
+// Ruta de bienvenida/informativa para el modulo de trabajos
 router.get('/', (req, res) => {
   res.json({
-    message: '📦 Módulo de Ejemplo',
+    message: '📦 Módulo de Trabajos - Los Vengadores',
     version: '1.0.0',
-    description: 'Este es un módulo de ejemplo para mostrar la estructura',
+    description: 'Endpoints para listar trabajos agendados para proveedores y clientes.',
     endpoints: {
-      ejemplo: '/api/nombre_grupo_ejemplo/ejemplo'
+      proveedor: '/api/vengadores/trabajos/proveedor',
+      cliente: '/api/vengadores/trabajos/cliente/:clienteId'
     }
   });
 });
 
-// Montar sub-rutas del módulo
-router.use('/ejemplo', ejemploRoutes);
-
-// Puedes agregar más rutas aquí:
-// router.use('/otra-ruta', otraRoutes);
+// Montar las sub-rutas funcionales del modulo (las que creamos)
+router.use('/', trabajoRoutes);
 
 export default router;
