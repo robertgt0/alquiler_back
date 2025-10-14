@@ -7,6 +7,8 @@ import {
   remove
 } from '../controllers/teamsys.controller';
 import { validateData } from '../middlewares/validate.middleware';
+import { registerUser, loginUser } from '../controllers/teamsys.controller';
+
 
 const router = Router();
 
@@ -22,5 +24,6 @@ router.post('/usuario/', validateData, create);
 router.put('/usuario/:id', update);
 /**eliminar un usr por id */
 router.delete('/usuario/:id', remove);
-
+router.post('/auth/register', validateData, registerUser);
+router.post('/auth/login', loginUser);
 export default router;
