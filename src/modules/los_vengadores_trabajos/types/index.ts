@@ -1,3 +1,4 @@
+//src/modules/los_vengadores_trabajos/types/index.ts
 // Define aquí los tipos/interfaces específicos de este módulo
 
 export interface EjemploEntity {
@@ -20,3 +21,25 @@ export interface ApiResponse<T> {
 export interface OtraInterface {
   // ...
 }
+
+//types para la HU2
+export interface HorarioDisponible{
+  horaInicio: string;
+  horaFin: string;
+  costoHora: number;
+  disponible: boolean;
+}
+export interface DiaDisponibilidad{
+  fecha: string; // Formato YYYY-MM-DD
+  disponible: boolean;
+  horarios?: HorarioDisponible[];
+}
+export interface CalendarioMensual {
+  proveedorId: string;
+  mes: number;
+  anio: number;
+  dias: DiaDisponibilidad[];
+}
+///
+
+
