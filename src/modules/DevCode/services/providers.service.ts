@@ -2,7 +2,7 @@ import connectDB from "@/config/database";
 import mongoose from "mongoose";
 import usuario from "../models/usuario";
 import Appointment from "../models/Appointment";
-import Providder from "../models/Providder";
+import Providder from "../models/Provider";
 export  const getProviders = async () => {
     try {
         await connectDB();

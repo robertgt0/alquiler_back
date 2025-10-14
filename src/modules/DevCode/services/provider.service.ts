@@ -2,7 +2,7 @@ import connectDB from "@/config/database";
 import mongoose from "mongoose";
 import usuario from "../models/usuario";
 import Appointment from "../models/Appointment";
-import Providder from "../models/Providder";
+import Provider from "../models/Provider";
 export  const getUsuariosSinModelo = async () => {
     try {
         await connectDB();
@@ -23,7 +23,7 @@ export const getProviderById = async ( id:string ) => {
   await connectDB();
 
   // Obtener el proveedor con info pública del usuario
-  const provider = await Providder.findById(id)
+  const provider = await Provider.findById(id)
     .populate("user", "name lastName")
     .select("-__v");
 
