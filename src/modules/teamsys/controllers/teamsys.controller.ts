@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import teamsysService from '../services/teamsys.service';
 import { ApiResponse, UsuarioDocument } from '../types/index';
 import { handleError } from '../errors/errorHandler';
-import bcrypt from 'bcryptjs';
 
 /*obtener todos los registros de usuario */
 export const getAll = async (req: Request, res: Response): Promise<void> => {
@@ -94,40 +93,5 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
     });
   } catch (error) {
     handleError(error, res);
-  }
-};
-
-export const loginController = async (req: Request, res: Response) => {
-  try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ success: false, message: 'Correo y contraseña son requeridos' });
-    }
-
-    const [rows]: any = await db.query('SELECT * FROM usuarios WHERE email = ?', [email]);
-    const usuario = rows.length > 0 ? rows[0] : null;
-
-    if (!usuario) {
-      return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
-    }
-
-    // Validar contraseña (encriptada)
-    const esValida = await bcrypt.compare(password, usuario.password);
-
-    if (!esValida) {
-      return res.status(401).json({ success: false, message: 'Contraseña incorrecta' });
-    }
-
-    // Si la contraseña es correcta, seguir flujo (crear token, etc.)
-    return res.status(200).json({
-      success: true,
-      message: 'Inicio de sesión exitoso',
-      usuario,
-      // token: generarToken(usuario) // si ya tienes JWT configurado
-    });
-  } catch (error) {
-    console.error('Error al iniciar sesión:', error);
-    return res.status(500).json({ success: false, message: 'Error interno del servidor' });
   }
 };
