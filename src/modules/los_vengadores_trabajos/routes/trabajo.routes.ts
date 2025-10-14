@@ -4,10 +4,10 @@ import { getTrabajosProveedor, getTrabajosCliente } from '../controllers/trabajo
 
 const router = Router();
 
-// Ruta para HU 1.7: Obtener la lista de trabajos para el proveedor logueado
+// Ruta para HU 1.7: aca obtenemos la lista de trabajos para el proveedor logueado
 router.get('/proveedor', getTrabajosProveedor);
 
-// Ruta para HU 1.8: Obtener la lista de trabajos para un cliente específico por su ID
+// Ruta para HU 1.8: aca obtenemos la lista de trabajos para un cliente especifico por su ID
 router.get('/cliente/:clienteId', getTrabajosCliente);
 
 export default router;
