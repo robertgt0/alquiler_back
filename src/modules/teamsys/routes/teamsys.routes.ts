@@ -29,8 +29,5 @@ router.delete('/usuario/:id', remove);
  */
 router.post("/google/callback", authController.googleCallback);
 router.get("/me", authController.getCurrentUser);
-router.post('/register', AuthController.register);
-router.post('/login', AuthController.login);
-router.post('/verificar-google', AuthController.verificarGoogle);
 
 export default router;
