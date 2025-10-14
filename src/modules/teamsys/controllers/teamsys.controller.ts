@@ -2,11 +2,7 @@ import { Request, Response } from 'express';
 import teamsysService from '../services/teamsys.service';
 import { ApiResponse, UsuarioDocument } from '../types/index';
 import { handleError } from '../errors/errorHandler';
-<<<<<<< HEAD
 import bcrypt from 'bcryptjs';
-=======
-import { signAccessToken } from '../utils/jwt'; //  añadido para crear tokens JWT
->>>>>>> dev/teamsys-Gabriel
 
 /*obtener todos los registros de usuario */
 export const getAll = async (req: Request, res: Response): Promise<void> => {
@@ -81,7 +77,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-/*eliminar un usr por id */
+/*eliminaar un usr por id */
 export const remove = async (req: Request, res: Response): Promise<void> => {
   try {
     const data = await teamsysService.delete(req.params.id);
@@ -101,7 +97,6 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-<<<<<<< HEAD
 export const loginController = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
@@ -134,63 +129,5 @@ export const loginController = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error al iniciar sesión:', error);
     return res.status(500).json({ success: false, message: 'Error interno del servidor' });
-=======
-/**
- * Inicio de sesión con correo electrónico y contraseña
- * Verifica credenciales y redirige al Home si la cuenta está validada.
- */
-export const loginWithEmail = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { correoElectronico, password } = req.body;
-
-    // Buscar usuario por correo
-    const user = await teamsysService.getByEmail(correoElectronico);
-    if (!user) {
-      res.status(404).json({
-        success: false,
-        message: "Usuario no encontrado",
-      });
-      return;
-    }
-
-    // Verificar contraseña (aquí se puede usar bcrypt en el futuro)
-    if (user.password !== password) {
-      res.status(401).json({
-        success: false,
-        message: "Contraseña incorrecta",
-      });
-      return;
-    }
-
-    // Verificar si la cuenta está validada (puedes agregar un campo booleano en el modelo)
-    // if (!user.validado) {
-    //   res.status(403).json({
-    //     success: false,
-    //     message: "Cuenta no validada. Revisa tu correo electrónico.",
-    //   });
-    //   return;
-    // }
-
-    // Generar token JWT
-    const token = signAccessToken({
-      userId: user._id,
-      email: user.correoElectronico,
-    });
-
-    // Responder con token y redirección al Home
-    res.status(200).json({
-      success: true,
-      message: "Inicio de sesión exitoso",
-      token,
-      redirectTo: "/home", 
-      user,
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      success: false,
-      message: "Error al iniciar sesión",
-    });
->>>>>>> dev/teamsys-Gabriel
   }
 };

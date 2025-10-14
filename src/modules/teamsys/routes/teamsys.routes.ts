@@ -8,7 +8,6 @@ import {
 } from '../controllers/teamsys.controller';
 import { validateData } from '../middlewares/validate.middleware';
 import { authController } from '../controllers/auth.controller';
-import { sessionTimeout } from '../middlewares/sessionTimeout.middleware'; 
 
 const router = Router();
 
