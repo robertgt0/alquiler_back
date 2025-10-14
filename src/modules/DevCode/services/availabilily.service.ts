@@ -1,9 +1,20 @@
-export const getAvailabilityService = async (providerId: string) => {
+export interface AvailabilityResponse {
+  providerId: string;
+  date: string;
+  slots: string[];
+}
+
+export const getAvailabilityService = async (
+  providerId: string,
+  date?: string
+): Promise<AvailabilityResponse> => {
+  // Reemplazar este mock por la lógica real que
+  // consulte la disponibilidad de horarios del proveedor y excluya las citas reservadas.
+  const normalizedDate = date || new Date().toISOString().slice(0, 10);
+
   return {
     providerId,
-    availability: [
-      { date: "2025-10-08", slots: ["09:00", "11:00", "14:00"] },
-      { date: "2025-10-09", slots: ["10:00", "13:00", "15:00"] },
-    ],
+    date: normalizedDate,
+    slots: ['09:00', '09:30', '10:00', '10:30'],
   };
 };

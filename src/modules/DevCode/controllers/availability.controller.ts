@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from "express";
-import { getAvailabilityService } from "../services/availabilily.service"
+import { Request, Response, NextFunction } from 'express';
+import { getAvailabilityService } from '../services/availabilily.service';
 
 export const getProviderAvailability = async (
   req: Request,
@@ -8,9 +8,13 @@ export const getProviderAvailability = async (
 ) => {
   try {
     const { providerId } = req.params;
-    const data = await getAvailabilityService(providerId);
-    res.json(data);
+    const { date } = req.query;
+    const selectedDate = typeof date === 'string' ? date : undefined;
+
+    const data = await getAvailabilityService(providerId, selectedDate);
+    res.json({ success: true, data });
   } catch (err) {
     next(err);
   }
 };
+
