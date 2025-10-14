@@ -10,9 +10,11 @@ export class UsuarioService {
    */
   async registrarUsuario(data: CrearUsuarioDto): Promise<UsuarioDocument> {
     // Validación de contraseña
+    if (data.password) {
     if (!validarPassword(data.password)) {
       throw new Error('La contraseña no cumple con los requisitos mínimos');
     }
+   }
 
     // Verificar si el correo ya está registrado
     const existe = await Usuario.findOne({ correoElectronico: data.correoElectronico });
