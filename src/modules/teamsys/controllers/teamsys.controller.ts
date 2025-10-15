@@ -39,9 +39,7 @@ export const getById = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-/*crear nuevo usr 
-  que verifique si un usr con el mismo 
-*/
+/*crear nuevo usr */
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
     const data = await teamsysService.create(req.body);
@@ -92,61 +90,6 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
     res.json({
       success: true,
       message: 'Registro eliminado correctamente',
-    });
-  } catch (error) {
-    handleError(error, res);
-  }
-};
-
-/**
- * tarea: endpoint de autenticacion
- * Registrar un nuevo usuario (versión autenticación)
- * Este endpoint se usa para crear usuarios con validación previa
- */
-export const registerUser = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const data = req.body;
-    const nuevoUsuario = await teamsysService.create(data);
-    res.status(201).json({
-      success: true,
-      message: 'Usuario registrado correctamente',
-      data: nuevoUsuario,
-    });
-  } catch (error) {
-    handleError(error, res);
-  }
-};
-
-/**
- * Iniciar sesión de un usuario existente
- * Verifica correo y contraseña
- */
-export const loginUser = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { correoElectronico, password } = req.body;
-
-    if (!correoElectronico || !password) {
-      res.status(400).json({
-        success: false,
-        message: 'El correo electrónico y la contraseña son requeridos',
-      });
-      return;
-    }
-
-    const usuario = await teamsysService.autenticarUsuario(correoElectronico, password);
-
-    if (!usuario) {
-      res.status(401).json({
-        success: false,
-        message: 'Credenciales inválidas',
-      });
-      return;
-    }
-
-    res.json({
-      success: true,
-      message: 'Inicio de sesión exitoso',
-      data: usuario,
     });
   } catch (error) {
     handleError(error, res);

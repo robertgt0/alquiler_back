@@ -6,10 +6,8 @@ import {
   update,
   remove
 } from '../controllers/teamsys.controller';
-
 import { validateData } from '../middlewares/validate.middleware';
-import { registerUser, loginUser } from '../controllers/teamsys.controller';
-
+import { authController } from '../controllers/auth.controller';
 
 const router = Router();
 
@@ -32,6 +30,4 @@ router.delete('/usuario/:id', remove);
 router.post("/google/callback", authController.googleCallback);
 router.get("/me", authController.getCurrentUser);
 
-router.post('/auth/register', validateData, registerUser);
-router.post('/auth/login', loginUser);
 export default router;

@@ -10,11 +10,9 @@ export class UsuarioService {
    */
   async registrarUsuario(data: CrearUsuarioDto): Promise<UsuarioDocument> {
     // Validación de contraseña
-    if (data.password) {
     if (!validarPassword(data.password)) {
       throw new Error('La contraseña no cumple con los requisitos mínimos');
     }
-   }
 
     // Verificar si el correo ya está registrado
     const existe = await Usuario.findOne({ correoElectronico: data.correoElectronico });
@@ -38,21 +36,6 @@ export class UsuarioService {
   }
 
   /**
-   * Impedir que el usuario acceda al sistema si la contraseña es incorrecta.
- * Verifica que el correo y la contraseña coincidan con un usuario registrado
- * @param correo - Correo electrónico del usuario que intenta iniciar sesión
- * @param password - Contraseña a verificiar, comparar e impedir si no es el caso
- * @returns UsuarioDocument si las contraseñas coinciden, null si no
- */
-async autenticarUsuario(correo: string, password: string): Promise<UsuarioDocument | null> {
-  const usuario = await Usuario.findOne({ correoElectronico: correo });
-  if (!usuario) return null;
-  if (usuario.password !== password) return null;
-  return usuario;
-}
-
-
-  /**
    * Obtener todos los usuarios
    */
   async getAll(): Promise<UsuarioDocument[]> {
@@ -64,6 +47,13 @@ async autenticarUsuario(correo: string, password: string): Promise<UsuarioDocume
    */
   async getById(id: string): Promise<UsuarioDocument | null> {
     return await Usuario.findById(id);
+  }
+
+  /**
+   * Obtener un usuario por Email
+   */
+  async getByEmail(email: string): Promise<UsuarioDocument | null> {
+    return await Usuario.findOne({correoElectronico: email})
   }
 
   /**

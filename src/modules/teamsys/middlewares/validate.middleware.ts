@@ -1,28 +1,21 @@
 import { Request, Response, NextFunction } from 'express';
-import { CrearUsuarioDto } from '../types';  
-import { limpiarInput } from '../utils/validaciones';
+import { CrearUsuarioDto } from '../types';
 
 export const validateData = (req: Request, res: Response, next: NextFunction): void => {
-  
-  try{
-  const { nombre, correoElectronico, telefono, password, terminosYCondiciones }: CrearUsuarioDto = limpiarInput(req.body)as CrearUsuarioDto;
-  
-  const nombreValido = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{2,50}$/;
-  const telefonoValido = /^[1-9][0-9]{7}$/;
-  const correoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const { nombre, correoElectronico, telefono, password, terminosYCondiciones }: CrearUsuarioDto = req.body;
 
-  if (!nombre || typeof nombre !== 'string' || !nombreValido.test(nombre)) {
-    res.status(400).json({ success: false, message: 'El campo nombre es requerido y debe ser texto y debe tener entre 2 y 50 letras' });
+  if (!nombre || typeof nombre !== 'string') {
+    res.status(400).json({ success: false, message: 'El campo nombre es requerido y debe ser texto' });
     return;
   }
 
-  if (!correoElectronico || typeof correoElectronico !== 'string'|| !correoValido.test(correoElectronico)) {
-    res.status(400).json({ success: false, message: 'El correo electrónico es requerido y corrige si metiste un correo chafa' });
+  if (!correoElectronico || typeof correoElectronico !== 'string') {
+    res.status(400).json({ success: false, message: 'El correo electrónico es requerido y debe ser texto' });
     return;
   }
 
-  if (!telefono || typeof telefono !== 'string'||!telefonoValido.test(telefono)) {
-    res.status(400).json({ success: false, message: 'El teléfono es requerido y debe tener 8 digitos y no comenzar con 0' });
+  if (!telefono || typeof telefono !== 'string') {
+    res.status(400).json({ success: false, message: 'El teléfono es requerido y debe ser texto' });
     return;
   }
 
@@ -33,10 +26,6 @@ export const validateData = (req: Request, res: Response, next: NextFunction): v
 
   if (terminosYCondiciones !== true) {
     res.status(400).json({ success: false, message: 'Debes aceptar los términos y condiciones' });
-    return;
-  }
-  }catch(e){
-    res.status(400).json({ success: false, message: 'modelo de usaurio no valido' });
     return;
   }
 
