@@ -1,9 +1,16 @@
 import { Router } from "express";
-import { getProveedores } from "../controllers/providers.controller";
-import { getProveedor } from "../controllers/providers.controller";
+import {
+  getProveedores,
+  getProveedor,
+  getProviderBusySlots,
+  getProviderAvailableSlots,
+} from "../controllers/providers.controller";
+
 const router = Router();
 
 router.get("/", getProveedores);
+router.get("/:providerId/available-slots", getProviderAvailableSlots);
+router.get("/:providerId/busy-slots", getProviderBusySlots);
 router.get("/:providerId", getProveedor);
 
 export default router;

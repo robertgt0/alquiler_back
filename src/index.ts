@@ -6,6 +6,7 @@ import availabilityRoutes from './modules/DevCode/routes/availability.routes';
 import overlapRoutes from './modules/DevCode/routes/overlap.routes';
 import bookingRoutes from './modules/DevCode/routes/booking.routes';
 import providersRoute from './modules/DevCode/routes/providers.routes'// Cargar variables de entorno
+import appointmentsRoutes from './modules/DevCode/routes/appointments.routes';
 dotenv.config();
 
 // Crear aplicación Express
@@ -18,6 +19,7 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 
 // Ruta raíz
 app.get('/', (req: Request, res: Response) => {
@@ -48,6 +50,8 @@ app.use('/api/devcode', overlapRoutes);
 app.use('/api/devcode', availabilityRoutes);
 
 app.use('/api/providers', providersRoute);
+app.use('/api/appointments', appointmentsRoutes);
+
 // ============================================
 // Manejo de errores 404
 // ============================================
