@@ -27,13 +27,12 @@ export interface HorarioDisponible{
   horaInicio: string;
   horaFin: string;
   costoHora: number;
-  disponible: boolean;
 }
 export interface DiaDisponibilidad{
   fecha: string; // Formato YYYY-MM-DD
-  disponible: boolean;
-  horarios?: HorarioDisponible[];
+  horarios: HorarioDisponible[];
 }
+
 export interface CalendarioMensual {
   proveedorId: string;
   mes: number;

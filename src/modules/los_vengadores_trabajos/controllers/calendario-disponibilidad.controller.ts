@@ -18,16 +18,26 @@ export const DisponibilidadController = {
         });
       }
 
+      const mesNum = parseInt(mes as string);
+      const anioNum = parseInt(anio as string);
+
+      // Validar rangos
+      if (mesNum < 1 || mesNum > 12) {
+        return res.status(400).json({ 
+          error: "El mes debe estar entre 1 y 12"
+        });
+      }
+
       const calendario = await DisponibilidadService.obtenerCalendarioMensual(
         proveedorId,
-        parseInt(mes as string),
-        parseInt(anio as string)
+        mesNum,
+        anioNum
       );
 
       res.json({
         proveedorId,
-        mes: parseInt(mes as string),
-        anio: parseInt(anio as string),
+        mes: mesNum,
+        anio: anioNum,
         dias: calendario
       });
     } catch (error) {
