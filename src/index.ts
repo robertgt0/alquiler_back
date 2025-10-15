@@ -6,6 +6,7 @@ import { connectMongo } from './config/mongoose';
 import offersRouter from './routes/offers';
 import nombreGrupoEjemploRouter from './modules/nombre_grupo_ejemplo';
 import fixerModule from './modules/fixer';
+import categoriesModule from './modules/categories';
 
 const app = express();
 
@@ -31,7 +32,8 @@ app.get('/', (_req: Request, res: Response) => {
     modules: [
       '/api/offers',
       '/api/nombre_grupo_ejemplo',
-      '/api/fixer'
+      '/api/fixer',
+      '/api/categories'
     ]
   });
 });
@@ -49,6 +51,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
 app.use('/api/offers', offersRouter);
 app.use('/api/nombre_grupo_ejemplo', nombreGrupoEjemploRouter);
 app.use('/api/fixer', fixerModule);
+app.use('/api/categories', categoriesModule);
 
 app.use((req: Request, res: Response) => {
   res.status(404).json({
@@ -70,7 +73,7 @@ connectMongo()
   .then(() => {
     app.listen(PORT, () => {
       console.log(`🚀 API listening on port ${PORT}`);
-      console.log('📦 Módulos disponibles: /api/offers, /api/nombre_grupo_ejemplo, /api/fixer');
+      console.log('📦 Módulos disponibles: /api/offers, /api/nombre_grupo_ejemplo, /api/fixer, /api/categories');
     });
   })
   .catch((e) => {
