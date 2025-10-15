@@ -9,7 +9,8 @@ export const getProviderAvailability = async (
   try {
     const { providerId } = req.params;
     const { date } = req.query;
-    
+    const selectedDate = typeof date === 'string' ? date : undefined;
+
     // 1. VALIDACIÓN OBLIGATORIA (Corrige el error de tipado y el error 400)
     if (typeof date !== 'string' || !date) {
         return res.status(400).json({ 
