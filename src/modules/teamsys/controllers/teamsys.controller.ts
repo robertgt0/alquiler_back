@@ -18,6 +18,23 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+export const existsByEmail = async (req: Request, res: Response) => {
+  try {
+    const email = (req.query.email ?? '').toString().trim();
+
+    if (!email) {
+      return res.status(400).json({ error: 'El parámetro "email" es requerido' });
+    }
+
+    const exists = await teamsysService.verificarCorreo(email);
+
+    return res.json({ exists });
+  } catch (err) {
+    console.error('Error en existsByEmail:', err);
+    return res.status(500).json({ error: 'Error interno del servidor' });
+  }
+};
+
 /*obtener usr por id */
 export const getById = async (req: Request, res: Response): Promise<void> => {
   try {

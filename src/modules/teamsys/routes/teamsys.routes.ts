@@ -4,11 +4,13 @@ import {
   getById,
   create,
   update,
-  remove
+  remove,
+  existsByEmail
 } from '../controllers/teamsys.controller';
 import { validateData } from '../middlewares/validate.middleware';
 import { authController } from '../controllers/auth.controller';
 import { registerUser, loginUser } from '../controllers/teamsys.controller';
+import { UsuarioService } from '../services/teamsys.service';
 
 
 const router = Router();
@@ -27,7 +29,7 @@ router.put('/usuario/:id', update);
 router.delete('/usuario/:id', remove);
 router.post('/auth/register', validateData, registerUser);
 router.post('/auth/login', loginUser);
-
+router.get('/exists', existsByEmail);
 /**
  * Auth routes
  */
