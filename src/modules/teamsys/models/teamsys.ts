@@ -5,9 +5,6 @@ import { UsuarioDocument } from '../types/index';
 // Esquema de Mongoose
 const usuarioSchema = new Schema<UsuarioDocument>(
   {
-    _id:{
-      type:Object
-    },
     nombre: {
       type: String,
       required: [true, 'El nombre es requerido'],
