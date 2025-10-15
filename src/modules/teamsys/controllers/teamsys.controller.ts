@@ -39,7 +39,9 @@ export const getById = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-/*crear nuevo usr */
+/*crear nuevo usr 
+  que verifique si un usr con el mismo 
+*/
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
     const data = await teamsysService.create(req.body);
