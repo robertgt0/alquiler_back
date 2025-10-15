@@ -68,9 +68,7 @@ export class AuthService  {
             user = await teamsysService.create({
                 nombre: profile.name,
                 correoElectronico: profile.email,
-                telefono: '123456789',
-                password: '1234HHHHws.',
-                // fotoPerfil: profile.picture,
+                //fotoPerfil: profile.picture,
                 terminosYCondiciones: true,
             });
         }

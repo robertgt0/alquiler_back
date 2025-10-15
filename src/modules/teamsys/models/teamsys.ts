@@ -5,6 +5,9 @@ import { UsuarioDocument } from '../types/index';
 // Esquema de Mongoose
 const usuarioSchema = new Schema<UsuarioDocument>(
   {
+    _id:{
+      type:Object
+    },
     nombre: {
       type: String,
       required: [true, 'El nombre es requerido'],
@@ -16,7 +19,6 @@ const usuarioSchema = new Schema<UsuarioDocument>(
     },
     telefono: {
       type: String,
-      required: [true, 'El teléfono es requerido'],
       trim: true,
     },
     correoElectronico: {
@@ -28,7 +30,6 @@ const usuarioSchema = new Schema<UsuarioDocument>(
     },
     password: {
       type: String,
-      required: [true, 'La contraseña es requerida'],
       minlength: [6, 'La contraseña debe tener al menos 6 caracteres'],
     },
     fotoPerfil: {
