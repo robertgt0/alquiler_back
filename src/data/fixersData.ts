@@ -5,7 +5,7 @@ export const fixersDefinidos = [
     especialidad: "Electricidad",
     descripcion: "Especialista en instalaciones eléctricas residenciales e industriales",
     rating: 4.8,
-    whatsapp: "+59171234567",
+    whatsapp: "+59164893768",
     verified: true
   },
   {
@@ -23,7 +23,7 @@ export const fixersDefinidos = [
     especialidad: "Pintura",
     descripcion: "Pintura interior y exterior, preparación de superficies, texturizados",
     rating: 4.7,
-    whatsapp: "+59170123456",
+    whatsapp: "+59177966624",
     verified: true
   },
   {
