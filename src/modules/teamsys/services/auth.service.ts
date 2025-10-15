@@ -107,6 +107,7 @@ export class AuthService  {
         const profile = await this.getGoogleUserProfile(googleTokens.access_token);
 
         const user = await this.findOrCreateUser(profile);
+        if (user==null)return null;
 
         const tokens = this.generateTokens(user); 
 

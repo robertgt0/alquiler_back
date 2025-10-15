@@ -23,7 +23,7 @@ export const validateData = (req: Request, res: Response, next: NextFunction): v
 
   if (!telefono || typeof telefono !== 'string'||!telefonoValido.test(telefono)) {
     res.status(400).json({ success: false, message: 'El teléfono es requerido y debe tener 8 digitos y no comenzar con 0' });
-    return;g
+    return;
   }
 
   if (!password || typeof password !== 'string') {

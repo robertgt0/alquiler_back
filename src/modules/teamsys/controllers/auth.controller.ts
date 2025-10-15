@@ -22,8 +22,15 @@ export class AuthController {
         // throw new Error('Authorizaction code is required');
       }
 
-      const result  = await this.authService.loginWithGoogle(code as string);
+      const result  = await this.authService.loginWithGoogle(code as string)
+      if (result==null){
+        res.status(400).json({
+          success: false,
+          data: result,
+          message: 'Usuario ya registrado correctamente!',
+      });
 
+      } 
       res.status(200).json({
           success: true,
           data: result,
