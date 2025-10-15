@@ -2,6 +2,7 @@
 
 import { Router } from 'express';
 import trabajoRoutes from './routes/trabajo.routes';
+import disponibilidad from './routes/calendario-disponibilidad.routes';
 
 const router = Router();
 
@@ -13,12 +14,14 @@ router.get('/', (req, res) => {
     description: 'Endpoints para listar trabajos agendados para proveedores y clientes.',
     endpoints: {
       proveedor: '/api/vengadores/trabajos/proveedor',
-      cliente: '/api/vengadores/trabajos/cliente/:clienteId'
+      cliente: '/api/vengadores/trabajos/cliente/:clienteId',
+      calendarioDisponibilidad: '/api/los_vengadores_trabajos/calendario-disponibilidad'
     }
   });
 });
 
+
 // Montar las sub-rutas funcionales del modulo (las que creamos)
 router.use('/', trabajoRoutes);
-
+router.use('/calendario-disponibilidad', disponibilidad);
 export default router;
