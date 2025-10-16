@@ -1,0 +1,25 @@
+{
+    "name": "gmail-notificacion",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "engines": { "node": ">=18" },
+    "scripts": {
+        "dev": "tsx watch src/index.ts",
+        "start": "node --enable-source-maps dist/index.js",
+        "build": "tsc -p ."
+    },
+    "dependencies": {
+        "dotenv": "^16.4.5",
+        "fastify": "^4.28.1",
+        "google-auth-library": "^9.14.2",
+        "googleapis": "^135.0.0",
+        "mailparser": "^3.7.1",
+        "pino": "^9.3.2",
+        "zod": "^3.23.8"
+    },
+    "devDependencies": {
+        "tsx": "^4.16.2",
+        "typescript": "^5.6.3"
+    }
+}
