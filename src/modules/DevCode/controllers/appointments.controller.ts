@@ -20,6 +20,11 @@ export const createAppointment = async (req: Request, res: Response, next: NextF
       return res.status(400).json({ message: "Faltan campos obligatorios" });
     }
 
+    // VALIDACIÓN DE CAMPO OBLIGATORIO: ubicacion
+     if (!ubicacion || typeof ubicacion !== 'string' || ubicacion.trim() === '') {
+      return res.status(400).json({ message: "La ubicación es un campo obligatorio y no puede estar vacío." });
+    }
+
     if (!Types.ObjectId.isValid(cliente) || !Types.ObjectId.isValid(proveedor)) {
       return res.status(400).json({ message: "IDs inválidos" });
     }
