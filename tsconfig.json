@@ -1,44 +1,46 @@
 {
   "compilerOptions": {
+    /* === Salida y estructura === */
     "outDir": "./dist",
     "rootDir": "./src",
     "sourceMap": true,
-    "declaration": false,
+    "declaration": false,                 // No generar .d.ts para evitar ruido
     "removeComments": true,
 
-    "target": "ES2020",
-    "module": "CommonJS",
-    "moduleResolution": "Node",
-    "lib": ["ES2020"],
+    /* === Módulos y compatibilidad === */
+    "target": "ES2022",                   // Mejor rendimiento y soporte moderno
+    "module": "NodeNext",                 // Recomendado para Node 18+ / 20+
+    "moduleResolution": "NodeNext",       // Compatible con imports ESM/CommonJS
+    "lib": ["ES2022", "DOM"],             // DOM opcional por si usas fetch u otras APIs
 
+    /* === Comportamiento del compilador === */
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
 
+    /* === Imports === */
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
 
+    /* === Alias === */
     "baseUrl": "./src",
     "paths": {
       "@/*": ["*"],
-
-      /* 👇 alias específicos para TU estructura */
-      "@teamsys/*": ["modules/teamsys/*"],
-      "@teamsys/models/*": ["modules/teamsys/models/*"],
-      "@teamsys/controllers/*": ["modules/teamsys/controllers/*"],
-      "@teamsys/services/*": ["modules/teamsys/services/*"],
-      "@teamsys/routes/*": ["modules/teamsys/routes/*"],
-      "@teamsys/middlewares/*": ["modules/teamsys/middlewares/*"],
-      "@teamsys/utils/*": ["modules/teamsys/utils/*"]
+      "@config/*": ["config/*"],
+      "@modules/*": ["modules/*"],
+      "@controllers/*": ["modules/*/controllers/*"],
+      "@services/*": ["modules/*/services/*"],
+      "@models/*": ["modules/*/models/*"],
+      "@utils/*": ["utils/*"]
     },
 
-    /* ❌ quitar: rompe build con emit */
-    // "allowImportingTsExtensions": true,
-
-    "incremental": true
+    /* === Nueva opción para desarrolladores === */
+    "allowImportingTsExtensions": true,   // Útil con moduleResolution NodeNext
+    "noUncheckedIndexedAccess": false,    // Puedes activarlo para aún más seguridad
+    "incremental": true                   // Compilación incremental más rápida
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "**/*.test.ts"]
