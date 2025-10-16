@@ -72,8 +72,7 @@ export const getAvailabilityService = async (
     // Filtrar los slots disponibles
     const availableSlots = allSlots.filter(slot => {
       const isReserved = reservedAppointments.some(reserved => 
-        // Llama a la función de superposición corregida (que usa getTime())
-        checkOverlap(slot.start, slot.end, reserved.horaInicio, reserved.horaFin) 
+      checkOverlap(slot.start, slot.end, reserved.horaInicio, reserved.horaFin) 
       );
       return !isReserved; 
     });
