@@ -5,3 +5,4 @@ dist/
 *.log
 build/
 coverage/tsconfig.tsbuildinfo
+tsconfig.tsbuildinfo
