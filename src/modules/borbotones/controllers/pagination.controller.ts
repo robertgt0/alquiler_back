@@ -1,55 +1,23 @@
 import { Request, Response } from 'express';
 
-// Intentar diferentes formas de importar la conexión
-let testConnection;
-
-try {
-  // Opción 1: Si el archivo se llama connection.ts
-  const connectionModule = require('../config/connections/connection');
-  testConnection = connectionModule.testConnection;
-} catch (error) {
-  try {
-    // Opción 2: Si el archivo se llama conecction.ts
-    const connectionModule = require('../config/connections/conecction');
-    testConnection = connectionModule.testConnection;
-  } catch (error) {
-    try {
-      // Opción 3: Si el archivo tiene otro nombre
-      const connectionModule = require('../config/connections/index');
-      testConnection = connectionModule.testConnection;
-    } catch (error) {
-      console.error('No se pudo cargar el módulo de conexión:', error);
-    }
-  }
-}
-
-// Si no se encuentra la conexión, crear una por defecto
-if (!testConnection) {
-  console.log('Usando conexión por defecto');
-  const { MongoClient } = require('mongodb');
-
-  testConnection = async () => {
-    const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://isindira:j5z3oE8XJx4kQb8V@isindira.nqvltjf.mongodb.net/isindira';
-    const client = new MongoClient(MONGODB_URI);
-    await client.connect();
-    console.log('Conectado a MongoDB con conexión por defecto');
-    return client;
-  };
-}
+// Importación directa y simple del módulo de conexión
+import { getDatabase } from '../config/conecction';
 
 export const getUsuariosPaginados = async (req: Request, res: Response) => {
-  let client;
+  let client: any = null;
+
   try {
-    // Verificar que la conexión esté disponible
-    if (!testConnection) {
+    console.log('🔄 Iniciando consulta de usuarios paginados...');
+
+    // Opción 1: Usar getDatabase (recomendado)
+    const db = await getDatabase();
+    if (!db) {
+      console.error('❌ getDatabase devolvió undefined');
       return res.status(500).json({
         success: false,
-        message: 'Módulo de conexión no disponible'
+        message: 'Error al obtener la conexión a la base de datos'
       });
     }
-
-    client = await testConnection();
-    const db = client.db();
     const usuariosCollection = db.collection('usuarios');
 
     // Parámetros de paginación
@@ -81,6 +49,15 @@ export const getUsuariosPaginados = async (req: Request, res: Response) => {
     const sortOrder = (req.query.sortOrder as string) === 'asc' ? 1 : -1;
     const sort: any = { [sortField]: sortOrder };
 
+    console.log('📋 Parámetros de búsqueda:', {
+      page,
+      limit,
+      skip,
+      filtros,
+      sortField,
+      sortOrder
+    });
+
     // Ejecutar consulta con paginación
     const [usuarios, total] = await Promise.all([
       usuariosCollection
@@ -96,6 +73,8 @@ export const getUsuariosPaginados = async (req: Request, res: Response) => {
     const totalPages = Math.ceil(total / limit);
     const hasNextPage = page < totalPages;
     const hasPrevPage = page > 1;
+
+    console.log(`✅ Consulta exitosa: ${usuarios.length} usuarios de ${total} total`);
 
     res.json({
       success: true,
@@ -113,16 +92,13 @@ export const getUsuariosPaginados = async (req: Request, res: Response) => {
     });
 
   } catch (error) {
-    console.error('Error en getUsuariosPaginados:', error);
+    console.error('❌ Error en getUsuariosPaginados:', error);
     res.status(500).json({
       success: false,
       message: 'Error interno del servidor',
       error: error instanceof Error ? error.message : 'Error desconocido'
     });
-  } finally {
-    if (client) {
-      await client.close();
-    }
   }
 };
+
 
