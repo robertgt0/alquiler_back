@@ -27,7 +27,7 @@ export class AuthController {
         res.status(400).json({
           success: false,
           data: result,
-          message: 'Usuario ya registrado correctamente!',
+          message: 'usuario ya registrado',
       });
 
       } 

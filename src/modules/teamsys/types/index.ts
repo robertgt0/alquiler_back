@@ -26,9 +26,9 @@ export interface OtraInterface {
 export interface UsuarioDocument extends Document {
   nombre: string;
   apellido?: string;
-  telefono: string;
+  telefono?: string;
   correoElectronico: string;
-  password: string;
+  password?: string;
   fotoPerfil?: Buffer; // Binario (imagen)
   ubicacion?: {
     type: 'Point';
@@ -45,5 +45,6 @@ export interface CrearUsuarioDto {
   correoElectronico: string;
   telefono?: string;
   password?: string;
+  fotoPerfil?:any;
   terminosYCondiciones: boolean;
 }

@@ -20,16 +20,17 @@ export const validateData = (req: Request, res: Response, next: NextFunction): v
     res.status(400).json({ success: false, message: 'El correo electrónico es requerido y corrige si metiste un correo chafa' });
     return;
   }
-
+  if(telefono!=null){
   if (!telefono || typeof telefono !== 'string'||!telefonoValido.test(telefono)) {
     res.status(400).json({ success: false, message: 'El teléfono es requerido y debe tener 8 digitos y no comenzar con 0' });
     return;
-  }
+  }}
 
+  if(password!=null){
   if (!password || typeof password !== 'string') {
     res.status(400).json({ success: false, message: 'La contraseña es requerida y debe ser texto' });
     return;
-  }
+  }}
 
   if (terminosYCondiciones !== true) {
     res.status(400).json({ success: false, message: 'Debes aceptar los términos y condiciones' });

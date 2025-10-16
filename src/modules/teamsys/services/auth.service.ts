@@ -62,18 +62,18 @@ export class AuthService  {
     }
 
     async findOrCreateUser(profile: GoogleUserProfile): Promise<UsuarioDocument> {
-        let user = await teamsysService.getByEmail(profile.email);
-        console.log({user})
-        if (! user) {
-            user = await teamsysService.create({
+        let user = await teamsysService.verificarCorreo(profile.email);
+        console.log(user)
+        if (!user) {
+            return  {
                 nombre: profile.name,
                 correoElectronico: profile.email,
-                //fotoPerfil: profile.picture,
+                fotoPerfil: profile.picture,
                 terminosYCondiciones: true,
-            });
+            }
         }
 
-        return user!;
+        return null;
     }
 
     generateAccessToken(payload: JWTPayload): string {
@@ -91,7 +91,7 @@ export class AuthService  {
     generateTokens(user: UsuarioDocument): AuthTokens {
         console.log({user})
         const payload: JWTPayload = {
-            userId: user._id.toString(),
+            userId: "",
             email: user.correoElectronico,
         }
         
