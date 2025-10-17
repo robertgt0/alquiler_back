@@ -92,3 +92,16 @@ modules/nombre_grupo_ejemplo/models/Ejemplo.ts (MongoDB)
 
 -------------------------------------------------------------------------------
 Detalles y Documentacion del modulo de Notification (endpoints y esquemas)
+
+npm install nodemailer googleapis uuid winston
+
+npm install -D @types/nodemailer @types/uuid
+
+npm install uuid
+
+npm install -D @types/express-validator
+
+npm install express-validator
+
+npm install --save-dev @types/express-validator
+

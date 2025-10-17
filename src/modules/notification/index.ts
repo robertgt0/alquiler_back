@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import ejemploRoutes from './routes/notificationRoutes';
+import ejemploRoutes from './routes/notification.routes';
 
 const router = Router();
 
