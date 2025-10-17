@@ -112,3 +112,8 @@ npm install --save-dev @types/express-validator @types/nodemailer @types/uuid
 npm install validator
 
 npm i --save-dev @types/validator
+
+
+npm install nodemailer googleapis
+
+npm install -D @types/nodemailer

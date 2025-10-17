@@ -1,137 +1,80 @@
-import { v4 as uuidv4 } from "uuid";
-import { GmailProvider } from "../providers/email.provider";
+import { sendMail } from "../providers/email.provider";
 import { NotificationModel } from "../models/notification.model";
-import { NotificationPayload } from "../models/notification.types";
-import { logNotification } from "../../../utils/logger";
-import validator from "validator";
+import { v4 as uuidv4 } from "uuid";
 
-const MAX_ATTEMPTS = 3;
+interface Destination {
+  email: string;
+  name?: string;
+}
+
+interface NotificationPayload {
+  subject: string;
+  message: string;
+  destinations: Destination[];
+  fromName?: string;
+}
 
 export class NotificationService {
-  private createProvider() {
-    return new GmailProvider({
-      mode: process.env.NOTIFICATIONS_GMAIL_MODE as any,
-      user: process.env.NOTIFICATIONS_GMAIL_USER!,
-      pass: process.env.NOTIFICATIONS_GMAIL_APP_PASS,
-      clientId: process.env.GMAIL_CLIENT_ID,
-      clientSecret: process.env.GMAIL_CLIENT_SECRET,
-      refreshToken: process.env.GMAIL_REFRESH_TOKEN,
-    });
-  }
-
+  /**
+   * Crea una notificación, la envía y la guarda en base de datos.
+   */
   async createAndSend(payload: NotificationPayload, fromName?: string) {
     const transactionId = uuidv4();
+    const { subject, message, destinations } = payload;
 
-    // 1️⃣ Crear registro inicial en la base de datos (estado: pending)
-    const doc = await NotificationModel.create({
-      transactionId,
-      ...payload,
-      status: "pending",
-      attempts: 0,
-      lastError: null,
-      createdAt: new Date(),
+    if (!subject || !message || !destinations?.length) {
+      throw new Error("Datos de notificación incompletos");
+    }
+
+    const toEmails = destinations.map((d) => d.email);
+
+    const from =
+      fromName && process.env.NOTIFICATIONS_GMAIL_USER
+        ? `"${fromName}" <${process.env.NOTIFICATIONS_GMAIL_USER}>`
+        : process.env.NOTIFICATIONS_GMAIL_USER;
+
+    const result = await sendMail({
+      to: toEmails,
+      subject,
+      html: message,
+      from,
     });
 
-    const provider = this.createProvider();
-
-    // ✅ 1.5 Verificar formato de correos ANTES de enviar
-    for (const dest of payload.destinations) {
-      if (!dest.email || !validator.isEmail(dest.email)) {
-        await NotificationModel.findByIdAndUpdate(doc._id, {
-          $set: {
-            status: "failed",
-            lastError: `Correo inválido: ${dest.email}`,
-          },
-        });
-
-        // Registrar log de error
-        logNotification(dest.email || "(sin email)", "FALLIDO", transactionId, "Formato de correo inválido");
-
-        throw new Error(`Correo inválido: ${dest.email}`);
-      }
-    }
-
-    // 2️⃣ Enviar a cada destinatario con reintentos
-    for (const dest of payload.destinations) {
-      let attempt = 0;
-      let success = false;
-
-      while (attempt < MAX_ATTEMPTS && !success) {
-        attempt++;
-        try {
-          const info = await provider.send(
-            dest.email!,
-            payload.subject,
-            payload.message,
-            fromName
-          );
-
-          // ✅ Actualizar base de datos al éxito
-          await NotificationModel.findByIdAndUpdate(doc._id, {
-            $set: {
-              status: "sent",
-              sentAt: new Date(),
-              providerResponse: info,
-            },
-            $inc: { attempts: 1 },
-          });
-
-          // 🧾 Log de éxito
-          logNotification(dest.email!, "OK", transactionId);
-
-          success = true;
-        } catch (err: any) {
-          const lastError = err.message || String(err);
-
-          // ❌ Registrar intento fallido
-          await NotificationModel.findByIdAndUpdate(doc._id, {
-            $inc: { attempts: 1 },
-            $set: { lastError, providerResponse: err },
-          });
-
-          // 🧾 Log de fallo
-          logNotification(dest.email!, "FALLIDO", transactionId, lastError);
-
-          if (attempt < MAX_ATTEMPTS) {
-            const backoff = 500 * Math.pow(2, attempt - 1);
-            await new Promise((r) => setTimeout(r, backoff));
-          } else {
-            // 🚨 Marcar como fallido tras agotar intentos
-            await NotificationModel.findByIdAndUpdate(doc._id, {
-              $set: { status: "failed", lastError },
-            });
-          }
-        }
-      }
-    }
-
-    // 3️⃣ Retornar el estado final del registro
-    const updated = await NotificationModel.findOne({ transactionId });
-    return { transactionId, notification: updated };
+    const notification = await NotificationModel.create({
+      transactionId,
+      subject,
+      message,
+      destinations, // 👈 este es el campo correcto del schema
+      channel: "email",
+      status: result.success ? "sent" : "failed",
+      providerResponse: result.info,
+      sentAt: new Date(),
+    });
+    return { transactionId, notification };
   }
 
-  async getByTransactionId(transactionId: string) {
-    return NotificationModel.findOne({ transactionId }).lean();
+  async getByTransactionId(id: string) {
+    return NotificationModel.findOne({ transactionId: id });
   }
 
-  async list(filter: any = {}, limit = 20, page = 1) {
-    const skip = (page - 1) * limit;
-    const q: any = {};
+  async list(filters: any, limit = 20, page = 1) {
+    const query: any = {};
 
-    if (filter.status) q.status = filter.status;
-    if (filter.to) q["destinations.email"] = filter.to;
+    if (filters.status) query.status = filters.status;
+    if (filters.to) query.to = { $in: [filters.to] };
+    if (filters.fromDate || filters.toDate) {
+      query.createdAt = {};
+      if (filters.fromDate) query.createdAt.$gte = new Date(filters.fromDate);
+      if (filters.toDate) query.createdAt.$lte = new Date(filters.toDate);
+    }
 
-    if (filter.fromDate || filter.toDate) q.createdAt = {};
-    if (filter.fromDate) q.createdAt.$gte = new Date(filter.fromDate);
-    if (filter.toDate) q.createdAt.$lte = new Date(filter.toDate);
-
-    const items = await NotificationModel.find(q)
+    const items = await NotificationModel.find(query)
       .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .lean();
+      .skip((page - 1) * limit)
+      .limit(limit);
 
-    const total = await NotificationModel.countDocuments(q);
-    return { items, total, page, limit };
+    const total = await NotificationModel.countDocuments(query);
+
+    return { items, total };
   }
 }
