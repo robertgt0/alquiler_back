@@ -1,0 +1,2 @@
+2025-10-17T15:30:59.334Z | TxID: bbed3172-c842-4f40-931b-fde2aa79e0a6 | To: adrianvallejosflores24@gmail.com | Estado: OK
+2025-10-17T15:38:16.964Z | TxID: a54ea266-59b4-4ee2-92e4-fabeeb75eb07 | To: adrivall1234@gmail.com | Estado: OK

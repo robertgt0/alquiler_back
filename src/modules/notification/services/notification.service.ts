@@ -1,23 +1,16 @@
 import { v4 as uuidv4 } from "uuid";
-import { logger } from "../../../utils/logger";
 import { GmailProvider } from "../providers/email.provider";
 import { NotificationModel } from "../models/notification.model";
 import { NotificationPayload } from "../models/notification.types";
+import { logNotification } from "../../../utils/logger";
 
 const MAX_ATTEMPTS = 3;
 
-function sleep(ms: number) {
-  return new Promise((res) => setTimeout(res, ms));
-}
-
 export class NotificationService {
-  private provider: GmailProvider;
-
-  constructor() {
-    const mode = (process.env.NOTIFICATIONS_GMAIL_MODE || "smtp") as any;
-    this.provider = new GmailProvider({
-      mode,
-      user: process.env.NOTIFICATIONS_GMAIL_USER || "",
+  private createProvider() {
+    return new GmailProvider({
+      mode: process.env.NOTIFICATIONS_GMAIL_MODE as any,
+      user: process.env.NOTIFICATIONS_GMAIL_USER!,
       pass: process.env.NOTIFICATIONS_GMAIL_APP_PASS,
       clientId: process.env.GMAIL_CLIENT_ID,
       clientSecret: process.env.GMAIL_CLIENT_SECRET,
@@ -25,80 +18,76 @@ export class NotificationService {
     });
   }
 
-  /**
-   * Crea y envía la notificación.
-   * Retorna el documento guardado (actualizado) y el resultado.
-   */
   async createAndSend(payload: NotificationPayload, fromName?: string) {
-    // Genera transactionId
     const transactionId = uuidv4();
 
-    // Crea registro inicial en DB (status pending)
+    // 1️⃣ Crear registro inicial en la base de datos (estado: pending)
     const doc = await NotificationModel.create({
       transactionId,
       ...payload,
       status: "pending",
       attempts: 0,
       lastError: null,
-      providerResponse: null,
+      createdAt: new Date(),
     });
 
-    // Intentos con reintentos
-    let attempt = 0;
-    let lastError: any = null;
-    let providerResponse: any = null;
+    const provider = this.createProvider();
 
-    // Para este PoC asumimos channel=email y una lista de destinations
+    // 2️⃣ Enviar a cada destinatario con reintentos
     for (const dest of payload.destinations) {
-      attempt = 0;
-      let sent = false;
+      let attempt = 0;
+      let success = false;
 
-      while (attempt < MAX_ATTEMPTS && !sent) {
+      while (attempt < MAX_ATTEMPTS && !success) {
         attempt++;
         try {
-          logger.info(`Intent ${attempt} - transaction ${transactionId} - sending to ${dest.email}`);
-          // Llamada real al provider
-          providerResponse = await this.provider.send(dest.email!, payload.subject, payload.message, fromName);
+          const info = await provider.send(
+            dest.email!,
+            payload.subject,
+            payload.message,
+            fromName
+          );
 
-          // Éxito -> actualizar DB
+          // ✅ Actualizar base de datos al éxito
           await NotificationModel.findByIdAndUpdate(doc._id, {
             $set: {
               status: "sent",
               sentAt: new Date(),
-              providerResponse,
+              providerResponse: info,
             },
-            $inc: { attempts: attempt },
-            $setOnInsert: { transactionId },
-          }, { new: true });
+            $inc: { attempts: 1 },
+          });
 
-          logger.info(`Sent OK transaction=${transactionId} to=${dest.email} info=${providerResponse?.messageId}`);
-          sent = true;
+          // 🧾 Log de éxito
+          logNotification(dest.email!, "OK", transactionId);
+
+          success = true;
         } catch (err: any) {
-          lastError = err?.message || String(err);
-          logger.error(`Attempt ${attempt} failed transaction=${transactionId} to=${dest.email} error=${lastError}`);
+          const lastError = err.message || String(err);
 
-          // Actualiza doc con intento fallido parcial
+          // ❌ Registrar intento fallido
           await NotificationModel.findByIdAndUpdate(doc._id, {
             $inc: { attempts: 1 },
             $set: { lastError, providerResponse: err },
-          }, { new: true });
+          });
+
+          // 🧾 Log de fallo
+          logNotification(dest.email!, "FALLIDO", transactionId, lastError);
 
           if (attempt < MAX_ATTEMPTS) {
-            // Backoff exponencial (500ms * 2^(attempt-1))
             const backoff = 500 * Math.pow(2, attempt - 1);
-            await sleep(backoff);
+            await new Promise((r) => setTimeout(r, backoff));
           } else {
-            // marcar como fallido
+            // 🚨 Marcar como fallido tras agotar intentos
             await NotificationModel.findByIdAndUpdate(doc._id, {
-              $set: { status: "failed", lastError, providerResponse: err },
-            }, { new: true });
-
-            logger.error(`Finalizado con error transaction=${transactionId} to=${dest.email}`);
+              $set: { status: "failed", lastError },
+            });
           }
         }
-      } // end while
-    } // end for
+      }
+    }
 
+    // 3️⃣ Retornar el estado final del registro
     const updated = await NotificationModel.findOne({ transactionId });
     return { transactionId, notification: updated };
   }
@@ -113,13 +102,17 @@ export class NotificationService {
 
     if (filter.status) q.status = filter.status;
     if (filter.to) q["destinations.email"] = filter.to;
-    if (filter.fromDate || filter.toDate) {
-      q.createdAt = {};
-      if (filter.fromDate) q.createdAt.$gte = new Date(filter.fromDate);
-      if (filter.toDate) q.createdAt.$lte = new Date(filter.toDate);
-    }
 
-    const items = await NotificationModel.find(q).sort({ createdAt: -1 }).skip(skip).limit(limit).lean();
+    if (filter.fromDate || filter.toDate) q.createdAt = {};
+    if (filter.fromDate) q.createdAt.$gte = new Date(filter.fromDate);
+    if (filter.toDate) q.createdAt.$lte = new Date(filter.toDate);
+
+    const items = await NotificationModel.find(q)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
     const total = await NotificationModel.countDocuments(q);
     return { items, total, page, limit };
   }
