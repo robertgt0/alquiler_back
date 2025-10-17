@@ -1,9 +1,10 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import connectDB from './config/database';;
+import connectDB from './config/database';
 
 import paginationRouter from './modules/borbotones/routes/pagination.router';
+import searchRouter from './modules/borbotones/routes/search.routes';
 
 // Cargar variables de entorno
 dotenv.config();
@@ -44,6 +45,7 @@ app.get('/api/health', (req: Request, res: Response) => {
 // ============================================
 // Montar tus módulos aquí:
 app.use('/api/borbotones', paginationRouter); //Historia de usuario P01
+app.use('/api/borbotones', searchRouter);
 
 
 // ============================================
