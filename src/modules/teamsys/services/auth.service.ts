@@ -1,6 +1,6 @@
 import axios from "axios";
 import jwt from "jsonwebtoken";
-import { UsuarioDocument } from "../types";
+import { UsuarioDocument, CrearUsuarioDto } from "../types";
 import { AuthTokens, GoogleTokenResponse, GoogleUserProfile, JWTPayload } from "../types/auth.types";
 import { TokenResponse } from "../types/token.types";
 import teamsysService from '../services/teamsys.service';
@@ -26,48 +26,46 @@ export class AuthService  {
 
     async exchangeCodeForTokens(code: string): Promise<GoogleTokenResponse> {
         try {
-            const requestBody = {
-                code: code,
-                client_id: process.env.GOOGLE_CLIENT_ID,
-                client_secret: process.env.GOOGLE_CLIENT_SECRET,
-                redirect_uri: process.env.GOOGLE_REDIRECT_URL,
-                grant_type: 'authorization_code',
-            };
+            const body = new URLSearchParams({
+    code,
+    client_id: process.env.GOOGLE_CLIENT_ID!,
+    client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+  redirect_uri: process.env.GOOGLE_REDIRECT_URL!, // (ojo con el nombre de env)
+    grant_type: 'authorization_code',
+});
 
-            const { data } = await axios.post<GoogleTokenResponse>(this.googleTokenUrl, requestBody);
-
-            return data;
+const { data } = await axios.post<GoogleTokenResponse>(
+    this.googleTokenUrl,
+    body,
+    { headers: { 'content-type': 'application/x-www-form-urlencoded' } }
+);
+return data; // ahora sí es GoogleUserProfile
         } catch (error: any) {
             throw new Error('Failed to exchange code for tokens');
         }
     }
 
     async getGoogleUserProfile(accessToken: string): Promise<GoogleUserProfile> {
-        try {
-            const headers = {
-                Authorization: `Bearer ${accessToken}`,
-            };
+    try {
+    const headers = { Authorization: `Bearer ${accessToken}` };
 
-            const { data } = await axios.get<GoogleTokenResponse>(
-                this.googleUserInfoUrl,
-                {
-                    headers: headers
-                }
-            );
+    //  antes: axios.get<GoogleTokenResponse>(...)
+    const { data } = await axios.get<GoogleUserProfile>(this.googleUserInfoUrl, { headers });
 
-            return data;
-        } catch (error: any) {
-            throw new Error('Failed to fetch user profile from google');
-        }
+    return data;
+    } catch (error: any) {
+    throw new Error('Failed to fetch user profile from google');
     }
+}
 
-    async findOrCreateUser(profile: GoogleUserProfile): Promise<UsuarioDocument> {
+
+    async findOrCreateUser(profile: GoogleUserProfile): Promise<CrearUsuarioDto> {
         let user = await teamsysService.verificarCorreo(profile.email);
         console.log(user)
         if (!user) {
             return  {
                 nombre: profile.name,
-                correoElectronico: profile.email,
+                correo: profile.email,
                 fotoPerfil: profile.picture,
                 terminosYCondiciones: true,
             }
@@ -91,8 +89,8 @@ export class AuthService  {
     generateTokens(user: UsuarioDocument): AuthTokens {
         console.log({user})
         const payload: JWTPayload = {
-            userId: "",
-            email: user.correoElectronico,
+            userId: user._id.toString(),
+            email: user.correo,
         }
         
         const accessToken = this.generateAccessToken(payload);
@@ -106,15 +104,24 @@ export class AuthService  {
 
         const profile = await this.getGoogleUserProfile(googleTokens.access_token);
 
-        const user = await this.findOrCreateUser(profile);
-        if (user==null)return null;
+        const userDoc = await this.findOrCreateUser(profile);
+        if (userDoc==null)return null;
 
-        const tokens = this.generateTokens(user); 
-
+        const tokens = this.generateTokens(userDoc as UsuarioDocument); 
+        const userForClient= {
+    nombre: userDoc.nombre,
+    correo: userDoc.correo,
+    fotoPerfil:userDoc.fotoPerfil,
+    terminosYCondiciones: userDoc.terminosYCondiciones,
+    //apellido: userDoc.apellido,
+    //telefono: userDoc.telefono,
+    // si quieres la foto de Google, pásala desde el service como campo aparte:
+    // fotoPerfil: profile.picture,
+    };
         return {
             accessToken: tokens.accessToken,
             refreshToken: tokens.refreshToken,
-            user: user,
+            user: userForClient ,
             expiresAt: new Date(),
         }
     }

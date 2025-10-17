@@ -8,7 +8,7 @@ export class UsuarioService {
    * @param data - Datos básicos del usuario (DTO)
    * @returns Usuario creado
    */
-  async registrarUsuario(data: CrearUsuarioDto): Promise<UsuarioDocument> {
+  async registrarUsuario(data: CrearUsuarioDto ): Promise<UsuarioDocument > {
     // Validación de contraseña
     if (data.password!=null) {
     if (!validarPassword(data.password)) {
@@ -17,7 +17,7 @@ export class UsuarioService {
     }
 
     // Verificar si el correo ya está registrado
-    const existe = await Usuario.findOne({ correoElectronico: data.correoElectronico });
+    const existe = await Usuario.findOne({ correo: data.correo });
     if (existe) {
       throw new Error('El correo electrónico ya está registrado');
     }
@@ -33,7 +33,7 @@ export class UsuarioService {
    * @returns true si existe, false si no
    */
   async verificarCorreo(correo: string): Promise<boolean> {
-    const usuario = await Usuario.findOne({ correoElectronico: correo });
+    const usuario = await Usuario.findOne({ correo: correo });
     return usuario!=null;
   }
 
@@ -44,8 +44,8 @@ export class UsuarioService {
  * @param password - Contraseña a verificiar, comparar e impedir si no es el caso
  * @returns UsuarioDocument si las contraseñas coinciden, null si no
  */
-async autenticarUsuario(correo: string, password: string): Promise<UsuarioDocument | null> {
-  const usuario = await Usuario.findOne({ correoElectronico: correo });
+async autenticarUsuario(correoE: string, password: string): Promise<UsuarioDocument | null> {
+  const usuario = await Usuario.findOne({ correo: correoE });
   if (!usuario) return null;
   if (usuario.password !== password) return null;
   return usuario;

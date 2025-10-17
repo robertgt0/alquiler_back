@@ -15,16 +15,6 @@ router.get('/', (req, res) => {
     }
   });
 });
-router.get('/', (req, res) => {
-  res.json({
-    message: '📦 Módulo de Ejemplo',
-    version: '1.0.0',
-    description: 'Este es un módulo de ejemplo para mostrar la estructura',
-    endpoints: {
-      ejemplo: '/api/teamsys/ejemploteamsys'
-    }
-  });
-});
 
 // Montar sub-rutas del módulo
 router.use('/', teamsysRoutes);

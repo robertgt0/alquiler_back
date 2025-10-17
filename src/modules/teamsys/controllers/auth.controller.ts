@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ApiResponse } from "@/types";
 import { TokenResponse } from "../types/token.types";
-import { AuthService, getUserService } from "../services/auth.service";
+import { AuthService} from "../services/auth.service";
 import { handleError } from "../errors/errorHandler";
 
 export class AuthController {

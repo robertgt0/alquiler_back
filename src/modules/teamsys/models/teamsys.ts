@@ -1,59 +1,73 @@
-import mongoose, { Schema, Document } from 'mongoose';
-import { UsuarioDocument } from '../types/index';
+import { Schema, model, InferSchemaType, HydratedDocument } from 'mongoose';
 
-
-// Esquema de Mongoose
-const usuarioSchema = new Schema<UsuarioDocument>(
+const userSchema = new Schema(
   {
-    nombre: {
-      type: String,
-      required: [true, 'El nombre es requerido'],
-      trim: true,
-    },
-    apellido: {
-      type: String,
-      trim: true,
-    },
-    telefono: {
-      type: String,
-      trim: true,
-    },
-    correoElectronico: {
+    nombre: { type: String,
+      required: [true, 'El nombre es requerido'], trim: true },
+    apellido: { type: String, trim: true },
+    telefono: { type: String, trim: true },
+
+    correo: {
       type: String,
       required: [true, 'El correo electrónico es requerido'],
       unique: true,
       trim: true,
       lowercase: true,
     },
+
     password: {
       type: String,
-      minlength: [6, 'La contraseña debe tener al menos 6 caracteres'],
+      minlength: [8, 'La contraseña debe tener al menos 8 caracteres'],
+      // No obligatorio: usuarios de Google no la tienen
     },
+
     fotoPerfil: {
-      type: Buffer, // binario (imagen)
+      type: String, // o String si usas URL
+      required: [true, 'La foto de perfil es obligatoria para todos los usuarios'],
     },
+
     ubicacion: {
       type: {
         type: String,
-        enum: ['Point'], // tipo GeoJSON
+        enum: ['Point'],
         default: 'Point',
       },
       coordinates: {
         type: [Number], // [longitud, latitud]
-        default: [0, 0],
+        required: [true, 'La ubicación es obligatoria para todos los usuarios'],
       },
     },
-    terminosYCondiciones: {
-      type: Boolean,
-      required: [true, 'Debes aceptar los términos y condiciones'],
+
+    terminosYCondiciones: { type: Boolean },
+
+    // === OAuth ===
+    authProvider: {
+      type: String,
+      enum: ['local', 'google'],
+      default: 'local',
+    },
+    googleId: {
+      type: String,
+      index: true,
+      sparse: true,
+      unique: true,
+    },
+
+    // === Rol ===
+    rol: {
+      type: String,
+      enum: ['requester', 'provider', 'admin'],
+      default: 'requester', // todos los nuevos usuarios serán requester
+      required: true,
     },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-// Índice geoespacial 2dsphere para búsquedas por radio
-usuarioSchema.index({ ubicacion: '2dsphere' });
+// Índices
+userSchema.index({ ubicacion: '2dsphere' });
+userSchema.index({ correo: 1 }, { unique: true });
 
-export default mongoose.model<UsuarioDocument>('Usuario', usuarioSchema);
+export type User = InferSchemaType<typeof userSchema>;
+export type UserDocument = HydratedDocument<User>;
+export default model<User>('User', userSchema, 'users');

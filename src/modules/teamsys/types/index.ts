@@ -27,9 +27,9 @@ export interface UsuarioDocument extends Document {
   nombre: string;
   apellido?: string;
   telefono?: string;
-  correoElectronico: string;
+  correo: string;
   password?: string;
-  fotoPerfil?: Buffer; // Binario (imagen)
+  fotoPerfil?: string; // Binario (imagen)
   ubicacion?: {
     type: 'Point';
     coordinates: [number, number]; // [longitud, latitud]
@@ -42,7 +42,7 @@ export interface UsuarioDocument extends Document {
 
 export interface CrearUsuarioDto {
   nombre: string;
-  correoElectronico: string;
+  correo: string;
   telefono?: string;
   password?: string;
   fotoPerfil?:any;

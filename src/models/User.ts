@@ -1,32 +1,32 @@
-import mongoose, { Schema, Document } from 'mongoose';
-import { IUser } from '../types';
+import { Schema, model, InferSchemaType, HydratedDocument } from 'mongoose';
 
-export interface IUserDocument extends IUser, Document {}
-
-const userSchema = new Schema<IUserDocument>(
+const usuarioSchema = new Schema(
   {
-    name: {
+    nombre: { type: String, required: [true, 'El nombre es requerido'], trim: true },
+    apellido: { type: String, trim: true },
+    telefono: { type: String, trim: true },
+    correoElectronico: {
       type: String,
-      required: [true, 'El nombre es requerido'],
-      trim: true,
-    },
-    email: {
-      type: String,
-      required: [true, 'El email es requerido'],
+      required: [true, 'El correo electrónico es requerido'],
       unique: true,
-      lowercase: true,
       trim: true,
-      match: [/^\S+@\S+\.\S+$/, 'Email inválido'],
+      lowercase: true,
     },
-    password: {
-      type: String,
-      required: [true, 'La contraseña es requerida'],
-      minlength: [6, 'La contraseña debe tener al menos 6 caracteres'],
+    password: { type: String, minlength: [6, 'La contraseña debe tener al menos 6 caracteres'] },
+    fotoPerfil: { type: Buffer }, // binario
+    ubicacion: {
+      type: { type: String, enum: ['Point'], default: 'Point' },
+      coordinates: { type: [Number], default: [0, 0] }, // [long, lat]
     },
+    terminosYCondiciones: { type: Boolean, required: [true, 'Debes aceptar los términos y condiciones'] },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-export default mongoose.model<IUserDocument>('User', userSchema);
+// índice geoespacial
+usuarioSchema.index({ ubicacion: '2dsphere' });
+
+export type Usuario = InferSchemaType<typeof usuarioSchema>;
+export type UsuarioDocument = HydratedDocument<Usuario>;
+
+export default model<Usuario>('Usuario', usuarioSchema, 'usuarios');

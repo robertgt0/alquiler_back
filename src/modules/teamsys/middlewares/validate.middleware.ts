@@ -5,7 +5,7 @@ import { limpiarInput } from '../utils/validaciones';
 export const validateData = (req: Request, res: Response, next: NextFunction): void => {
   
   try{
-  const { nombre, correoElectronico, telefono, password, terminosYCondiciones }: CrearUsuarioDto = limpiarInput(req.body)as CrearUsuarioDto;
+  const { nombre, correo, telefono, password, terminosYCondiciones }: CrearUsuarioDto = limpiarInput(req.body)as CrearUsuarioDto;
   
   const nombreValido = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{2,50}$/;
   const telefonoValido = /^[1-9][0-9]{7}$/;
@@ -16,7 +16,7 @@ export const validateData = (req: Request, res: Response, next: NextFunction): v
     return;
   }
 
-  if (!correoElectronico || typeof correoElectronico !== 'string'|| !correoValido.test(correoElectronico)) {
+  if (!correo || typeof correo !== 'string'|| !correoValido.test(correo)) {
     res.status(400).json({ success: false, message: 'El correo electrónico es requerido y corrige si metiste un correo chafa' });
     return;
   }
