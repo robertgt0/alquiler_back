@@ -7,7 +7,6 @@ import notifyRoutes from './routes/notify.js';
 export async function startServer() {
     const app = Fastify({ logger });
 
-    // Rutas
     app.register(oauthRoutes, { prefix: '/oauth' });
     app.register(notifyRoutes, { prefix: '/notify' });
 

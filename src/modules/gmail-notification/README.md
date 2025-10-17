@@ -11,5 +11,4 @@ Servicio HTTP para enviar notificaciones por Gmail usando **Gmail API + OAuth2**
 ## Instalación
 ```bash
 npm install
-cp .env.example .env   # completa las variables
-npm run dev
+cp .env.example .env   

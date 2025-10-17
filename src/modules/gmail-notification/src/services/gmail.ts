@@ -32,7 +32,6 @@ export async function listUnread(auth: OAuth2Client, maxResults = 10) {
 
 export async function getMessageParsed(auth: OAuth2Client, id: string) {
     const api = gmail(auth);
-    // Pedimos formato RAW para parsear MIME completo
     const res = await backoff(() => api.users.messages.get({ userId: 'me', id, format: 'raw' }));
     const rawB64 = res.data.raw!;
     const raw = Buffer.from(rawB64, 'base64');
