@@ -19,10 +19,10 @@ export const createNotificationHandler = async (req: Request, res: Response) => 
 /*
 ESTRUCTURA ESPERADA:
     {
-      "subject": "Prueba SMTP exitosa",
+      "subject": "Prueba SMTP con OAUTH2 exitosa",
       "message": "<h2>Hola!</h2><p>Mensaje de prueba usando SMTP</p>",
       "destinations": [
-        { "type": "email", "to": "+correo@gmail.com" }
+        { "type": "email", "to": "correo@gmail.com" }
       ],
       "fromName": "Sistema Alquiler"
     }
