@@ -87,3 +87,8 @@ modules/nombre_grupo_ejemplo/models/Ejemplo.ts (MongoDB)
 - Usa TypeScript para mejor autocompletado y menos errores
 - Implementa validaciones en los middlewares
 - Maneja los errores de forma consistente
+
+
+
+-------------------------------------------------------------------------------
+Detalles y Documentacion del modulo de Notification (endpoints y esquemas)
