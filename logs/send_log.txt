@@ -1,2 +1,6 @@
 2025-10-17T15:30:59.334Z | TxID: bbed3172-c842-4f40-931b-fde2aa79e0a6 | To: adrianvallejosflores24@gmail.com | Estado: OK
 2025-10-17T15:38:16.964Z | TxID: a54ea266-59b4-4ee2-92e4-fabeeb75eb07 | To: adrivall1234@gmail.com | Estado: OK
+2025-10-17T16:27:56.865Z | TxID: 02f03f4f-17cd-481d-b717-cd9563456308 | To: cynthiachambibaltazar55@gmail.com | Estado: OK
+2025-10-17T16:28:46.735Z | TxID: 6403de12-e033-4349-822a-016e862535f9 | To: cynthiachambibaltazar55@gmail.com | Estado: OK
+2025-10-17T16:29:30.310Z | TxID: ea1cd5da-61df-4b74-a704-62f8e0ff1cda | To: cynthiachambibaltazar55123@gmail.com | Estado: OK
+2025-10-17T16:40:29.954Z | TxID: f220eaf0-de27-453f-8fb1-be856e6107d3 | To: correo_ficticio@gmail.com | Estado: OK

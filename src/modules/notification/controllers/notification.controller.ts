@@ -1,6 +1,5 @@
 // src/modules/notifications/controllers/notification.controller.ts
 import { Request, Response } from "express";
-import { validationResult } from "express-validator";
 import { NotificationService } from "../services/notification.service";
 
 let _service: NotificationService | null = null;
@@ -10,9 +9,6 @@ function getService() {
 }
 
 export const createNotificationHandler = async (req: Request, res: Response) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) return res.status(400).json({ ok: false, errors: errors.array() });
-
   const payload = req.body;
 
   // Validación de estructura básica del paquete recibido

@@ -3,6 +3,7 @@ import { GmailProvider } from "../providers/email.provider";
 import { NotificationModel } from "../models/notification.model";
 import { NotificationPayload } from "../models/notification.types";
 import { logNotification } from "../../../utils/logger";
+import validator from "validator";
 
 const MAX_ATTEMPTS = 3;
 
@@ -32,6 +33,23 @@ export class NotificationService {
     });
 
     const provider = this.createProvider();
+
+    // ✅ 1.5 Verificar formato de correos ANTES de enviar
+    for (const dest of payload.destinations) {
+      if (!dest.email || !validator.isEmail(dest.email)) {
+        await NotificationModel.findByIdAndUpdate(doc._id, {
+          $set: {
+            status: "failed",
+            lastError: `Correo inválido: ${dest.email}`,
+          },
+        });
+
+        // Registrar log de error
+        logNotification(dest.email || "(sin email)", "FALLIDO", transactionId, "Formato de correo inválido");
+
+        throw new Error(`Correo inválido: ${dest.email}`);
+      }
+    }
 
     // 2️⃣ Enviar a cada destinatario con reintentos
     for (const dest of payload.destinations) {
