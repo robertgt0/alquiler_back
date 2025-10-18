@@ -11,6 +11,7 @@ import { requestLogger } from "./modules/notification/middlewares/request.middle
 import { notFoundHandler } from "./modules/notification/middlewares/notFound.middleware";
 import { globalErrorHandler } from "./modules/notification/middlewares/error.middleware";
 
+
 // Cargar variables de entorno
 dotenv.config();
 import "./config/env";
