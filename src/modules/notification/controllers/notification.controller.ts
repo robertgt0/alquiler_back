@@ -9,28 +9,28 @@ function getService() {
 
 /**
  * Controlador principal para crear y enviar notificaciones por correo.
- * Soporta SMTP o OAuth2 según la configuración en variables de entorno.
+ * Usa la API de Gmail con OAuth2 según la configuración del entorno.
  */
 export const createNotificationHandler = async (req: Request, res: Response) => {
   try {
     const payload = req.body;
 
     /*
-    ESTRUCTURA ESPERADA DEL BODY:
+      ESTRUCTURA ESPERADA DEL BODY:
 
-    {
-      "subject": "Prueba de correo con OAuth2",
-      "message": "<h2>Hola!</h2><p>Este es un mensaje de prueba</p>",
-      "destinations": [
-        { "email": "correo@gmail.com", "name": "Usuario Ejemplo" }
-      ],
-      "fromName": "Sistema Alquiler"
-    }
+      {
+        "subject": "Prueba de correo con OAuth2",
+        "message": "<h2>Hola!</h2><p>Este es un mensaje de prueba</p>",
+        "destinations": [
+          { "email": "correo@gmail.com", "name": "Usuario Ejemplo" }
+        ],
+        "fromName": "Sistema Alquiler"
+      }
     */
 
     const { message, subject, destinations, fromName } = payload;
 
-    // Validación robusta de estructura
+    // Validación de estructura
     if (
       !message ||
       !subject ||
@@ -45,7 +45,7 @@ export const createNotificationHandler = async (req: Request, res: Response) => 
       });
     }
 
-    // Normalizamos los destinos (acepta tanto 'email' como 'to')
+    // Normalizar destinos
     const normalizedDestinations = destinations.map((d: any) => ({
       email: d.email || d.to,
       name: d.name || null,
@@ -53,7 +53,7 @@ export const createNotificationHandler = async (req: Request, res: Response) => 
 
     const service = getService();
 
-    // Enviar correo y registrar notificación
+    // Enviar correo
     const { transactionId, notification } = await service.createAndSend(
       { subject, message, destinations: normalizedDestinations },
       fromName
@@ -63,19 +63,18 @@ export const createNotificationHandler = async (req: Request, res: Response) => 
       ok: true,
       transactionId,
       notification,
-      message: "Correo enviado correctamente (OAuth2 activo)",
+      message: "Correo enviado correctamente mediante Gmail API (OAuth2).",
     });
   } catch (err: any) {
     console.error("createNotificationHandler error:", err);
 
-    // Log específico para depurar autenticación
     if (err.message?.includes("Invalid login") || err.code === "EAUTH") {
       console.error("⚠️ Error de autenticación con Gmail OAuth2. Verifica tu refresh token o client_id/secret.");
     }
 
     return res.status(500).json({
       ok: false,
-      error: err.message || "Error interno del servidor al enviar el correo",
+      error: err.message || "Error interno del servidor al enviar el correo.",
     });
   }
 };
@@ -90,7 +89,7 @@ export const getNotificationHandler = async (req: Request, res: Response) => {
     const record = await service.getByTransactionId(id);
 
     if (!record) {
-      return res.status(404).json({ ok: false, error: "Notificación no encontrada" });
+      return res.status(404).json({ ok: false, error: "Notificación no encontrada." });
     }
 
     return res.json({ ok: true, notification: record });

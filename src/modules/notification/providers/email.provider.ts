@@ -5,6 +5,9 @@ import path from "path";
 
 const logFile = path.join(process.cwd(), "logs", "email.log");
 
+/**
+ * Escribe una entrada en el log local (logs/email.log)
+ */
 function writeLog(entry: any) {
   try {
     fs.mkdirSync(path.dirname(logFile), { recursive: true });
@@ -26,18 +29,21 @@ export interface EmailOptions {
   fromName?: string;
 }
 
+/**
+ * Envía un correo electrónico usando Gmail API (OAuth2)
+ * y registra el resultado en un archivo de logs.
+ */
 export async function sendEmail(options: EmailOptions) {
   const { to, subject, html, text, from, fromName } = options;
 
   try {
-    // ✅ Crear cliente OAuth2 con las variables del .env
+    // ✅ Crear cliente OAuth2
     const oAuth2Client = new google.auth.OAuth2(
       process.env.GMAIL_CLIENT_ID,
       process.env.GMAIL_CLIENT_SECRET,
-      "https://developers.google.com/oauthplayground"
+      "https://developers.google.com/oauthplayground" // Redirect URI estándar
     );
 
-    // ✅ Establecer el refresh token
     oAuth2Client.setCredentials({
       refresh_token: process.env.GMAIL_REFRESH_TOKEN,
     });
@@ -49,7 +55,7 @@ export async function sendEmail(options: EmailOptions) {
       throw new Error("No se pudo obtener el access token de Google OAuth2.");
     }
 
-    // ✅ Crear el transporter de nodemailer usando OAuth2
+    // ✅ Configurar el transporter con OAuth2
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -62,7 +68,7 @@ export async function sendEmail(options: EmailOptions) {
       },
     });
 
-    // ✅ Enviar correo
+    // ✅ Enviar el correo
     const info = await transporter.sendMail({
       from: fromName
         ? `"${fromName}" <${from || process.env.NOTIFICATIONS_GMAIL_USER}>`
@@ -73,6 +79,7 @@ export async function sendEmail(options: EmailOptions) {
       text,
     });
 
+    // ✅ Registrar en log
     writeLog({
       level: "INFO",
       action: "send",
@@ -95,6 +102,7 @@ export async function sendEmail(options: EmailOptions) {
       to: options.to,
       error: error.message,
     });
+
     return { success: false, error: error.message };
   }
 }
