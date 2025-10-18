@@ -1,15 +1,9 @@
-import express from "express";
-import cors from "cors";
-import ofertasModule from "./modules/ofertas/index";
+import express from 'express';
+import offerRoutes from './offers';
 
-const app = express();
+const router = express.Router();
 
-app.use(cors()); // permite peticiones desde tu frontend
-app.use(express.json());
+// Ruta para las ofertas
+router.use('/offers', offerRoutes);
 
-app.use("/api", ofertasModule); // las ofertas estarán en /api/ofertas
-
-app.listen(4000, () => {
-  console.log("Servidor corriendo en http://localhost:4000");
-});
-
+export default router;
