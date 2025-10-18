@@ -4,7 +4,7 @@ import mongoose from 'mongoose'; // Importa Mongoose, la librería para conectar
 const connectDB = async (): Promise<void> => {
   try {
     // Intenta conectarse a MongoDB usando la variable de entorno MONGO_URI
-    const conn = await mongoose.connect(process.env.MONGO_URI as string);
+    const conn = await mongoose.connect(process.env.MONGODB_URI as string);
     // Si la conexión es exitosa, muestra en consola el host al que se conectó
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
