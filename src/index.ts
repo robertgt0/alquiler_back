@@ -2,7 +2,8 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/database';
-import notificationRoutes from "./modules/notification/routes/notificationRoutes";
+import notificationRoutes from "./modules/notification/routes/notification.routes";
+import notificationsCentralRouter from "./modules/notification/routes/central.router";
 import helmet from "helmet";
 
 
@@ -66,7 +67,8 @@ app.get('/api/health', (req: Request, res: Response) => {
 // MONTAR MÓDULOS/GRUPOS AQUÍ
 // ============================================
 // Montar tus módulos aquí:
-app.use("/api/notifications", notificationRoutes); // nuevo
+app.use("/notifications", notificationRoutes);
+app.use("/api/notifications", notificationsCentralRouter);
 
 // ============================================
 // Manejo de errores 404
