@@ -1,131 +1,100 @@
-import nodemailer, { Transporter } from 'nodemailer';
-import { google } from 'googleapis';
-import dotenv from "dotenv"
+import nodemailer from "nodemailer";
+import { google } from "googleapis";
+import fs from "fs";
+import path from "path";
 
-dotenv.config();
+const logFile = path.join(process.cwd(), "logs", "email.log");
 
-const OAuth2 = google.auth.OAuth2;
-
-const {
-  NOTIFICATIONS_GMAIL_MODE,
-  NOTIFICATIONS_GMAIL_USER,
-  NOTIFICATIONS_GMAIL_APP_PASS,
-  GMAIL_CLIENT_ID,
-  GMAIL_CLIENT_SECRET,
-  GMAIL_REFRESH_TOKEN,
-} = process.env;
-
-let transporter: Transporter | null = null;
-
-/**
- * Crea (o devuelve) un transporter nodemailer configurado
- */
-async function createTransporter(): Promise<Transporter> {
-  if (transporter) return transporter;
-
-  if (NOTIFICATIONS_GMAIL_MODE === 'oauth2') {
-    if (!GMAIL_CLIENT_ID || !GMAIL_CLIENT_SECRET || !GMAIL_REFRESH_TOKEN || !NOTIFICATIONS_GMAIL_USER) {
-      throw new Error('Faltan variables para OAuth2: GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET, GMAIL_REFRESH_TOKEN, NOTIFICATIONS_GMAIL_USER');
-    }
-
-    const oauth2Client = new OAuth2(
-      GMAIL_CLIENT_ID,
-      GMAIL_CLIENT_SECRET,
-      'https://developers.google.com/oauthplayground'
-    );
-
-    oauth2Client.setCredentials({ refresh_token: GMAIL_REFRESH_TOKEN });
-
-    const accessTokenResponse = await oauth2Client.getAccessToken();
-    const accessToken =
-      accessTokenResponse && typeof accessTokenResponse === 'object'
-        ? (accessTokenResponse as any).token
-        : accessTokenResponse;
-
-    if (!accessToken) {
-      throw new Error('No se pudo obtener access token desde refresh token (verifica GMAIL_REFRESH_TOKEN)');
-    }
-
-    transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        type: 'OAuth2',
-        user: NOTIFICATIONS_GMAIL_USER,
-        clientId: GMAIL_CLIENT_ID,
-        clientSecret: GMAIL_CLIENT_SECRET,
-        refreshToken: GMAIL_REFRESH_TOKEN,
-        accessToken,
-      },
-    });
-  } else {
-    // Fallback SMTP con App Password
-    if (!NOTIFICATIONS_GMAIL_USER || !NOTIFICATIONS_GMAIL_APP_PASS) {
-      throw new Error('Faltan variables para SMTP: NOTIFICATIONS_GMAIL_USER, NOTIFICATIONS_GMAIL_APP_PASS');
-    }
-
-    transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: NOTIFICATIONS_GMAIL_USER,
-        pass: NOTIFICATIONS_GMAIL_APP_PASS,
-      },
-    });
-  }
-
+function writeLog(entry: any) {
   try {
-    await transporter.verify();
-    return transporter;
+    fs.mkdirSync(path.dirname(logFile), { recursive: true });
+    fs.appendFileSync(
+      logFile,
+      JSON.stringify({ ts: new Date().toISOString(), ...entry }) + "\n"
+    );
   } catch (err) {
-    transporter = null;
-    throw err;
+    console.error("Error al escribir log:", err);
   }
 }
 
-/**
- * Envía correo con las opciones dadas
- */
-export async function sendMail(opts: {
+export interface EmailOptions {
   to: string | string[];
   subject: string;
-  text?: string;
   html?: string;
+  text?: string;
   from?: string;
-  cc?: string | string[];
-  bcc?: string | string[];
-  attachments?: any[];
-}) {
-  const { to, subject, text, html, from, cc, bcc, attachments } = opts;
-  const transport = await createTransporter();
-
-  const mailOptions = {
-    from: from || NOTIFICATIONS_GMAIL_USER,
-    to,
-    subject,
-    text,
-    html,
-    cc,
-    bcc,
-    attachments,
-  };
-
-  try {
-    const info = await transport.sendMail(mailOptions);
-    return { success: true, info };
-  } catch (error) {
-    transporter = null;
-    throw error;
-  }
+  fromName?: string;
 }
 
-/**
- * Verifica si el transporte está funcional
- */
-export async function verifyTransport() {
+export async function sendEmail(options: EmailOptions) {
+  const { to, subject, html, text, from, fromName } = options;
+
   try {
-    const t = await createTransporter();
-    await t.verify();
-    return { ok: true };
-  } catch (err: any) {
-    return { ok: false, error: err?.message || String(err) };
+    // ✅ Crear cliente OAuth2 con las variables del .env
+    const oAuth2Client = new google.auth.OAuth2(
+      process.env.GMAIL_CLIENT_ID,
+      process.env.GMAIL_CLIENT_SECRET,
+      "https://developers.google.com/oauthplayground"
+    );
+
+    // ✅ Establecer el refresh token
+    oAuth2Client.setCredentials({
+      refresh_token: process.env.GMAIL_REFRESH_TOKEN,
+    });
+
+    // ✅ Obtener access token válido
+    const accessToken = await oAuth2Client.getAccessToken();
+
+    if (!accessToken?.token) {
+      throw new Error("No se pudo obtener el access token de Google OAuth2.");
+    }
+
+    // ✅ Crear el transporter de nodemailer usando OAuth2
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        type: "OAuth2",
+        user: process.env.NOTIFICATIONS_GMAIL_USER,
+        clientId: process.env.GMAIL_CLIENT_ID,
+        clientSecret: process.env.GMAIL_CLIENT_SECRET,
+        refreshToken: process.env.GMAIL_REFRESH_TOKEN,
+        accessToken: accessToken.token,
+      },
+    });
+
+    // ✅ Enviar correo
+    const info = await transporter.sendMail({
+      from: fromName
+        ? `"${fromName}" <${from || process.env.NOTIFICATIONS_GMAIL_USER}>`
+        : from || process.env.NOTIFICATIONS_GMAIL_USER,
+      to,
+      subject,
+      html,
+      text,
+    });
+
+    writeLog({
+      level: "INFO",
+      action: "send",
+      to,
+      accepted: info.accepted,
+      rejected: info.rejected,
+      messageId: info.messageId,
+    });
+
+    return {
+      success: true,
+      messageId: info.messageId,
+      accepted: info.accepted,
+      rejected: info.rejected,
+    };
+  } catch (error: any) {
+    writeLog({
+      level: "ERROR",
+      action: "send",
+      to: options.to,
+      error: error.message,
+    });
+    return { success: false, error: error.message };
   }
 }

@@ -1,4 +1,3 @@
-// src/modules/notifications/controllers/notification.controller.ts
 import { Request, Response } from "express";
 import { NotificationService } from "../services/notification.service";
 
@@ -16,13 +15,14 @@ export const createNotificationHandler = async (req: Request, res: Response) => 
   try {
     const payload = req.body;
 
-/*
-ESTRUCTURA ESPERADA:
+    /*
+    ESTRUCTURA ESPERADA DEL BODY:
+
     {
-      "subject": "Prueba SMTP con OAUTH2 exitosa",
-      "message": "<h2>Hola!</h2><p>Mensaje de prueba usando SMTP</p>",
+      "subject": "Prueba de correo con OAuth2",
+      "message": "<h2>Hola!</h2><p>Este es un mensaje de prueba</p>",
       "destinations": [
-        { "type": "email", "to": "correo@gmail.com" }
+        { "email": "correo@gmail.com", "name": "Usuario Ejemplo" }
       ],
       "fromName": "Sistema Alquiler"
     }
@@ -30,7 +30,7 @@ ESTRUCTURA ESPERADA:
 
     const { message, subject, destinations, fromName } = payload;
 
-    // Validación robusta de estructura antes de continuar
+    // Validación robusta de estructura
     if (
       !message ||
       !subject ||
@@ -45,15 +45,15 @@ ESTRUCTURA ESPERADA:
       });
     }
 
-    // Normalizar destinos (acepta tanto 'email' como 'to')
+    // Normalizamos los destinos (acepta tanto 'email' como 'to')
     const normalizedDestinations = destinations.map((d: any) => ({
       email: d.email || d.to,
-      name: d.name,
+      name: d.name || null,
     }));
 
     const service = getService();
 
-    // Enviar y registrar la notificación
+    // Enviar correo y registrar notificación
     const { transactionId, notification } = await service.createAndSend(
       { subject, message, destinations: normalizedDestinations },
       fromName
@@ -63,10 +63,16 @@ ESTRUCTURA ESPERADA:
       ok: true,
       transactionId,
       notification,
-      message: "Correo enviado correctamente usando SMTP u OAuth2",
+      message: "Correo enviado correctamente (OAuth2 activo)",
     });
   } catch (err: any) {
     console.error("createNotificationHandler error:", err);
+
+    // Log específico para depurar autenticación
+    if (err.message?.includes("Invalid login") || err.code === "EAUTH") {
+      console.error("⚠️ Error de autenticación con Gmail OAuth2. Verifica tu refresh token o client_id/secret.");
+    }
+
     return res.status(500).json({
       ok: false,
       error: err.message || "Error interno del servidor al enviar el correo",
