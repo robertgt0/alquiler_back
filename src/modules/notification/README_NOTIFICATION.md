@@ -87,3 +87,33 @@ modules/nombre_grupo_ejemplo/models/Ejemplo.ts (MongoDB)
 - Usa TypeScript para mejor autocompletado y menos errores
 - Implementa validaciones en los middlewares
 - Maneja los errores de forma consistente
+
+
+
+-------------------------------------------------------------------------------
+Detalles y Documentacion del modulo de Notification (endpoints y esquemas)
+
+npm install nodemailer googleapis uuid winston
+
+npm install -D @types/nodemailer @types/uuid
+
+npm install uuid
+
+npm install -D @types/express-validator
+
+npm install express-validator
+
+npm install --save-dev @types/express-validator
+
+npm install express-validator nodemailer googleapis uuid winston
+
+npm install --save-dev @types/express-validator @types/nodemailer @types/uuid
+
+npm install validator
+
+npm i --save-dev @types/validator
+
+
+npm install nodemailer googleapis
+
+npm install -D @types/nodemailer
