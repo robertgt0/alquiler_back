@@ -1,75 +1,28 @@
-// src/index.ts
-import express, { Request, Response } from "express";
-import cors from "cors";
-import dotenv from "dotenv";
+import express from 'express';
+import cors from 'cors';
+import { env } from './config/env';
+import { connectDB } from './config/mongoose';
+import offersRouter from './routes/offers';
 
-// ⬇️ Carga variables del entorno (Railway las inyecta)
-//    No uses path aquí para que NO dependa de un archivo .env
-dotenv.config();
+async function bootstrap() {
+  await connectDB();
 
-import connectDB from "./config/database";
+  const app = express();
+  app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }));
+  app.use(express.json());
 
-import nombreGrupoEjemploRouter from "./modules/nombre_grupo_ejemplo";
-import fixerModule from "./modules/fixer";
-import categoriesModule from "./modules/categories";
+  app.get('/health', (_req, res) => res.json({ ok: true }));
 
-const app = express();
+  // HU9/HU10: módulo de ofertas
+  app.use('/api/offers', offersRouter);
 
-// CORS: desde variable ALLOWED_ORIGINS (coma separada)
-app.use(
-  cors({
-    origin: (process.env.ALLOWED_ORIGINS || "*").split(","),
-    credentials: true,
-  })
-);
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// 🔌 Conecta Mongo SOLO si DB_ENABLED=true y existe MONGODB_URI
-if (process.env.DB_ENABLED === "true") {
-  if (!process.env.MONGODB_URI) {
-    console.warn("⚠️ DB_ENABLED=true pero falta MONGODB_URI. No se conectará a Mongo.");
-  } else {
-    connectDB().catch((err) => {
-      console.error("❌ Error conectando a Mongo:", err);
-      process.exit(1); // opcional: tumbar si falla la DB en producción
-    });
-  }
-} else {
-  console.log("🔌 Base de datos: DESACTIVADA (modo sin DB)");
+  app.listen(env.PORT, () => {
+    console.log(`🚀 API running on http://localhost:${env.PORT}`);
+  });
 }
 
-app.get("/", (_req: Request, res: Response) => {
-  res.json({
-    message: "API Backend",
-    status: "OK",
-    version: "1.0.0",
-    timestamp: new Date().toISOString(),
-    modules: ["/api/nombre_grupo_ejemplo", "/api/fixer", "/api/categories"],
-  });
+bootstrap().catch((err) => {
+  console.error(err);
+  process.exit(1);
 });
 
-app.get("/api/health", (_req: Request, res: Response) => {
-  res.json({
-    status: "healthy",
-    database: process.env.DB_ENABLED === "true" ? "enabled" : "disabled",
-    uptime: process.uptime(),
-    timestamp: new Date().toISOString(),
-  });
-});
-
-app.use("/api/nombre_grupo_ejemplo", nombreGrupoEjemploRouter);
-app.use("/api/fixer", fixerModule);
-app.use("/api/categories", categoriesModule);
-
-app.use((req: Request, res: Response) => {
-  res.status(404).json({ success: false, message: "Ruta no encontrada", path: req.path });
-});
-
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`\nServidor corriendo en puerto ${PORT}`);
-  console.log(`URL: http://localhost:${PORT}`);
-  console.log(`Módulos: /api/nombre_grupo_ejemplo, /api/fixer, /api/categories`);
-});
