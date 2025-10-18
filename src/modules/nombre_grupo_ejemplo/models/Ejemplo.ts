@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { EjemploEntity } from '../types';
 
-export interface EjemploDocument extends EjemploEntity, Document {}
+export interface EjemploDocument extends Omit<Document, '_id'>, EjemploEntity {}
 
 const ejemploSchema = new Schema<EjemploDocument>(
   {
