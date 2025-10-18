@@ -7,6 +7,7 @@ import offersRouter from './routes/offers';
 import nombreGrupoEjemploRouter from './modules/nombre_grupo_ejemplo';
 import fixerModule from './modules/fixer';
 import categoriesModule from './modules/categories';
+import ofertasModule from './modules/ofertas/routes/ofertas.routes';
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.get('/', (_req: Request, res: Response) => {
     timestamp: new Date().toISOString(),
     modules: [
       '/api/offers',
+      '/api/ofertas',
       '/api/nombre_grupo_ejemplo',
       '/api/fixer',
       '/api/categories'
@@ -52,6 +54,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
 });
 
 app.use('/api/offers', offersRouter);
+app.use('/api/ofertas', ofertasModule);
 app.use('/api/nombre_grupo_ejemplo', nombreGrupoEjemploRouter);
 app.use('/api/fixer', fixerModule);
 app.use('/api/categories', categoriesModule);
@@ -92,7 +95,7 @@ async function bootstrap() {
 
   app.listen(PORT, () => {
     console.log(`🚀 API listening on port ${PORT}`);
-    console.log('📦 Módulos disponibles: /api/offers, /api/nombre_grupo_ejemplo, /api/fixer, /api/categories');
+    console.log('📦 Módulos disponibles: /api/offers, /api/ofertas, /api/nombre_grupo_ejemplo, /api/fixer, /api/categories');
     console.log(`🔌 Base de datos: ${dbEnabled ? 'ACTIVADA' : 'DESACTIVADA'}`);
   });
 }
