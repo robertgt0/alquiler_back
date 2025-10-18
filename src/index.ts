@@ -1,15 +1,27 @@
-import express from "express";
-import cors from "cors";
-import ofertasModule from "./modules/ofertas/index";
+import express from 'express';
+import cors from 'cors';
+import { env } from './config/env';
+import { connectDB } from './config/mongoose';
+import offersRouter from './routes/offers';
 
-const app = express();
+async function bootstrap() {
+  await connectDB();
 
-app.use(cors()); // permite peticiones desde tu frontend
-app.use(express.json());
+  const app = express();
+  app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }));
+  app.use(express.json());
 
-app.use("/api", ofertasModule); // las ofertas estarán en /api/ofertas
+  app.get('/health', (_req, res) => res.json({ ok: true }));
 
-app.listen(4000, () => {
-  console.log("Servidor corriendo en http://localhost:4000");
+  // HU9/HU10: módulo de ofertas
+  app.use('/api/offers', offersRouter);
+
+  app.listen(env.PORT, () => {
+    console.log(`🚀 API running on http://localhost:${env.PORT}`);
+  });
+}
+
+bootstrap().catch((err) => {
+  console.error(err);
+  process.exit(1);
 });
-
