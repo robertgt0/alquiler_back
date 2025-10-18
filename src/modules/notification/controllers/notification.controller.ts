@@ -18,16 +18,17 @@ export const createNotificationHandler = async (req: Request, res: Response) => 
     /*
       ESTRUCTURA ESPERADA DEL BODY:
 
-      {
-        "subject": "Prueba de correo con OAuth2",
-        "message": "<h2>Hola!</h2><p>Este es un mensaje de prueba</p>",
-        "destinations": [
-          { "email": "correo@gmail.com", "name": "Usuario Ejemplo" }
-        ],
-        "fromName": "Sistema Alquiler"
+     {
+          "subject": "Prueba exitosa",
+          "message": "<h2>Hola!</h2><p>Mensaje de prueba usando gmail :)</p>",
+          "destinations": [
+              { "type": "email", "to": "tugmail@gmail.com" }
+          ],
+          "fromName": "Sistema Alquiler"
       }
-    */
 
+    */
+   
     const { message, subject, destinations, fromName } = payload;
 
     // Validación de estructura
