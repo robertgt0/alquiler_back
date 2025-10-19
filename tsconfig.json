@@ -14,12 +14,11 @@
     "lib": ["ES2022", "DOM"],             // DOM opcional por si usas fetch u otras APIs
 
     /* === Comportamiento del compilador === */
-    "noEmit": false,
-    "noEmitOnError": false,
-    "strict": false,
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "exactOptionalPropertyTypes": false,
-    "noUncheckedIndexedAccess": false,
 
     /* === Imports === */
     "esModuleInterop": true,
@@ -32,17 +31,17 @@
       "@/*": ["*"],
       "@config/*": ["config/*"],
       "@modules/*": ["modules/*"],
-      "@controllers/*": ["modules/teamsys/controllers/*"],
-      "@services/*": ["modules/teamsys/services/*"],
-      "@models/*": ["modules/teamsys/models/*"],
+      "@controllers/*": ["modules/*/controllers/*"],
+      "@services/*": ["modules/*/services/*"],
+      "@models/*": ["modules/*/models/*"],
       "@utils/*": ["utils/*"]
     },
 
     /* === Nueva opción para desarrolladores === */
-    //"allowImportingTsExtensions": true,   // Útil con moduleResolution NodeNext
+    "allowImportingTsExtensions": true,   // Útil con moduleResolution NodeNext
     "noUncheckedIndexedAccess": false,    // Puedes activarlo para aún más seguridad
     "incremental": true                   // Compilación incremental más rápida
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts","src/modules/DevCode", "src/modules/nombre_grupo_ejemplo"]
+  "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }
