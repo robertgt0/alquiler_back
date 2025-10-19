@@ -10,7 +10,7 @@ mongoose.connect(MONGO_URI)
   .catch((err) => console.error("❌ Error al conectar a MongoDB:", err));
 
 export interface Oferta {
-  id?: string;           // 👈 id único
+  id?: string;           // id único
   descripcion: string;
   categoria: string;
   imagen?: Buffer;       // se guardará en binario
@@ -29,11 +29,29 @@ const ofertaSchema = new mongoose.Schema<Oferta>({
 
 const OfertaModel = mongoose.model<Oferta>("Oferta", ofertaSchema);
 
+// 🔹 Crear oferta
 export async function crearOferta(oferta: Oferta) {
   const nuevaOferta = new OfertaModel(oferta);
   return await nuevaOferta.save();
 }
 
+// 🔹 Obtener todas las ofertas
 export async function obtenerOfertas() {
   return await OfertaModel.find();
+}
+
+// 🔹 Eliminar oferta por id
+export async function eliminarOferta(id: string) {
+  const result = await OfertaModel.findOneAndDelete({ id });
+  return result;
+}
+
+// 🔹 Actualizar oferta por id
+export async function actualizarOferta(id: string, datos: Partial<Oferta>) {
+  const ofertaEditada = await OfertaModel.findOneAndUpdate(
+    { id },
+    { ...datos, updatedAt: new Date() },
+    { new: true } // devuelve el documento actualizado
+  );
+  return ofertaEditada;
 }
