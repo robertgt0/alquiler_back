@@ -5,3 +5,5 @@ dist/
 #*.log
 build/
 coverage/
+.idea
+logs
