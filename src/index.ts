@@ -10,12 +10,6 @@ import notificationsCentralRouter from "./modules/notification/routes/central.ro
 import { requestLogger } from "./modules/notification/middlewares/request.middleware";
 import { notFoundHandler } from "./modules/notification/middlewares/notFound.middleware";
 import { globalErrorHandler } from "./modules/notification/middlewares/error.middleware";
-
-
-// ⬇️ MIDDLEWARES (RUTA EN SINGULAR)
-import { requestLogger } from "./modules/notification/middlewares/request.middleware";
-import { notFoundHandler } from "./modules/notification/middlewares/notFound.middleware";
-import { globalErrorHandler } from "./modules/notification/middlewares/error.middleware";
 // Cargar variables de entorno
 dotenv.config();
 import "./config/env";
@@ -31,9 +25,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
-
-// 🧩 Logger por request (antes de las rutas)
-app.use(requestLogger);
 
 /*
 Ruta raiz 1
@@ -67,12 +58,6 @@ app.use("/api/notifications", notificationsCentralRouter);
 app.use(notFoundHandler);
 app.use(globalErrorHandler);
 app.use(requestLogger);
-
-// ============================================
-// ERRORES (DESPUÉS DE LAS RUTAS)
-// ============================================
-app.use(notFoundHandler);
-app.use(globalErrorHandler);
 
 // Iniciar servidor
 const PORT = process.env.PORT || 5000;
