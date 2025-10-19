@@ -7,6 +7,10 @@ import notificationsCentralRouter from "./modules/notification/routes/central.ro
 import helmet from "helmet";
 
 
+// ⬇️ MIDDLEWARES (RUTA EN SINGULAR)
+import { requestLogger } from "./modules/notification/middlewares/request.middleware";
+import { notFoundHandler } from "./modules/notification/middlewares/notFound.middleware";
+import { globalErrorHandler } from "./modules/notification/middlewares/error.middleware";
 // Cargar variables de entorno
 dotenv.config();
 import "./config/env";
@@ -69,6 +73,11 @@ app.get('/api/health', (req: Request, res: Response) => {
 // Montar tus módulos aquí:
 app.use("/notifications", notificationRoutes);
 app.use("/api/notifications", notificationsCentralRouter);
+
+
+app.use(notFoundHandler);
+app.use(globalErrorHandler);
+app.use(requestLogger);
 
 // ============================================
 // Manejo de errores 404
