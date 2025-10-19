@@ -1,93 +1,110 @@
-# Backend API - Arquitectura Modular
+T8: a cargo de Silvia Lili Alarcon Espinoza y Maria Berniz Ramirez Saravia
 
-## 🏗️ Estructura del Proyecto
+Backend del proyecto Alquiler, con módulo base de notificaciones.
 
-```
-backend/
+🛠 Estructura del proyecto
+alquiler_back/
 ├── src/
-│   ├── config/              # Configuración global (DB, etc)
-│   ├── types/               # Tipos globales compartidos
-│   ├── utils/               # Utilidades globales
-│   ├── middlewares/         # Middlewares globales
-│   ├── modules/             # Módulos/Grupos independientes
-│   │   └── nombre_grupo_ejemplo/  # Ejemplo de módulo
-│   │       ├── config/
-│   │       ├── controllers/
-│   │       ├── routes/
-│   │       ├── services/
-│   │       ├── middlewares/
-│   │       ├── models/
-│   │       ├── types/
-│   │       ├── utils/
-│   │       ├── errors/
-│   │       └── index.ts
-│   └── index.ts             # Punto de entrada principal
-├── dist/                    # Código compilado
-├── .env                     # Variables de entorno
-├── tsconfig.json           # Configuración TypeScript
-└── package.json            # Dependencias
-```
+│   ├── config/                 # Configuración global (DB, etc.)
+│   ├── middlewares/            # Middlewares
+│   ├── models/                 # Modelos de datos
+│   ├── modules/
+│   │   ├── notifications/      # Módulo de notificaciones
+│   │   │   ├── controllers/    # Controladores
+│   │   │   ├── workflows/      # Workflow de notificaciones
+│   │   │   ├── services/       # Servicios (placeholder)
+│   │   │   ├── routes/         # Rutas del módulo
+│   │   │   ├── types/          # Tipos TypeScript
+│   │   │   └── index.ts        # Exporta el módulo
+│   ├── routes/                 # Rutas generales (email, etc.)
+│   ├── types/                  # Tipos globales
+│   ├── utils/                  # Utilidades (emailService.js)
+│   └── index.ts                # Entrada principal del servidor
+├── package.json
+├── tsconfig.json
+└── README.md
 
-## 📦 Módulos
+⚡ Tecnologías
 
-Cada módulo es **independiente** y contiene toda su lógica:
+Node.js
 
-- ✅ Sus propios controllers
-- ✅ Sus propias routes
-- ✅ Sus propios models
-- ✅ Sus propios services
-- ✅ Sus propios middlewares
-- ✅ Sus propios types
+Express
 
-### Módulos actuales:
-- `nombre_grupo_ejemplo` - Módulo de ejemplo (template)
+TypeScript
 
-## 🚀 Cómo agregar un nuevo módulo
+Nodemailer (para envío de correo, placeholder en esta etapa)
 
-1. Copia la carpeta `src/modules/nombre_grupo_ejemplo`
-2. Renómbrala con el nombre de tu módulo
-3. Modifica los archivos según tu necesidad
-4. Importa y monta en `src/index.ts`:
+dotenv
 
-```typescript
-import tuModuloRouter from './modules/tu_modulo';
-app.use('/api/tu_modulo', tuModuloRouter);
-```
+ts-node-dev (para desarrollo)
 
-## 🔧 Instalación
+🚀 Flujo de notificaciones (base)
 
-```bash
+Solicitud HTTP POST llega al endpoint /api/notify.
+
+Controlador createNotification recibe los datos y llama a processNotification.
+
+Workflow processNotification decide el canal (email o console) y llama al servicio correspondiente.
+
+Servicio sendEmailNotification (placeholder) registra el envío con console.log.
+
+Devuelve respuesta JSON:
+
+{
+  "success": true,
+  "message": "Notificación procesada correctamente"
+}
+
+
+Nota: Por ahora el envío real de correo está simulado; el flujo base está diseñado para soportar cualquier canal futuro.
+
+📝 Endpoints
+Enviar notificación
+POST /api/notify
+
+
+Body (JSON)
+
+{
+  "to": "correo@ejemplo.com",
+  "subject": "Asunto de prueba",
+  "message": "Mensaje de prueba",
+  "channel": "email"
+}
+
+
+Respuesta
+
+{
+  "success": true,
+  "message": "Notificación procesada correctamente"
+}
+
+⚙️ Configuración del proyecto
+
+Instalar dependencias:
+
 npm install
-```
-
-## 🏃 Ejecutar
-
-```bash
-# Desarrollo
-npm run dev
-
-# Compilar
-npm run build
-
-# Producción
-npm start
-```
-
-## 📡 Endpoints base
-
-- `GET /` - Info de la API
-- `GET /api/health` - Health check
-
-## 👥 Trabajo en equipo
-
-Cada equipo trabaja en su propio módulo sin interferir con otros:
-
-- **Equipo A** → `modules/modulo_a/`
-- **Equipo B** → `modules/modulo_b/`
-- **Equipo C** → `modules/modulo_c/`
-
-Una vez terminado, cada equipo monta su módulo en `src/index.ts`
 
 
-## DevCode
-- Johan
+Variables de entorno en .env (opcional para integración real de email):
+
+EMAIL_USER=tu_correo@gmail.com
+EMAIL_PASS=tu_app_password
+PORT=5000
+
+
+Ejecutar servidor en desarrollo:
+
+npx ts-node-dev --respawn --transpile-only src/index.ts
+
+
+Probar endpoint con CURL o Postman.
+
+🧩 Notas
+
+El flujo base está listo para extenderse a envío real de correos, notificaciones push, SMS, etc.
+
+La lógica de notificaciones está centralizada en el workflow, permitiendo añadir fácilmente nuevos canales.
+
+sendEmailNotification actualmente es un placeholder que imprime en consola el mensaje.
