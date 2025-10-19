@@ -2,6 +2,7 @@ import nodemailer from "nodemailer";
 import { google } from "googleapis";
 import fs from "fs";
 import path from "path";
+import { ProviderError } from "../errors/CustomError";
 
 const logFile = path.join(process.cwd(), "logs", "email.log");
 
@@ -28,7 +29,6 @@ export interface EmailOptions {
   from?: string;
   fromName?: string;
 }
-
 /**
  * Envía un correo electrónico usando Gmail API (OAuth2)
  * y registra el resultado en un archivo de logs.
@@ -52,7 +52,7 @@ export async function sendEmail(options: EmailOptions) {
     const accessToken = await oAuth2Client.getAccessToken();
 
     if (!accessToken?.token) {
-      throw new Error("No se pudo obtener el access token de Google OAuth2.");
+      throw new ProviderError("No se pudo obtener el access token de Google OAuth2.");
     }
 
     // ✅ Configurar el transporter con OAuth2
@@ -103,6 +103,7 @@ export async function sendEmail(options: EmailOptions) {
       error: error.message,
     });
 
-    return { success: false, error: error.message };
+    // Propagar error centralizado para que el servicio lo maneje (reintentos/catch)
+    throw new ProviderError(error.message || 'Error sending email', { original: error });
   }
 }

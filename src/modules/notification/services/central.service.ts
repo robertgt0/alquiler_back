@@ -4,6 +4,7 @@ import { sendEmail } from "../providers/email.provider";
 import { NotificationModel } from "../models/notification.model";
 import fs from "fs";
 import path from "path";
+import { ValidationError, ProviderError } from "../errors/CustomError";
 
 const logFile = path.join(process.cwd(), "logs", "email.log");
 
@@ -155,19 +156,22 @@ export class CentralNotificationService {
   }
 
   validatePayload(data: CreateNotificationInput) {
-    if (!data) throw new Error("Payload vacío");
-    if (!data.subject || typeof data.subject !== "string") throw new Error("subject is required");
-    if (!data.message || typeof data.message !== "string") throw new Error("message is required");
-    if (data.message.length > 500) throw new Error("message exceeds 500 characters");
-    if (!Array.isArray(data.destinations) || data.destinations.length === 0)
-      throw new Error("destinations must be a non-empty array");
+    const errors: any[] = [];
+    if (!data) errors.push({ message: 'Payload vacío' });
+    if (!data?.subject || typeof data.subject !== "string") errors.push({ field: 'subject', message: 'subject is required' });
+    if (!data?.message || typeof data.message !== "string") errors.push({ field: 'message', message: 'message is required' });
+    if (data?.message && data.message.length > 500) errors.push({ field: 'message', message: 'message exceeds 500 characters' });
+    if (!Array.isArray(data?.destinations) || data?.destinations.length === 0)
+      errors.push({ field: 'destinations', message: 'destinations must be a non-empty array' });
 
     // validar emails básicos
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    for (const d of data.destinations) {
+    for (const d of data?.destinations || []) {
       if (!d.email || !emailRegex.test(d.email)) {
-        throw new Error(`Invalid email in destinations: ${d.email}`);
+        errors.push({ field: 'destinations', message: `Invalid email in destinations: ${d.email}` });
       }
     }
+
+    if (errors.length > 0) throw new ValidationError(errors);
   }
 }

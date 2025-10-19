@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import { Router } from 'express';
 import ejemploRoutes from './routes/notification.routes';
+import { errorHandler } from './errors/errorHandler';
 
 const router = Router();
 
@@ -22,5 +23,8 @@ router.use('/ejemplo', ejemploRoutes);
 
 // Puedes agregar más rutas aquí:
 // router.use('/otra-ruta', otraRoutes);
+
+// Manejador de errores
+router.use(errorHandler);
 
 export default router;

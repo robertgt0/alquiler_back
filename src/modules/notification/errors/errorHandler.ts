@@ -1,27 +1,39 @@
-import { Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
+import { CustomError } from './CustomError';
 
-export const handleError = (error: any, res: Response): void => {
-  console.error('Error:', error);
+export function errorHandler(err: any, req: Request, res: Response, next: NextFunction) {
+  console.error('[notification] error:', err?.message || err);
 
-  if (error.name === 'ValidationError') {
-    res.status(400).json({
+  if (err instanceof CustomError) {
+    return res.status(err.statusCode).json({
       success: false,
-      message: 'Error de validación',
-      errors: error.errors,
+      error: {
+        code: err.code,
+        message: err.message,
+        status: err.statusCode,
+        details: err.details,
+      },
     });
-    return;
   }
 
-  if (error.name === 'CastError') {
-    res.status(400).json({
+  if (err?.name === 'ValidationError' || err?.name === 'CastError') {
+    return res.status(400).json({
       success: false,
-      message: 'ID inválido',
+      error: {
+        code: 'VALIDATION_ERROR',
+        message: err?.message || 'Error de validación',
+        status: 400,
+        details: err?.errors || null,
+      },
     });
-    return;
   }
 
-  res.status(500).json({
+  return res.status(500).json({
     success: false,
-    message: error.message || 'Error interno del servidor',
+    error: {
+      code: 'INTERNAL_ERROR',
+      message: err?.message || 'Error interno del servidor',
+      status: 500,
+    },
   });
-};
+}

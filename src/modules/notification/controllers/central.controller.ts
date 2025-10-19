@@ -1,6 +1,7 @@
 // src/modules/notifications/controllers/central.controller.ts
-import { Request, Response } from "express";
+import { Request, Response,NextFunction } from "express";
 import { CentralNotificationService } from "../services/central.service";
+import { ValidationError, NotFoundError, ProviderError } from "../errors/CustomError";
 
 const service = new CentralNotificationService();
 
@@ -20,18 +21,18 @@ Body esperado:
 
 Encabezado requerido: x-api-key: <API_KEY>
  */
-export const receiveNotificationHandler = async (req: Request, res: Response) => {
+export const receiveNotificationHandler = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const apiKeyHeader = (req.headers["x-api-key"] || "") as string;
     if (!apiKeyHeader || apiKeyHeader !== process.env.API_KEY) {
-      return res.status(401).json({ ok: false, error: "Unauthorized" });
+      throw new ValidationError({ field: "x-api-key", message: "API key inválida o ausente" });
     }
 
     const payload = req.body;
 
     // Validation - basic (more strict checks in service)
     if (!payload || typeof payload !== "object") {
-      return res.status(400).json({ ok: false, error: "Invalid body" });
+      throw new ValidationError({ body: "El cuerpo de la petición es inválido" });
     }
 
     const { subject, message, destinations, fromName } = payload;
@@ -44,7 +45,6 @@ export const receiveNotificationHandler = async (req: Request, res: Response) =>
 
     return res.status(200).json({ ok: true, transactionId, notification });
   } catch (err: any) {
-    console.error("receiveNotificationHandler error:", err);
-    return res.status(500).json({ ok: false, error: err.message || "Server error" });
+    next(err);
   }
 };

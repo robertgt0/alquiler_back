@@ -1,5 +1,6 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { NotificationService } from "../services/notification.service";
+import { ValidationError, ProviderError, NotFoundError } from "../errors/CustomError";
 
 let _service: NotificationService | null = null;
 function getService() {
@@ -11,9 +12,10 @@ function getService() {
  * Controlador principal para crear y enviar notificaciones por correo.
  * Usa la API de Gmail con OAuth2 según la configuración del entorno.
  */
-export const createNotificationHandler = async (req: Request, res: Response) => {
+export const createNotificationHandler = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const payload = req.body;
+    const { message, subject, destinations, fromName } = payload;
 
     /*
       ESTRUCTURA ESPERADA DEL BODY:
@@ -29,7 +31,6 @@ export const createNotificationHandler = async (req: Request, res: Response) => 
 
     */
    
-    const { message, subject, destinations, fromName } = payload;
 
     // Validación de estructura
     if (
@@ -39,12 +40,12 @@ export const createNotificationHandler = async (req: Request, res: Response) => 
       destinations.length === 0 ||
       !destinations.every((d) => d.email || d.to)
     ) {
-      return res.status(400).json({
-        ok: false,
-        error:
-          "Estructura inválida. Se requiere: { subject, message, destinations: [{ email }] }",
+      throw new ValidationError({
+        message: "Estructura inválida",
+        expected: "{ subject, message, destinations: [{ email }] }",
       });
     }
+
 
     // Normalizar destinos
     const normalizedDestinations = destinations.map((d: any) => ({
@@ -73,37 +74,34 @@ export const createNotificationHandler = async (req: Request, res: Response) => 
       console.error("⚠️ Error de autenticación con Gmail OAuth2. Verifica tu refresh token o client_id/secret.");
     }
 
-    return res.status(500).json({
-      ok: false,
-      error: err.message || "Error interno del servidor al enviar el correo.",
-    });
+    // Delegar al middleware central
+    return next(err);
   }
 };
 
 /**
  * Obtiene una notificación específica por su transactionId
  */
-export const getNotificationHandler = async (req: Request, res: Response) => {
+export const getNotificationHandler = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const service = getService();
     const { id } = req.params;
     const record = await service.getByTransactionId(id);
 
     if (!record) {
-      return res.status(404).json({ ok: false, error: "Notificación no encontrada." });
+      throw new NotFoundError(`Notificación con ID ${id} no encontrada`);
     }
 
     return res.json({ ok: true, notification: record });
   } catch (err: any) {
-    console.error("getNotificationHandler error:", err);
-    return res.status(500).json({ ok: false, error: err.message || err });
+    next(err);
   }
 };
 
 /**
  * Lista las notificaciones con filtros opcionales
  */
-export const listNotificationsHandler = async (req: Request, res: Response) => {
+export const listNotificationsHandler = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const service = getService();
     const { status, to, fromDate, toDate, limit = 20, page = 1 } = req.query;
@@ -121,7 +119,6 @@ export const listNotificationsHandler = async (req: Request, res: Response) => {
       page: Number(page),
     });
   } catch (err: any) {
-    console.error("listNotificationsHandler error:", err);
-    return res.status(500).json({ ok: false, error: err.message || err });
+    next(err);
   }
 };
