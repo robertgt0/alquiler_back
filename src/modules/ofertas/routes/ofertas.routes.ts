@@ -7,10 +7,16 @@ const upload = multer({ storage });
 
 const router = Router();
 
-// POST con imagen
+// POST: Crear oferta con imagen
 router.post("/", upload.single("imagen"), OfertasController.crearOfertaConImagen);
 
-// GET todas las ofertas
+// GET: Listar todas las ofertas
 router.get("/", OfertasController.listarOfertas);
+
+// DELETE: Borrar oferta por ID
+router.delete("/:id", OfertasController.borrarOferta);
+
+// PUT: Editar oferta por ID (con o sin nueva imagen)
+router.put("/:id", upload.single("imagen"), OfertasController.editarOferta);
 
 export default router;
