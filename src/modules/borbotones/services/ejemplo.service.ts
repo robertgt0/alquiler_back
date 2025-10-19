@@ -1,4 +1,4 @@
-import Ejemplo from '../models/Ejemplo';
+import Ejemplo from '../models/usuarios.model';
 import { EjemploEntity } from '../types';
 
 export class EjemploService {

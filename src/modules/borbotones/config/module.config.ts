@@ -1,4 +1,3 @@
-// Configuración específica de este módulo
 
 export const moduleConfig = {
   moduleName: 'Borbotones',
