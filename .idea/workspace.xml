@@ -4,27 +4,53 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bc339e81-ebc5-4bf0-bb35-f53c0f38adc0" name="Changes" comment="ignore" />
+    <list default="true" id="bc339e81-ebc5-4bf0-bb35-f53c0f38adc0" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/modules/notification/controllers/notification.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/modules/notification/middlewares/notification.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/modules/notification/routes/notification.routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/modules/notification/routes/notification.routes.ts" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="dev/recode" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/robertgt0/alquiler_back.git",
-    "accountId": "81f5b9c5-76a5-422f-a8cf-ffa3da6f4e2b"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/robertgt0/alquiler_back.git&quot;,
+    &quot;accountId&quot;: &quot;81f5b9c5-76a5-422f-a8cf-ffa3da6f4e2b&quot;
   }
-}]]></component>
+}</component>
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "git-widget-placeholder": "dev/recode",
-    "node.js.selected.package.tslint": "(autodetect)"
+    "Node.js.index.ts.executor": "Run",
+    "git-widget-placeholder": "dev/recode-Miguel-prueba",
+    "last_opened_file_path": "D:/ProyectosUMSS/Servineo_IS/Servineo_back/alquiler_back",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "ts.external.directory.path": "D:\\ProyectosUMSS\\Servineo_IS\\Servineo_back\\alquiler_back\\node_modules\\typescript\\lib"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\ProyectosUMSS\Servineo_IS\Servineo_back\alquiler_back" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\ProyectosUMSS\Servineo_IS\Servineo_back\alquiler_back\src\modules\notification\middlewares" />
+      <recent name="D:\ProyectosUMSS\Servineo_IS\Servineo_back\alquiler_back\src\modules\notification\utils" />
+      <recent name="D:\ProyectosUMSS\Servineo_IS\Servineo_back\alquiler_back\src\modules\notification\errors" />
+    </key>
+  </component>
   <component name="TaskManager">
     <task id="LOCAL-00001" summary="ignore">
       <option name="closed" value="true" />
