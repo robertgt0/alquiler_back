@@ -88,6 +88,63 @@ export class CentralNotificationService {
             attempts: attempt,
           });
 
+          try {
+            const n8nPayload = {
+              transactionId,
+              event: "notification.sent",
+              subject: data.subject,
+              to: toEmails,
+              attempts: attempt,
+              providerResponse: sendResult,
+            };
+
+            const n8nWebhookUrl = process.env.N8N_WEBHOOK_URL;
+
+            if (n8nWebhookUrl) {
+              try {
+                const n8nRes = await fetch(n8nWebhookUrl, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(n8nPayload),
+                });
+
+                const jsonRes = await n8nRes.json().catch(() => ({}));
+
+                const connectedToN8n = n8nRes.ok; // true si status 200–299
+
+                writeLog({
+                  level: connectedToN8n ? "INFO" : "WARN",
+                  action: "n8n-trigger",
+                  transactionId,
+                  connectedToN8n,
+                  status: n8nRes.status,
+                  response: jsonRes,
+                });
+
+                if (connectedToN8n) {
+                  console.log("Conectado correctamente con n8n Cloud");
+                } else {
+                  console.warn("Error al conectar con n8n Cloud:", n8nRes.status);
+                }
+              } catch (error) {
+                console.error("Fallo al intentar conectar con n8n Cloud:", error);
+                writeLog({
+                  level: "ERROR",
+                  action: "n8n-trigger-exception",
+                  transactionId,
+                  error: String(error),
+                });
+              }
+            }
+          } catch (e) {
+            writeLog({
+              level: "WARN",
+              action: "n8n-trigger-failed",
+              transactionId,
+              error: String(e),
+            });
+          }
+
           writeLog({
             level: "INFO",
             action: "email-sent",
