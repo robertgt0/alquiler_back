@@ -15,7 +15,7 @@ export const validateData = (req: Request, res: Response, next: NextFunction): v
   return;
   }
 
-  if (nombre.length > 10) {
+  if (nombre.length > 15) {
   res.status(400).json({ success: false, message: 'El nombre no puede tener más de 10 caracteres' });
   return;
   }
