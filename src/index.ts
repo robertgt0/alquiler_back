@@ -6,6 +6,7 @@ import notificationRoutes from "./modules/notification/routes/notification.route
 import notificationsCentralRouter from "./modules/notification/routes/central.router";
 import helmet from "helmet";
 
+
 // Cargar variables de entorno
 dotenv.config();
 import "./config/env";
