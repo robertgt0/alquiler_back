@@ -2,6 +2,7 @@ export class CustomError extends Error {
     public statusCode: number;
     public code: string;
     public details?: any;
+    public retryable?: boolean;
 
     constructor(message: string, code = 'INTERNAL_ERROR', statusCode = 500, details?: any) {
         super(message);
@@ -9,6 +10,7 @@ export class CustomError extends Error {
         this.code = code;
         this.statusCode = statusCode;
         this.details = details;
+        this.retryable = false;
         Object.setPrototypeOf(this, new.target.prototype);
     }
 }
@@ -31,5 +33,6 @@ export class ProviderError extends CustomError {
     constructor(message = 'Provider error', details?: any) {
         super(message, 'PROVIDER_ERROR', 502, details);
         this.name = 'ProviderError';
+        this.retryable = true;
     }
 }

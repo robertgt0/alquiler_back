@@ -5,6 +5,7 @@ import { NotificationModel } from "../models/notification.model";
 import fs from "fs";
 import path from "path";
 import { ValidationError, ProviderError } from "../errors/CustomError";
+import { retry } from "../utils/retry";
 
 const logFile = path.join(process.cwd(), "logs", "email.log");
 
@@ -58,101 +59,55 @@ export class CentralNotificationService {
       sentAt: null,
     });
 
-    // 3) Intentar envío con reintentos
-    let attempt = 0;
-    let lastError: any = null;
+    // 3) Intentar envío usando el util de reintentos central
     let sendResult: any = null;
+    try {
+      sendResult = await retry(() => sendEmail({ to: toEmails, subject: data.subject, html: data.message, fromName }), {
+        retries: this.maxRetries,
+        delayBaseMs: this.retryDelayBaseMs,
+      });
 
-    while (attempt < this.maxRetries) {
-      attempt++;
-      try {
-        // Llamamos al provider (sendEmail) que devuelve { success, messageId, accepted, rejected } o { success:false, error }
-        sendResult = await sendEmail({
-          to: toEmails,
-          subject: data.subject,
-          html: data.message,
-          fromName,
-        });
+      // registrar intento exitoso: actualizar attempts y estado
+      await NotificationModel.findByIdAndUpdate(notification._id, {
+        status: "sent",
+        providerResponse: sendResult,
+        messageId: sendResult.messageId || null,
+        sentAt: new Date(),
+        // attempts: can be derived or left as last value
+      });
 
-        // Actualizamos attempts
-        await NotificationModel.findByIdAndUpdate(notification._id, {
-          $inc: { attempts: 1 },
-        });
+      writeLog({
+        level: "INFO",
+        action: "email-sent",
+        transactionId,
+        to: toEmails,
+        subject: data.subject,
+        providerResponse: sendResult,
+      });
 
-        if (sendResult.success) {
-          // Éxito
-          await NotificationModel.findByIdAndUpdate(notification._id, {
-            status: "sent",
-            providerResponse: sendResult,
-            messageId: sendResult.messageId || null,
-            sentAt: new Date(),
-            attempts: attempt,
-          });
+      return { transactionId, notification: await NotificationModel.findById(notification._id) };
+    } catch (err: any) {
+      // Falló después de reintentos
+      const lastError = err?.message || err;
+      await NotificationModel.findByIdAndUpdate(notification._id, {
+        status: "failed",
+        lastError: String(lastError),
+        providerResponse: sendResult || null,
+        // attempts: could be set to maxRetries
+      });
 
-          writeLog({
-            level: "INFO",
-            action: "email-sent",
-            transactionId,
-            to: toEmails,
-            subject: data.subject,
-            attempt,
-            providerResponse: sendResult,
-          });
+      writeLog({
+        level: "ERROR",
+        action: "email-final-failed",
+        transactionId,
+        to: toEmails,
+        subject: data.subject,
+        attempts: this.maxRetries,
+        lastError,
+      });
 
-          return { transactionId, notification: await NotificationModel.findById(notification._id) };
-        } else {
-          // Error conocido, registrar y reintentar si aplica
-          lastError = sendResult.error || "unknown";
-          writeLog({
-            level: "WARN",
-            action: "send-error",
-            transactionId,
-            to: toEmails,
-            subject: data.subject,
-            attempt,
-            error: lastError,
-            providerResponse: sendResult,
-          });
-        }
-      } catch (err: any) {
-        lastError = err?.message || err;
-        writeLog({
-          level: "ERROR",
-          action: "send-exception",
-          transactionId,
-          to: toEmails,
-          subject: data.subject,
-          attempt,
-          error: lastError,
-        });
-      }
-
-      // Exponencial backoff simple antes del siguiente intento
-      if (attempt < this.maxRetries) {
-        const wait = this.retryDelayBaseMs * Math.pow(2, attempt - 1);
-        await new Promise((res) => setTimeout(res, wait));
-      }
+      return { transactionId, notification: await NotificationModel.findById(notification._id) };
     }
-
-    // Si llegamos aquí, falló después de reintentos
-    await NotificationModel.findByIdAndUpdate(notification._id, {
-      status: "failed",
-      lastError: String(lastError),
-      providerResponse: sendResult || null,
-      attempts: attempt,
-    });
-
-    writeLog({
-      level: "ERROR",
-      action: "email-final-failed",
-      transactionId,
-      to: toEmails,
-      subject: data.subject,
-      attempts: attempt,
-      lastError,
-    });
-
-    return { transactionId, notification: await NotificationModel.findById(notification._id) };
   }
 
   validatePayload(data: CreateNotificationInput) {
