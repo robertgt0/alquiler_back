@@ -19,7 +19,7 @@ import "./config/env";
 const app = express();
 
 // Conectar a MongoDB
-//connectDB();
+connectDB();
 
 // Middlewares globales
 app.use(cors());
