@@ -3,7 +3,7 @@ import {
   createNotificationHandler,
   getNotificationHandler,
   listNotificationsHandler,
-} from "../controllers/notification.controller"; // ✅ corregida la ruta (antes apuntaba mal)
+} from "../middlewares/notification.controller"; // ✅ corregida la ruta (antes apuntaba mal)
 import { createNotificationValidators } from "../dtos/createNotification.dto";
 
 // ✅ Creamos el router principal
