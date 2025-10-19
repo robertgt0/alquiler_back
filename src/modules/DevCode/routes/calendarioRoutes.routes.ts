@@ -4,6 +4,7 @@ import * as calendarioController from "../controllers/calendarioController.contr
 const router = Router();
 
 router.post("/", calendarioController.createCalendario);
+router.get("/disponibilidad", calendarioController.getAvailability);
 router.get("/", calendarioController.getCalendarios);
 router.get("/:id", calendarioController.getCalendarioById);
 router.put("/:id", calendarioController.updateCalendario);
