@@ -16,6 +16,8 @@ import connectDB from './config/database';
 import paginationRouter from './modules/borbotones/routes/pagination.router';
 import ordenamientoRouter from './modules/borbotones/routes/ordering.routes';
 import busquedaRouter from './modules/borbotones/routes/busqueda.router';
+import filtrosRouter from './modules/borbotones/routes/filstros.routes';
+
 
 // ============================================
 // 🔹 Cargar variables de entorno
@@ -65,6 +67,9 @@ app.use('/api/borbotones', ordenamientoRouter);
 // Módulo de búsqueda
 // Ejemplo: http://localhost:5000/api/busqueda?termino=ele
 app.use('/api/busqueda', busquedaRouter);
+
+
+app.use('/api/filtros', filtrosRouter);
 
 // ============================================
 // 🩺 Endpoint de salud (para monitoreo)
