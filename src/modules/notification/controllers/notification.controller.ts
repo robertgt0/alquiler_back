@@ -124,4 +124,34 @@ export const listNotificationsHandler = async (req: Request, res: Response) => {
     console.error("listNotificationsHandler error:", err);
     return res.status(500).json({ ok: false, error: err.message || err });
   }
+  
+};
+/**
+ * Enviar correo con template de reserva (T12)
+ */
+export const sendBookingTemplateHandler = async (req: Request, res: Response) => {
+  try {
+    const { to, userName, serviceName, date, price } = req.body;
+
+    const service = getService();
+    const result = await service.sendBookingNotification({
+      to,
+      userName,
+      serviceName,
+      date,
+      price,
+    });
+
+    return res.status(200).json({
+      ok: true,
+      message: "Correo con template enviado correctamente",
+      result,
+    });
+  } catch (err: any) {
+    console.error("sendBookingTemplateHandler error:", err);
+    return res.status(500).json({
+      ok: false,
+      error: err.message || "Error al enviar el correo con template",
+    });
+  }
 };

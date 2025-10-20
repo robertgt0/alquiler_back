@@ -3,6 +3,8 @@ import { NotificationModel } from "../models/notification.model";
 import { v4 as uuidv4 } from "uuid";
 import fs from "fs";
 import path from "path";
+import { bookingConfirmationTemplate } from "../templates";
+import { NotificationData } from "../types/notification.types";
 
 const logFile = path.join(process.cwd(), "logs", "email.log");
 
@@ -30,9 +32,19 @@ interface CreateNotificationInput {
 }
 
 export class NotificationService {
-  async createAndSend(data: CreateNotificationInput, fromName?: string) {
-    const { subject, message, destinations } = data;
-    const toEmails = destinations.map((d) => d.email);
+  async createAndSend(data: NotificationData, fromName?: string)
+ {
+  const { subject, message, destinations, to } = data;
+const toEmails: string[] =
+  destinations && destinations.length > 0
+    ? destinations.map((d) => d.email)
+    : to
+    ? Array.isArray(to)
+      ? to
+      : [to]
+    : [];
+
+
     const transactionId = uuidv4();
 
     // ✅ Enviar correo vía SMTP
@@ -74,5 +86,25 @@ export class NotificationService {
       .sort({ createdAt: -1 });
     const total = await NotificationModel.countDocuments(filters);
     return { items, total };
+  }
+  /**
+  * Enviar una notificación con template de reserva (T12)
+   */
+  async sendBookingNotification(data: {
+    to: string;
+    userName: string;
+    serviceName: string;
+    date: string;
+    price: number;
+  }) {
+    const html = bookingConfirmationTemplate(data);
+
+    const input: NotificationData = {
+      subject: "Confirmación de Reserva",
+      message: html, // se envía como HTML
+      destinations: [{ email: data.to, name: data.userName }],
+    };
+
+    return this.createAndSend(input, "Sistema de Servicios");
   }
 }

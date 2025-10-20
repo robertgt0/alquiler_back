@@ -3,6 +3,7 @@ import {
   createNotificationHandler,
   getNotificationHandler,
   listNotificationsHandler,
+  sendBookingTemplateHandler, // 👈 añade este import
 } from "../controllers/notification.controller"; // ✅ corregida la ruta (antes apuntaba mal)
 import { createNotificationValidators } from "../dtos/createNotification.dto";
 
@@ -28,5 +29,8 @@ router.get("/:id", getNotificationHandler);
  * Lista todas las notificaciones registradas (en logs o DB)
  */
 router.get("/", listNotificationsHandler);
+
+// 👇 NUEVA RUTA (T12)
+router.post("/booking-template", sendBookingTemplateHandler);
 
 export default router;
