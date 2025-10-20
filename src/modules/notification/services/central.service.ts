@@ -61,20 +61,32 @@ export class CentralNotificationService {
 
     // 3) Intentar envío usando el util de reintentos central
     let sendResult: any = null;
-    try {
-      sendResult = await retry(() => sendEmail({ to: toEmails, subject: data.subject, html: data.message, fromName }), {
-        retries: this.maxRetries,
-        delayBaseMs: this.retryDelayBaseMs,
-      });
 
-      // registrar intento exitoso: actualizar attempts y estado
-      await NotificationModel.findByIdAndUpdate(notification._id, {
-        status: "sent",
-        providerResponse: sendResult,
-        messageId: sendResult.messageId || null,
-        sentAt: new Date(),
-        // attempts: can be derived or left as last value
-      });
+    while (attempt < this.maxRetries) {
+      attempt++;
+      try {
+        // Llamamos al provider (sendEmail) que devuelve { success, messageId, accepted, rejected } o { success:false, error }
+        sendResult = await sendEmail({
+          to: toEmails,
+          subject: data.subject,
+          html: data.message,
+          fromName,
+        });
+
+        // Actualizamos attempts
+        await NotificationModel.findByIdAndUpdate(notification._id, {
+          $inc: { attempts: 1 },
+        });
+
+        if (sendResult.success) {
+          // Éxito
+          await NotificationModel.findByIdAndUpdate(notification._id, {
+            status: "sent",
+            providerResponse: sendResult,
+            messageId: sendResult.messageId || null,
+            sentAt: new Date(),
+            attempts: attempt,
+          });
 
       writeLog({
         level: "INFO",
