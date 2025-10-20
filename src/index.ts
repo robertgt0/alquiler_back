@@ -65,7 +65,7 @@ app.use('/api/borbotones', paginationRouter);
 app.use('/api/borbotones', ordenamientoRouter);
 
 // Módulo de búsqueda
-app.use('/api/busqueda', busquedaRouter);
+app.use('/api/borbotones/search', busquedaRouter);
 
 
 app.use('/api/borbotones/filtros', filtrosRouter);

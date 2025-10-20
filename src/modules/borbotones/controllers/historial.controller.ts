@@ -1,32 +1,65 @@
-import { Request, Response } from 'express'; // Importa los tipos Request y Response de Express para manejar solicitudes y respuestas HTTP
-import { HistorialService } from '../services/historial.service'; // Importa el servicio que contiene la lógica para manejar el historial de búsquedas
+import { Request, Response } from 'express';
+import { getDatabase } from '../config/conecction';
+import { handleError } from '../errors/errorHandler';
 
-// Controlador para obtener el historial de búsquedas
-export const getHistorial = async (req: Request, res: Response) => {
+export const getSearchHistory = async (req: Request, res: Response) => {
   try {
-    // Llama al servicio para obtener el historial de búsquedas según el usuario o la sesión
-    const historial = await HistorialService.obtenerHistorial(req);
-    // Envía la respuesta exitosa con el historial obtenido
-    res.status(200).json({ success: true, historial });
+    const db = await getDatabase();
+    if (!db)
+      return res
+        .status(500)
+        .json({ success: false, message: 'Error de conexión con la base de datos.' });
+
+    const historial = db.collection('historial');
+
+    const datos = await historial
+      .aggregate([
+        { $sort: { fecha: -1 } },
+        { $group: { _id: '$terminoOriginal', ultimaFecha: { $first: '$fecha' } } },
+        { $sort: { ultimaFecha: -1 } },
+        { $limit: 5 },
+      ])
+      .toArray();
+
+    if (datos.length === 0) {
+      return res.status(200).json({
+        success: true,
+        data: [],
+        message: 'Aún no hay búsquedas registradas.',
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: datos.map((d) => d._id),
+    });
   } catch (error) {
-    // Muestra el error en consola si ocurre algún problema
-    console.error('❌ Error al obtener historial:', error);
-    // Devuelve un mensaje de error al cliente con código 500 (error interno)
-    res.status(500).json({ success: false, message: 'Error al obtener el historial de búsquedas.' });
+    handleError(error, res);
   }
 };
 
-// Controlador para limpiar (eliminar) el historial de búsquedas
-export const limpiarHistorial = async (req: Request, res: Response) => {
+/**
+ * 🗑️ ELIMINAR TODO EL HISTORIAL
+ */
+export const clearSearchHistory = async (req: Request, res: Response) => {
   try {
-    // Llama al servicio para borrar todo el historial de búsquedas
-    await HistorialService.limpiarHistorial(req);
-    // Envía una respuesta confirmando que se limpió correctamente
-    res.status(200).json({ success: true, message: 'Historial limpiado correctamente.' });
+    const db = await getDatabase();
+    if (!db)
+      return res
+        .status(500)
+        .json({ success: false, message: 'Error de conexión con la base de datos.' });
+
+    const historial = db.collection('historial');
+    const result = await historial.deleteMany({});
+
+    res.status(200).json({
+      success: true,
+      message:
+        result.deletedCount === 0
+          ? 'El historial ya estaba vacío.'
+          : `Historial eliminado (${result.deletedCount} registros).`,
+    });
   } catch (error) {
-    // Muestra el error en consola si ocurre algún problema al limpiar el historial
-    console.error('❌ Error al limpiar historial:', error);
-    // Devuelve un mensaje de error al cliente con código 500 (error interno)
-    res.status(500).json({ success: false, message: 'Error al limpiar el historial.' });
+    handleError(error, res);
   }
 };

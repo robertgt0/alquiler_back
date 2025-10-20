@@ -1,112 +1,363 @@
 import { Request, Response } from 'express';
-import Especialidad from '../models/Especialidad';
+import { getDatabase } from '../config/conecction';
+import { handleError } from '../errors/errorHandler';
 
-/**
- * 🔹 Función auxiliar: normalizarTexto
- * Elimina acentos y convierte el texto a minúsculas.
- * Esto permite hacer búsquedas insensibles a mayúsculas y acentos.
- * Ejemplo: "Eléctrico" -> "electrico"
- */
-const normalizarTexto = (texto: string): string =>
-  texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-
-/**
- * 🔹 Función auxiliar: validarCaracteres
- * Permite solo letras (con o sin acentos), espacios, comas y guiones.
- * Evita que se busquen cosas como símbolos, números o caracteres extraños.
- */
-const validarCaracteres = (texto: string): boolean => {
-  const permitidos = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ´\s,-]+$/;
-  return permitidos.test(texto);
-};
-
-/**
- * ✅ Controlador principal: getBusqueda
- * 
- * Este controlador recibe una búsqueda del frontend y devuelve coincidencias.
- * 
- * 📍 Endpoint esperado en el backend:
- *    GET /api/borbotones/busqueda?q=<termino>
- * 
- * 🔁 Flujo:
- *  1. Recibe el parámetro `q` desde la URL (?q=plomero)
- *  2. Valida que el texto sea correcto (no vacío, sin caracteres raros, etc.)
- *  3. Normaliza el texto (sin acentos, minúsculas)
- *  4. Busca coincidencias en la colección "Especialidad"
- *  5. Devuelve las coincidencias como un array de strings
- * 
- * 🔸 Ejemplo de petición desde el frontend:
- * fetch("http://localhost:5000/api/borbotones/busqueda?q=elec")
- *   .then(res => res.json())
- *   .then(data => console.log(data));
- */
-export const getBusqueda = async (req: Request, res: Response) => {
+export const searchAutocomplete = async (req: Request, res: Response) => {
   try {
-    // 1️⃣ Extraer el parámetro de búsqueda de la URL
-    const { q } = req.query;
+    const { q: searchTerm, limit = 4 } = req.query;
 
-    // Validar que exista y sea un string
-    if (!q || typeof q !== 'string') {
+    if (!searchTerm || typeof searchTerm !== 'string') {
+      return res.json({ success: true, data: [] });
+    }
+
+    if (searchTerm.length > 80) {
       return res.status(400).json({
         success: false,
-        message: 'Debe proporcionar un parámetro de búsqueda válido.'
+        message: 'La búsqueda no puede exceder 80 caracteres.',
       });
     }
 
-    // 2️⃣ Limpiar espacios múltiples y recortar el texto
-    const textoLimpio = q.replace(/\s+/g, ' ').trim();
+    const normalize = (str: string) =>
+      str
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[“”‘’"']/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
 
-    // 3️⃣ Normalizar texto para comparación sin acentos
-    const texto = normalizarTexto(textoLimpio);
+    const trimmedSearch = normalize(searchTerm);
 
-    // 4️⃣ Validaciones adicionales
-    if (textoLimpio.length === 0 || texto.length === 0) {
+    if (!trimmedSearch) {
       return res.status(400).json({
         success: false,
-        message: 'Ingrese un término de búsqueda válido.'
+        message: 'Búsqueda inexistente o caracteres no válidos.',
       });
     }
 
-    if (textoLimpio.length > 80) {
+    const validCharsRegex = /^[a-záéíóúñü\s´,\-]+$/i;
+    if (!validCharsRegex.test(searchTerm)) {
       return res.status(400).json({
         success: false,
-        message: 'Máximo 80 caracteres permitidos.'
+        message: 'Solo se permiten caracteres alfabéticos.',
       });
     }
 
-    if (!validarCaracteres(textoLimpio)) {
+    const onlySpecials = /^[´',\-\s]+$/;
+    if (onlySpecials.test(searchTerm)) {
       return res.status(400).json({
         success: false,
-        message: 'Solo se permiten caracteres alfabéticos y: ´ , -'
+        message: 'Búsqueda inexistente o caracteres no válidos.',
       });
     }
 
-    if (texto.length < 2) {
+    if (trimmedSearch.length < 2) {
       return res.status(400).json({
         success: false,
-        message: 'Debe ingresar al menos 2 caracteres para buscar.'
+        message: 'La búsqueda debe tener al menos dos caracteres.',
       });
     }
 
-    // 5️⃣ Buscar coincidencias en la colección "Especialidad"
-    // Se usa una expresión regular (regex) para coincidencias parciales e insensibles a mayúsculas
-    const resultados = await Especialidad.find({
-      nombre: { $regex: texto, $options: 'i' }
-    }).limit(5); // Limitar a 5 resultados
+    const db = await getDatabase();
+    if (!db)
+      return res.status(500).json({
+        success: false,
+        message: 'Error de conexión con la base de datos.',
+      });
 
-    // 6️⃣ Devolver respuesta exitosa al frontend
-    return res.status(200).json({
+    const regex = new RegExp(trimmedSearch, 'i');
+
+
+    const especialidades = db.collection('especialidades');
+    const servicios = db.collection('servicios');
+    const usuarios = db.collection('usuarios');
+    const historial = db.collection('historial');
+
+
+    const resultadosEspecialidades = await especialidades
+      .aggregate([
+        {
+          $addFields: {
+            nombre_normalizado: {
+              $toLower: {
+                $replaceAll: {
+                  input: {
+                    $replaceAll: {
+                      input: {
+                        $replaceAll: {
+                          input: {
+                            $replaceAll: {
+                              input: {
+                                $replaceAll: {
+                                  input: {
+                                    $replaceAll: {
+                                      input: '$nombre',
+                                      find: 'á',
+                                      replacement: 'a',
+                                    },
+                                  },
+                                  find: 'é',
+                                  replacement: 'e',
+                                },
+                              },
+                              find: 'í',
+                              replacement: 'i',
+                            },
+                          },
+                          find: 'ó',
+                          replacement: 'o',
+                        },
+                      },
+                      find: 'ú',
+                      replacement: 'u',
+                    },
+                  },
+                  find: 'ñ',
+                  replacement: 'n',
+                },
+              },
+            },
+            profesion_normalizada: {
+              $toLower: {
+                $replaceAll: {
+                  input: {
+                    $replaceAll: {
+                      input: {
+                        $replaceAll: {
+                          input: {
+                            $replaceAll: {
+                              input: {
+                                $replaceAll: {
+                                  input: {
+                                    $replaceAll: {
+                                      input: '$profesion',
+                                      find: 'á',
+                                      replacement: 'a',
+                                    },
+                                  },
+                                  find: 'é',
+                                  replacement: 'e',
+                                },
+                              },
+                              find: 'í',
+                              replacement: 'i',
+                            },
+                          },
+                          find: 'ó',
+                          replacement: 'o',
+                        },
+                      },
+                      find: 'ú',
+                      replacement: 'u',
+                    },
+                  },
+                  find: 'ñ',
+                  replacement: 'n',
+                },
+              },
+            },
+            servicios_normalizados: {
+              $map: {
+                input: '$servicios',
+                as: 'serv',
+                in: {
+                  nombre_normalizado: {
+                    $toLower: {
+                      $replaceAll: {
+                        input: {
+                          $replaceAll: {
+                            input: {
+                              $replaceAll: {
+                                input: {
+                                  $replaceAll: {
+                                    input: {
+                                      $replaceAll: {
+                                        input: {
+                                          $replaceAll: {
+                                            input: '$$serv.nombre',
+                                            find: 'á',
+                                            replacement: 'a',
+                                          },
+                                        },
+                                        find: 'é',
+                                        replacement: 'e',
+                                      },
+                                    },
+                                    find: 'í',
+                                    replacement: 'i',
+                                  },
+                                },
+                                find: 'ó',
+                                replacement: 'o',
+                              },
+                            },
+                            find: 'ú',
+                            replacement: 'u',
+                          },
+                        },
+                        find: 'ñ',
+                        replacement: 'n',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        {
+          $match: {
+            $or: [
+              { nombre_normalizado: { $regex: regex } },
+              { profesion_normalizada: { $regex: regex } },
+              { 'servicios_normalizados.nombre_normalizado': { $regex: regex } },
+            ],
+          },
+        },
+        {
+          $project: {
+            tipo: { $literal: 'especialidad' },
+            id_especialidad: 1,
+            nombre: 1,
+            profesion: 1,
+            servicios: { $slice: ['$servicios', 2] },
+            _id: 0,
+          },
+        },
+        { $limit: parseInt(limit as string) },
+      ])
+      .toArray();
+
+
+    const resultadosServicios = await servicios
+      .aggregate([
+        {
+          $addFields: {
+            nombre_normalizado: {
+              $toLower: {
+                $replaceAll: {
+                  input: '$nombre',
+                  find: 'ñ',
+                  replacement: 'n',
+                },
+              },
+            },
+            descripcion_normalizada: {
+              $toLower: {
+                $replaceAll: {
+                  input: '$descripcion',
+                  find: 'ñ',
+                  replacement: 'n',
+                },
+              },
+            },
+          },
+        },
+        {
+          $match: {
+            $or: [
+              { nombre_normalizado: { $regex: regex } },
+              { descripcion_normalizada: { $regex: regex } },
+            ],
+          },
+        },
+        {
+          $project: {
+            tipo: { $literal: 'servicio' },
+            nombre: 1,
+            descripcion: 1,
+            _id: 0,
+          },
+        },
+        { $limit: parseInt(limit as string) },
+      ])
+      .toArray();
+
+
+    const resultadosUsuarios = await usuarios
+      .aggregate([
+        {
+          $addFields: {
+            nombre_normalizado: {
+              $toLower: {
+                $replaceAll: {
+                  input: '$nombre',
+                  find: 'ñ',
+                  replacement: 'n',
+                },
+              },
+            },
+            correo_normalizado: {
+              $toLower: {
+                $replaceAll: {
+                  input: '$correo',
+                  find: 'ñ',
+                  replacement: 'n',
+                },
+              },
+            },
+          },
+        },
+        {
+          $match: {
+            $or: [
+              { nombre_normalizado: { $regex: regex } },
+              { correo_normalizado: { $regex: regex } },
+            ],
+          },
+        },
+        {
+          $project: {
+            tipo: { $literal: 'usuario' },
+            nombre: 1,
+            correo: 1,
+            _id: 0,
+          },
+        },
+        { $limit: parseInt(limit as string) },
+      ])
+      .toArray();
+
+    const combinados = [
+      ...resultadosEspecialidades,
+      ...resultadosServicios,
+      ...resultadosUsuarios,
+    ];
+
+    if (combinados.length === 0) {
+      return res.json({
+        success: true,
+        data: [],
+        message: `No se han encontrado resultados para "${searchTerm}"`,
+      });
+    }
+
+    const resultadosUnicos = combinados.filter(
+      (item, index, self) =>
+        index === self.findIndex((t) => t.nombre === item.nombre)
+    );
+
+
+    await historial.updateOne(
+      { termino: trimmedSearch },
+      {
+        $set: {
+          termino: trimmedSearch,
+          terminoOriginal: searchTerm,
+          fecha: new Date(),
+        },
+      },
+      { upsert: true }
+    );
+
+
+    return res.json({
       success: true,
-      resultados: resultados.map(e => e.nombre), // Solo se envían los nombres
-      terminoOriginal: q // Se devuelve el término original para mostrarlo al usuario
+      data: resultadosUnicos,
+      searchTerm,
+      count: resultadosUnicos.length,
     });
-
   } catch (error) {
-    // 7️⃣ Manejo de errores generales
-    console.error('❌ Error en la búsqueda:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error al realizar la búsqueda. Intenta de nuevo.'
-    });
+    handleError(error, res);
   }
 };
