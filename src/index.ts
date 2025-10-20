@@ -16,7 +16,7 @@ import connectDB from './config/database';
 import paginationRouter from './modules/borbotones/routes/pagination.router';
 import ordenamientoRouter from './modules/borbotones/routes/ordering.routes';
 import busquedaRouter from './modules/borbotones/routes/busqueda.router';
-import filtrosRouter from './modules/borbotones/routes/filstros.routes';
+import filtrosRouter from './modules/borbotones/routes/filtros.routes';
 
 
 // ============================================

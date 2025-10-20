@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import Usuario from "../models/usuarios.model";
 import City from "../models/city.model";
 import Provincia from "../models/provincia.model";
+import boliviaDepartments from "../config/boliviaDepartments";
+import boliviaDeptCities from "../config/boliviaDeptCities";
 
 /* ========= Utils ========= */
 function escapeRegex(s: string) {
@@ -17,6 +19,10 @@ export const listarCiudades = async (req: Request, res: Response) => {
     const limitRaw = Number(req.query.limit ?? 50);
     const pageRaw = Number(req.query.page ?? 1);
 
+    // Soporte para filtrar solo ciudades de Bolivia
+    const pais = (req.query.pais as string | undefined)?.trim()?.toLowerCase();
+    const soloBolivia = pais === "bolivia" || pais === "bo" || req.query.soloBolivia === "true";
+
     const pageSize = Number.isNaN(limitRaw)
       ? 50
       : Math.min(Math.max(limitRaw, 1), 200);
@@ -25,6 +31,23 @@ export const listarCiudades = async (req: Request, res: Response) => {
 
     const filter: any = {};
     if (q && q !== "") filter.nombre = new RegExp(escapeRegex(q), "i");
+
+    if (soloBolivia) {
+      // Si el cliente pide solo Bolivia, restringimos la búsqueda a nombres presentes en la lista
+      // Construimos la lista a partir de boliviaDeptCities (concat + unique)
+      const allCities = Object.values(boliviaDeptCities).flat().map((c) => c.toLowerCase());
+      const unique = Array.from(new Set(allCities));
+      const escaped = unique.map((c) => escapeRegex(c)).join("|");
+      const bolRegex = new RegExp(`^(${escaped})$`, "i");
+      // Si ya había q, combinamos (nombre que contiene q) y (pertenece a la lista)
+      if (filter.nombre) {
+        // Se busca que el nombre contenga q y además sea una ciudad boliviana: usamos $and
+        filter.$and = [ { nombre: filter.nombre }, { nombre: bolRegex } ];
+        delete filter.nombre;
+      } else {
+        filter.nombre = bolRegex;
+      }
+    }
 
     const [data, total] = await Promise.all([
       City.find(filter, { _id: 0, id_ciudad: 1, nombre: 1 })
@@ -38,6 +61,38 @@ export const listarCiudades = async (req: Request, res: Response) => {
     res.json({ success: true, total, page, pageSize, data });
   } catch (err: any) {
     console.error("Error en /filstros/ciudades:", err);
+    res.status(500).json({ success: false, message: err?.message ?? "Error interno" });
+  }
+};
+
+/* =======================================================
+ *  Listado de DEPARTAMENTOS (Bolivia)
+ *  Endpoint simple que devuelve lista estática
+ * ======================================================= */
+export const listarDepartamentos = async (_req: Request, res: Response) => {
+  try {
+    res.json({ success: true, total: boliviaDepartments.length, data: boliviaDepartments });
+  } catch (err: any) {
+    console.error("Error en /departamentos:", err);
+    res.status(500).json({ success: false, message: err?.message ?? "Error interno" });
+  }
+};
+
+/* =======================================================
+ *  Ciudades por departamento (Bolivia) - endpoint estático
+ *  Query: ?departamento=Nombre
+ * ======================================================= */
+export const ciudadesPorDepartamento = async (req: Request, res: Response) => {
+  try {
+    const departamentoRaw = (req.query.departamento as string | undefined)?.trim();
+    if (!departamentoRaw) {
+      return res.status(400).json({ success: false, message: "Debes enviar ?departamento=Nombre" });
+    }
+    const key = departamentoRaw.toLowerCase();
+    const ciudades = boliviaDeptCities[key] ?? [];
+    res.json({ success: true, total: ciudades.length, data: ciudades.map((c) => ({ id_ciudad: 0, nombre: c })) });
+  } catch (err: any) {
+    console.error("Error en /ciudades/por-departamento:", err);
     res.status(500).json({ success: false, message: err?.message ?? "Error interno" });
   }
 };
