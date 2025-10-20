@@ -106,3 +106,98 @@ router.get('/:id', async (req, res) => {
 });
 
 export default router;
+// ...importaciones y código existente arriba
+
+/** Crear oferta (soft requirements: JSON; si mandan campos en español también funciona) */
+router.post('/', async (req, res) => {
+  try {
+    const {
+      id,
+      ownerId,
+      title,
+      description,
+      category,
+      contact,
+      images,
+
+      // alias en español por compatibilidad
+      descripcion,
+      categoria,
+      whatsapp,
+    } = req.body ?? {};
+
+    const now = new Date();
+
+    const doc = await OfferModel.create({
+      // si te mandan un id lo respetas; si no, generas uno simple
+      id: id ?? String(now.getTime()),
+      ownerId: ownerId ?? 'fixer-1', // TODO: reemplazar cuando haya auth real
+      title: title ?? descripcion ?? 'Oferta sin título',
+      description: description ?? descripcion ?? '',
+      category: category ?? categoria ?? 'General',
+      contact: contact ?? (whatsapp ? { whatsapp } : {}),
+      images: Array.isArray(images) ? images.filter(x => typeof x === 'string') : [],
+      status: 'active',
+      createdAt: now,
+    });
+
+    res.status(201).json(normalize(doc.toObject()));
+  } catch (e) {
+    console.error(e);
+    res.status(400).json({ error: 'No se pudo crear la oferta' });
+  }
+});
+
+/** Editar oferta por id propio o _id (solo campos permitidos) */
+router.put('/:id', async (req, res) => {
+  try {
+    const id = String(req.params.id);
+
+    // campos editables
+    const patch: any = {};
+    if (req.body.title ?? req.body.descripcion) patch.title = req.body.title ?? req.body.descripcion;
+    if (req.body.description ?? req.body.descripcion) patch.description = req.body.description ?? req.body.descripcion;
+    if (req.body.category ?? req.body.categoria) patch.category = req.body.category ?? req.body.categoria;
+    if (req.body.contact) patch.contact = req.body.contact;
+    if (Array.isArray(req.body.images)) patch.images = req.body.images.filter((x: any) => typeof x === 'string');
+    if (['active', 'inactive', 'deleted'].includes(req.body.status)) patch.status = req.body.status;
+
+    const asObjectId =
+      mongoose.Types.ObjectId.isValid(id) ? { _id: new mongoose.Types.ObjectId(id) } : null;
+
+    const doc = await OfferModel.findOneAndUpdate(
+      asObjectId ? { $or: [{ id }, asObjectId] } : { id },
+      { $set: patch },
+      { new: true, lean: true }
+    );
+
+    if (!doc) return res.status(404).json({ error: 'Oferta no encontrada' });
+    res.json(normalize(doc));
+  } catch (e) {
+    console.error(e);
+    res.status(400).json({ error: 'No se pudo editar la oferta' });
+  }
+});
+
+/** Eliminar (soft delete: status = 'deleted') */
+router.delete('/:id', async (req, res) => {
+  try {
+    const id = String(req.params.id);
+    const asObjectId =
+      mongoose.Types.ObjectId.isValid(id) ? { _id: new mongoose.Types.ObjectId(id) } : null;
+
+    const result = await OfferModel.findOneAndUpdate(
+      asObjectId ? { $or: [{ id }, asObjectId] } : { id },
+      { $set: { status: 'deleted' } },
+      { new: true, lean: true }
+    );
+
+    if (!result) return res.status(404).json({ error: 'Oferta no encontrada' });
+    res.json({ ok: true });
+  } catch (e) {
+    console.error(e);
+    res.status(400).json({ error: 'No se pudo eliminar la oferta' });
+  }
+});
+
+// ...export default router

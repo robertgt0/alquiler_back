@@ -1,28 +1,26 @@
+// src/index.ts
+import 'dotenv/config';                 // <-- NUEVO
 import express from 'express';
 import cors from 'cors';
-import { env } from './config/env';
-import { connectDB } from './config/mongoose';
+import { connectMongo } from './config/mongoose';
 import offersRouter from './routes/offers';
 
-async function bootstrap() {
-  await connectDB();
+const app = express();
 
-  const app = express();
-  app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }));
-  app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
-  app.get('/health', (_req, res) => res.json({ ok: true }));
+app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:3000' }));
 
-  // HU9/HU10: módulo de ofertas
-  app.use('/api/offers', offersRouter);
+app.get('/health', (_req, res) => res.json({ ok: true }));
+app.use('/api/offers', offersRouter);
 
-  app.listen(env.PORT, () => {
-    console.log(`🚀 API running on http://localhost:${env.PORT}`);
+connectMongo().then(() => {
+  app.listen(Number(process.env.PORT || 4000), () => {
+    console.log(`🚀 API running on http://localhost:${process.env.PORT || 4000}`);
   });
-}
-
-bootstrap().catch((err) => {
-  console.error(err);
-  process.exit(1);
+}).catch((e) => {
+  console.error('❌ Error al iniciar el servidor');
+  console.error(e);
 });
 
