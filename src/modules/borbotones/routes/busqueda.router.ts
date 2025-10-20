@@ -39,9 +39,11 @@ const guardarEnHistorial = (req: any, res: any, next: any) => {
 
 // Ruta principal de búsqueda
 // Cuando se hace GET a '/', primero pasa por guardarEnHistorial y luego ejecuta getBusqueda
+
 router.get('/', guardarEnHistorial, getBusqueda);
 
 // Ruta para obtener el historial de búsquedas almacenado
+
 router.get('/historial', getHistorial);
 
 // Ruta para eliminar (limpiar) todo el historial de búsquedas

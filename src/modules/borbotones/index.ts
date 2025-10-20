@@ -1,5 +1,5 @@
-import { Router } from "express";
-import filtrosRouter from "./routes/filtros.routes";
+/*import { Router } from "express";
+//import filtrosRouter from "./routes/filtros.routes";
 
 const router = Router();
 
@@ -15,7 +15,7 @@ router.get("/", (_req, res) => {
         "/api/borbotones/filtros/ciudades?q={texto}&limit=50&page=1",
 
       // 🔹 Especialidades
-  especialidades_listado: "/api/borbotones/filtros/especialidades",
+      especialidades_listado: "/api/borbotones/filtros/especialidades",
       usuarios_por_especialidad_nombre:
         "/api/borbotones/filtros/usuarios/especialidad?especialidad={Nombre}",
       usuarios_por_especialidad_id:
@@ -59,6 +59,6 @@ router.get("/", (_req, res) => {
 });
 
 // Monta las rutas del módulo de filtros
-router.use("/filtros", filtrosRouter);
+//router.use("/filtros", filtrosRouter);
 
-export default router;
+export default router;*/
