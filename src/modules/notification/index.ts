@@ -1,5 +1,7 @@
+import dotenv from "dotenv";
+dotenv.config();
 import { Router } from 'express';
-import ejemploRoutes from './routes/ejemplo.routes';
+import ejemploRoutes from './routes/notification.routes';
 
 const router = Router();
 

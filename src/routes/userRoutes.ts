@@ -1,12 +1,24 @@
-import { Router } from "express";
+import express, { Router } from "express";
+import {
+  getUsers,
+  getUserById,
+  createUser,
+  updateUser,
+  deleteUser,
+} from '../controllers/userController';
 import devCodeRoutes from "../modules/DevCode";
-import ejemploRoutes from "../modules/nombre_grupo_ejemplo";
 
 const router = Router();
 
+// Rutas de DevCode
 router.use("/devcode", devCodeRoutes);
-router.use("/grupo-ejemplo", ejemploRoutes);
 
-
+// Rutas de usuario
+router.get("/users", getUsers);
+router.get("/users/:id", getUserById);
+router.post("/users", createUser);
+router.put("/users/:id", updateUser);
+router.delete("/users/:id", deleteUser);
 
 export default router;
+
