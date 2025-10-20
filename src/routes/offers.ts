@@ -96,6 +96,13 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
+=======
+export default router;
+// ...importaciones y código existente arriba
+
+/** Crear oferta (soft requirements: JSON; si mandan campos en español también funciona) */
+>>>>>>> f64bed3 (chore(hu9-hu10): baseline estable (listado, detalle, seed, env cargando))
 router.post('/', async (req, res) => {
   try {
     const {
@@ -106,23 +113,41 @@ router.post('/', async (req, res) => {
       category,
       contact,
       images,
+<<<<<<< HEAD
       descripcion,
       categoria,
       whatsapp
+=======
+
+      // alias en español por compatibilidad
+      descripcion,
+      categoria,
+      whatsapp,
+>>>>>>> f64bed3 (chore(hu9-hu10): baseline estable (listado, detalle, seed, env cargando))
     } = req.body ?? {};
 
     const now = new Date();
 
     const doc = await OfferModel.create({
+<<<<<<< HEAD
       id: id ?? String(now.getTime()),
       ownerId: ownerId ?? 'fixer-1',
+=======
+      // si te mandan un id lo respetas; si no, generas uno simple
+      id: id ?? String(now.getTime()),
+      ownerId: ownerId ?? 'fixer-1', // TODO: reemplazar cuando haya auth real
+>>>>>>> f64bed3 (chore(hu9-hu10): baseline estable (listado, detalle, seed, env cargando))
       title: title ?? descripcion ?? 'Oferta sin título',
       description: description ?? descripcion ?? '',
       category: category ?? categoria ?? 'General',
       contact: contact ?? (whatsapp ? { whatsapp } : {}),
       images: Array.isArray(images) ? images.filter(x => typeof x === 'string') : [],
       status: 'active',
+<<<<<<< HEAD
       createdAt: now
+=======
+      createdAt: now,
+>>>>>>> f64bed3 (chore(hu9-hu10): baseline estable (listado, detalle, seed, env cargando))
     });
 
     res.status(201).json(normalize(doc.toObject()));
@@ -132,9 +157,18 @@ router.post('/', async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 router.put('/:id', async (req, res) => {
   try {
     const id = String(req.params.id);
+=======
+/** Editar oferta por id propio o _id (solo campos permitidos) */
+router.put('/:id', async (req, res) => {
+  try {
+    const id = String(req.params.id);
+
+    // campos editables
+>>>>>>> f64bed3 (chore(hu9-hu10): baseline estable (listado, detalle, seed, env cargando))
     const patch: any = {};
     if (req.body.title ?? req.body.descripcion) patch.title = req.body.title ?? req.body.descripcion;
     if (req.body.description ?? req.body.descripcion) patch.description = req.body.description ?? req.body.descripcion;
@@ -160,6 +194,10 @@ router.put('/:id', async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
+=======
+/** Eliminar (soft delete: status = 'deleted') */
+>>>>>>> f64bed3 (chore(hu9-hu10): baseline estable (listado, detalle, seed, env cargando))
 router.delete('/:id', async (req, res) => {
   try {
     const id = String(req.params.id);
@@ -180,4 +218,8 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 export default router;
+=======
+// ...export default router
+>>>>>>> f64bed3 (chore(hu9-hu10): baseline estable (listado, detalle, seed, env cargando))

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import 'dotenv/config';
 import express, { Request, Response } from 'express';
 import cors from 'cors';
@@ -8,27 +7,9 @@ import nombreGrupoEjemploRouter from './modules/nombre_grupo_ejemplo';
 import fixerModule from './modules/fixer';
 import categoriesModule from './modules/categories';
 import ofertasModule from './modules/ofertas/routes/ofertas.routes';
-=======
-import express from 'express';
-import cors from 'cors';
-import { env } from './config/env';
-import { connectDB } from './config/mongoose';
-import offersRouter from './routes/offers';
 
-async function bootstrap() {
-  await connectDB();
+const app = express();
 
-  const app = express();
-  app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }));
-  app.use(express.json());
-
-  app.get('/health', (_req, res) => res.json({ ok: true }));
->>>>>>> c2c1a4b (feat(HU9,HU10): API de ofertas (listado y detalle) + Mongo + seed; CORS y env configurados HU9 Y HU10 back terminado)
-
-  // HU9/HU10: módulo de ofertas
-  app.use('/api/offers', offersRouter);
-
-<<<<<<< HEAD
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
@@ -114,15 +95,3 @@ async function bootstrap() {
 }
 
 bootstrap();
-=======
-  app.listen(env.PORT, () => {
-    console.log(`🚀 API running on http://localhost:${env.PORT}`);
-  });
-}
-
-bootstrap().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
-
->>>>>>> c2c1a4b (feat(HU9,HU10): API de ofertas (listado y detalle) + Mongo + seed; CORS y env configurados HU9 Y HU10 back terminado)
