@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ccb29092-aeb2-45ef-90c8-599ee07314e7" name="Changes" comment="ignore">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="ccb29092-aeb2-45ef-90c8-599ee07314e7" name="Changes" comment="ignore" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -123,7 +121,15 @@
       <option name="project" value="LOCAL" />
       <updated>1760919503719</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="ignore">
+      <option name="closed" value="true" />
+      <created>1761003691279</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1761003691279</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -132,6 +138,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="prueba" />
     <MESSAGE value="T9 propia (aun falta complementar con antigua tarea)" />
-    <option name="LAST_COMMIT_MESSAGE" value="T9 propia (aun falta complementar con antigua tarea)" />
+    <MESSAGE value="ignore" />
+    <option name="LAST_COMMIT_MESSAGE" value="ignore" />
   </component>
 </project>

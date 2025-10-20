@@ -4,6 +4,8 @@ import path from "path";
 
 const logFile = path.join(process.cwd(), "logs", "n8n.log");
 
+//T9 terminada
+
 /**
  * Escribe una entrada en la bitácora local (logs/n8n.log)
  */
