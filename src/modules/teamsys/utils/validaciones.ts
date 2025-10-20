@@ -1,4 +1,5 @@
 
+import dns from 'dns';
 
 export function validarPassword(password: string): boolean {
   if (typeof password !== "string") return false;
@@ -13,6 +14,29 @@ export function validarPassword(password: string): boolean {
 export function validarCoincidenciaPassword(password: string, confirmarPassword: string): boolean {
   if (!validarPassword(password) || !validarPassword(confirmarPassword)) return false;
   return password === confirmarPassword;
+}
+
+/**
+ * @param correo Correo electrónico a validar.
+ * @returns Promise<boolean> → true si el formato y el dominio son válidos.
+ */
+export async function validarCorreoElectronico(correo: string): Promise<boolean> {
+  if (typeof correo !== 'string') return false;
+  const patronCorreo = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (!patronCorreo.test(correo)) return false;
+  const partes = correo.split('@');
+  const dominio = partes[1];
+  const dominioValido = /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(dominio);
+  if (!dominioValido) return false;
+  return new Promise((resolve) => {
+    dns.resolveMx(dominio, (err, addresses) => {
+      if (err || !addresses || addresses.length === 0) {
+        resolve(false);
+      } else {
+        resolve(true);
+      }
+    });
+  });
 }
 
 export function validarImagen(imagen: string): boolean {
