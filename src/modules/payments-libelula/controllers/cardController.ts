@@ -17,7 +17,7 @@ export const registrarDeudaController = async (req: Request, res: Response) => {
         identificador_deuda,
         fecha_vencimiento: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
         descripcion,
-        callback_url: "https://tusitio.com/pago-exitoso",
+        callback_url: "http://localhost:3000",
         nombre_cliente,
         apellido_cliente,
         ci,
