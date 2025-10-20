@@ -1,32 +1,14 @@
-import { Router } from "express";
-import {
-  createNotificationHandler,
-  getNotificationHandler,
-  listNotificationsHandler,
-} from "../controllers/notification.controller"; // ✅ corregida la ruta (antes apuntaba mal)
-import { createNotificationValidators } from "../dtos/createNotification.dto";
+// src/modules/notifications/routes/notification.routes.ts
+import { Router } from 'express';
+import { createNotification, testWebhook } from '../controllers/notification.controller';
 
-// ✅ Creamos el router principal
 const router = Router();
 
-/**
- * POST /notifications
- * Crea una nueva notificación.
- * Usa los validadores definidos en createNotification.dto.ts
- * y luego el controlador que usa Gmail API (no SMTP)
- */
-router.post("/", createNotificationValidators, createNotificationHandler);
+// POST /api/notify   -> crea y procesa una notificación
+router.post('/', createNotification);
 
-/**
- * GET /notifications/:id
- * Obtiene una notificación específica por ID
- */
-router.get("/:id", getNotificationHandler);
-
-/**
- * GET /notifications
- * Lista todas las notificaciones registradas (en logs o DB)
- */
-router.get("/", listNotificationsHandler);
+// POST /api/notify/webhook-test  -> opcional: endpoint que reenvía a n8n (ejemplo)
+router.post('/webhook-test', testWebhook);
 
 export default router;
+
