@@ -26,52 +26,48 @@ export class AuthService  {
 
     async exchangeCodeForTokens(code: string): Promise<GoogleTokenResponse> {
         try {
-            const body = new URLSearchParams({
-    code,
-    client_id: process.env.GOOGLE_CLIENT_ID!,
-    client_secret: process.env.GOOGLE_CLIENT_SECRET!,
-  redirect_uri: process.env.GOOGLE_REDIRECT_URL!, // (ojo con el nombre de env)
-    grant_type: 'authorization_code',
-});
+            const requestBody = {
+                code: code,
+                client_id: process.env.GOOGLE_CLIENT_ID,
+                client_secret: process.env.GOOGLE_CLIENT_SECRET,
+                redirect_uri: process.env.GOOGLE_REDIRECT_URL,
+                grant_type: 'authorization_code',
+            };
 
-const { data } = await axios.post<GoogleTokenResponse>(
-    this.googleTokenUrl,
-    body,
-    { headers: { 'content-type': 'application/x-www-form-urlencoded' } }
-);
-return data; // ahora sí es GoogleUserProfile
+            const { data } = await axios.post<GoogleTokenResponse>(this.googleTokenUrl, requestBody);
+
+            return data;
         } catch (error: any) {
             throw new Error('Failed to exchange code for tokens');
         }
     }
 
     async getGoogleUserProfile(accessToken: string): Promise<GoogleUserProfile> {
-    try {
-    const headers = { Authorization: `Bearer ${accessToken}` };
+        try {
+            const headers = { Authorization: `Bearer ${accessToken}` };
 
-    //  antes: axios.get<GoogleTokenResponse>(...)
-    const { data } = await axios.get<GoogleUserProfile>(this.googleUserInfoUrl, { headers });
+            //  antes: axios.get<GoogleTokenResponse>(...)
+            const { data } = await axios.get<GoogleUserProfile>(this.googleUserInfoUrl, { headers });
 
-    return data;
-    } catch (error: any) {
-    throw new Error('Failed to fetch user profile from google');
+            return data;
+        } catch (error: any) {
+            throw new Error('Failed to fetch user profile from google');
+        }
     }
-}
 
 
-    async findOrCreateUser(profile: GoogleUserProfile): Promise<CrearUsuarioDto> {
-        let user = await teamsysService.verificarCorreo(profile.email);
-        console.log(user)
-        if (!user) {
-            return  {
+    async findOrCreateUser(profile: GoogleUserProfile): Promise<UsuarioDocument> {
+        let user = await teamsysService.getByEmail(profile.email);
+        if (! user) {
+            user = await teamsysService.create({
                 nombre: profile.name,
                 correo: profile.email,
                 fotoPerfil: profile.picture,
                 terminosYCondiciones: true,
-            }
+            });
         }
 
-        return null;
+        return user!;
     }
 
     generateAccessToken(payload: JWTPayload): string {
@@ -99,30 +95,24 @@ return data; // ahora sí es GoogleUserProfile
         return { accessToken, refreshToken };
     }
 
-    async loginWithGoogle(code: string): Promise<TokenResponse> {
+    async loginWithGoogle(code: string): Promise<{user: any}> {
         const googleTokens = await this.exchangeCodeForTokens(code);
 
         const profile = await this.getGoogleUserProfile(googleTokens.access_token);
 
-        const userDoc = await this.findOrCreateUser(profile);
-        if (userDoc==null)return null;
+        // const userDoc = await this.findOrCreateUser(profile);
 
-        const tokens = this.generateTokens(userDoc as UsuarioDocument); 
-        const userForClient= {
-    nombre: userDoc.nombre,
-    correo: userDoc.correo,
-    fotoPerfil:userDoc.fotoPerfil,
-    terminosYCondiciones: userDoc.terminosYCondiciones,
-    //apellido: userDoc.apellido,
-    //telefono: userDoc.telefono,
-    // si quieres la foto de Google, pásala desde el service como campo aparte:
-    // fotoPerfil: profile.picture,
-    };
+        // const tokens = this.generateTokens(userDoc);
+
         return {
-            accessToken: tokens.accessToken,
-            refreshToken: tokens.refreshToken,
-            user: userForClient ,
-            expiresAt: new Date(),
+            // accessToken: tokens.accessToken,
+            // refreshToken: tokens.refreshToken,
+            user: {
+                nombre: profile.given_name,
+                correo: profile.email,
+                fotoPerfil: profile.picture,
+                // terminosYCondiciones: true
+            }
         }
     }
 }

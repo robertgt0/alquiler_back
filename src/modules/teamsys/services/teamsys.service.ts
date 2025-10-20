@@ -67,6 +67,13 @@ async autenticarUsuario(correoE: string, password: string): Promise<UsuarioDocum
   }
 
   /**
+   * Obtener un usuario por Email
+   */
+  async getByEmail(email: string): Promise<UsuarioDocument | null> {
+    return await Usuario.findOne({correo: email})
+  }
+
+  /**
    * Crear un nuevo usuario (usado por el controlador)
    */
   async create(data: CrearUsuarioDto): Promise<UsuarioDocument> {
