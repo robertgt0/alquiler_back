@@ -65,11 +65,10 @@ app.use('/api/borbotones', paginationRouter);
 app.use('/api/borbotones', ordenamientoRouter);
 
 // Módulo de búsqueda
-// Ejemplo: http://localhost:5000/api/busqueda?termino=ele
 app.use('/api/busqueda', busquedaRouter);
 
 
-app.use('/api/filtros', filtrosRouter);
+app.use('/api/borbotones/filtros', filtrosRouter);
 
 // ============================================
 // 🩺 Endpoint de salud (para monitoreo)

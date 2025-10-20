@@ -23,7 +23,7 @@ const guardarEnHistorial = (req: any, res: any, next: any) => {
   const originalJson = res.json;
 
   // Sobrescribimos res.json temporalmente para interceptar la respuesta
-  res.json = function(data: any) {
+  res.json = function (data: any) {
     // Si la respuesta indica éxito y tiene resultados, guardamos la búsqueda
     if (data.success && data.resultados && data.resultados.length > 0) {
       // Llamamos al servicio para guardar el término buscado en el historial
@@ -45,6 +45,7 @@ router.get('/', guardarEnHistorial, getBusqueda);
 router.get('/historial', getHistorial);
 
 // Ruta para eliminar (limpiar) todo el historial de búsquedas
+
 router.delete('/historial', limpiarHistorial);
 
 // Exportamos el router para poder usarlo en app.ts o index.ts

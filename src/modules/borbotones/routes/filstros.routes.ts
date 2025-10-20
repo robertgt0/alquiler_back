@@ -18,6 +18,7 @@ router.get("/ciudades", listarCiudades);
 router.get("/especialidades", listarEspecialidades);
 
 // Usuarios por ciudad
+// http://localhost:5000/api/borbotones/filtros/usuarios/ciudad?ciudad=cochabamba
 router.get("/usuarios/ciudad", usuariosPorCiudad);
 router.get("/usuarios/ciudad/:ciudad", usuariosPorCiudad);
 
@@ -31,6 +32,7 @@ router.get("/usuarios/disponible", usuariosPorDisponibilidad);
 router.get("/ciudad/provincias", provinciasPorCiudad);
 
 // ✅ Nuevo: usuarios por nombre de servicio
+// http://localhost:5000/api/borbotones/filtros/usuarios/servicio?servicio=Cambio de cerraduras
 router.get("/usuarios/servicio", usuariosPorServicio);
 
 export default router;
