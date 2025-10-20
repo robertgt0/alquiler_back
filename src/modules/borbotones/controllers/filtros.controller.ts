@@ -10,6 +10,17 @@ function escapeRegex(s: string) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+function getRandomLocation() {
+  const departments = Object.keys(boliviaDeptCities);
+  const randomDept = departments[Math.floor(Math.random() * departments.length)];
+  const cities = boliviaDeptCities[randomDept];
+  const randomCity = cities[Math.floor(Math.random() * cities.length)];
+  return {
+    departamento: randomDept.charAt(0).toUpperCase() + randomDept.slice(1),
+    ciudad: randomCity
+  };
+}
+
 /* =======================================================
  *  Listado de CIUDADES
  * ======================================================= */
@@ -58,7 +69,17 @@ export const listarCiudades = async (req: Request, res: Response) => {
       City.countDocuments(filter),
     ]);
 
-    res.json({ success: true, total, page, pageSize, data });
+    // Añadir ubicación aleatoria a cada resultado
+    const dataWithLocation = data.map(item => {
+      const location = getRandomLocation();
+      return {
+        ...item,
+        departamento: location.departamento,
+        ciudad: location.ciudad
+      };
+    });
+
+    res.json({ success: true, total, page, pageSize, data: dataWithLocation });
   } catch (err: any) {
     console.error("Error en /filstros/ciudades:", err);
     res.status(500).json({ success: false, message: err?.message ?? "Error interno" });
@@ -71,6 +92,7 @@ export const listarCiudades = async (req: Request, res: Response) => {
  * ======================================================= */
 export const listarDepartamentos = async (_req: Request, res: Response) => {
   try {
+    // Los departamentos ya son strings, no necesitamos mapear
     res.json({ success: true, total: boliviaDepartments.length, data: boliviaDepartments });
   } catch (err: any) {
     console.error("Error en /departamentos:", err);
