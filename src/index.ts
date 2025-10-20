@@ -18,7 +18,7 @@ import "./config/env";
 const app = express();
 
 // Conectar a MongoDB si lo deseas
-// connectDB();
+connectDB();
 
 // Middlewares base
 app.use(cors());
