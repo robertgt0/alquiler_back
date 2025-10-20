@@ -1,44 +1,48 @@
-import { model, Schema, Document } from 'mongoose';
+// src/models/Offer.ts
+import { Schema, model, models } from 'mongoose';
 
-export type OfferStatus = 'active' | 'inactive' | 'deleted';
-
-export interface Contact {
-  whatsapp?: string;
-  phone?: string;
-  email?: string;
-}
-
-export interface OfferDoc extends Document {
-  id: string;               // id legible para el front (p.ej. "1")
-  ownerId?: string;
-  title: string;
-  description: string;
-  category: string;
-  contact: Contact;
-  createdAt: Date;
-  status: OfferStatus;
-  images: string[];
-}
-
-const ContactSchema = new Schema<Contact>({
-  whatsapp: { type: String },
-  phone: { type: String },
-  email: { type: String },
-}, { _id: false });
-
-const OfferSchema = new Schema<OfferDoc>(
+const ContactSchema = new Schema(
   {
-    id: { type: String, required: true, unique: true }, // importante para /offers/:id
-    ownerId: { type: String },
-    title: { type: String, required: true },
-    description: { type: String, default: '' },
-    category: { type: String, required: true },
-    contact: { type: ContactSchema, default: {} },
-    createdAt: { type: Date, default: () => new Date() },
-    status: { type: String, enum: ['active', 'inactive', 'deleted'], default: 'active' },
-    images: { type: [String], default: [] },
+    whatsapp: { type: String },
+    phone: { type: String },
+    email: { type: String },
   },
-  { collection: 'ofertas' }
+  { _id: false }
 );
 
-export const OfferModel = model<OfferDoc>('Offer', OfferSchema);
+const OfferSchema = new Schema(
+  {
+    // id “legible” (HU10 permite buscar por id o por _id)
+    id: { type: String, index: true },
+
+    ownerId: { type: String, default: 'fixer-1' },
+
+    // Campos “nuevos”
+    title: { type: String },
+    description: { type: String },
+    category: { type: String },
+
+    // Compatibilidad con documentos “históricos” en español
+    descripcion: { type: String },
+    categoria: { type: String },
+    imagen: { type: String }, // cuando viene una sola imagen
+
+    // Contacto
+    contact: { type: ContactSchema, default: {} },
+
+    images: { type: [String], default: [] },
+
+    status: {
+      type: String,
+      enum: ['active', 'inactive', 'deleted'],
+      default: 'active',
+    },
+  },
+  {
+    timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' },
+    strict: false,                 // acepta campos extra de docs viejos
+    collection: 'ofertas',         // ⬅️ MUY IMPORTANTE: usa la colección correcta
+  }
+);
+
+export const OfferModel = models.Offer ?? model('Offer', OfferSchema);
