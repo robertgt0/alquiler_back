@@ -1,7 +1,5 @@
-// src/modules/notifications/types/notification.types.ts
-
 /**
- * Destino individual dentro de una notificación.
+ * 📦 Tipo base de destinatario
  */
 export interface Destination {
   email: string;
@@ -9,25 +7,25 @@ export interface Destination {
 }
 
 /**
- * Canales posibles para envío de notificaciones.
+ * 🚀 Canales posibles de envío
  */
-export type NotificationChannel = 'email' | 'sms' | 'push' | 'n8n' | 'desconocido';
+export type NotificationChannel = "email" | "sms" | "push" | "n8n" | "webhook" | "desconocido";
 
 /**
- * Estructura principal para una notificación.
- * Incluye campos opcionales para tracking y respuesta del proveedor (Gmail / n8n).
+ * 📨 Estructura general de notificación
  */
 export interface NotificationData {
   _id?: string;
   transactionId?: string;
-  to?: string;
+  to?: string | string[];
   destinations?: Destination[];
   subject: string;
   message: string;
+  html?: string;
   channel?: NotificationChannel;
   type?: string;
   meta?: Record<string, any>;
-  status?: 'draft' | 'pending' | 'sent' | 'failed';
+  status?: "draft" | "pending" | "sent" | "failed";
   attempts?: number;
   sentAt?: Date | string | null;
   providerResponse?: any;
