@@ -1,98 +1,92 @@
-<<<<<<< HEAD
-import { sendEmail } from "../providers/email.provider";
 import { NotificationData } from "../types/notification.types";
+import { triggerN8nWebhook } from "../providers/n8n.provider";
+import { sendEmailOAuth2 } from "../providers/gmail.api";
+import { saveNotification } from "../models/notification.model";
 
 /**
- * Flujo base de procesamiento de notificaciones
- * Responsable de enviar correos y manejar diferentes canales.
+ * 🔄 Flujo principal de procesamiento de notificaciones
+ * Compatible con Gmail API (OAuth2) y n8n
  */
-export async function processNotificationWorkflow(data: NotificationData) {
-  console.log("📨 Iniciando flujo de procesamiento de notificación...");
-
-  try {
-    // ✅ Validar datos requeridos
-    if (!data.channel || !data.to || !data.subject || !data.message) {
-      throw new Error("Datos de notificación incompletos");
-    }
-
-    // ✅ Procesar según el canal
-    switch (data.channel) {
-      case "email":
-        console.log("📧 Enviando correo...");
-        const result = await sendEmail({
-          to: Array.isArray(data.to) ? data.to : [data.to],
-          subject: data.subject,
-          html: data.html || data.message,
-          fromName: "Sistema de Alquiler de Servicios", // puedes cambiarlo
-        });
-
-        if (!result.success) {
-          throw new Error(result.error || "Error al enviar el correo");
-        }
-
-        console.log("✅ Correo enviado correctamente:", result.messageId);
-        break;
-
-      case "webhook":
-        console.log("🌐 Notificación vía webhook:", data);
-        break;
-
-      default:
-        throw new Error(`Canal no soportado: ${data.channel}`);
-    }
-
-    return { ok: true, message: "Notificación procesada exitosamente" };
-  } catch (error: any) {
-    console.error("❌ Error en el flujo de notificaciones:", error.message);
-    return { ok: false, error: error.message };
-  }
-}
-=======
-// src/modules/notifications/workflows/notification.workflow.ts
-import { NotificationData } from '../types/notification.types';
-import { sendEmailNotification } from '../services/notification.service';
-import { saveNotification } from '../models/notification.model';
-
 export async function processNotification(notification: NotificationData) {
   try {
-    console.log('🟢 [Workflow] Iniciando procesamiento de notificación');
+    console.log("🟢 [Workflow] Iniciando procesamiento de notificación");
 
-    // Validaciones básicas
-    if (!notification.subject || !notification.message) {
-      throw new Error('Faltan subject o message');
+    if (!notification.to || !notification.subject || !notification.message) {
+      throw new Error("Faltan campos obligatorios: to, subject o message");
     }
 
-    const channel = notification.channel ?? 'email';
+    const channel = notification.channel ?? "email";
+    const dbEntry = await saveNotification({
+      to: notification.to,
+      subject: notification.subject,
+      message: notification.message,
+      channel,
+      status: "pending",
+      meta: { createdAt: new Date() },
+    });
 
-    // Guardado previo (ejemplo: persistencia mínima)
-    await saveNotification({ ...notification, channel });
+    let result: any;
 
-    // Enrutamiento por canal
     switch (channel) {
-      case 'email':
-        if (!notification.to) throw new Error('Campo "to" requerido para email');
-        await sendEmailNotification(notification);
-        break;
+      case "n8n":
+      case "webhook": {
+        result = await triggerN8nWebhook({
+          to: Array.isArray(notification.to) ? notification.to.join(",") : notification.to,
+          subject: notification.subject,
+          message: notification.message,
+          id: dbEntry?._id?.toString?.(),
+          type: notification.type ?? "generic",
+        });
 
-      case 'console':
-        console.log('📣 [Console Channel] ->', notification.message);
-        break;
 
-      case 'webhook':
-        // Aquí podrías llamar a otro webhook (por ejemplo n8n)
-        console.log('🔗 [Webhook Channel] ->', notification.meta?.webhookUrl ?? 'sin webhookUrl');
+        const isSuccess = result?.success ?? false;
+        await saveNotification({
+          ...dbEntry,
+          status: isSuccess ? "sent" : "failed",
+          externalId: result?.data?.gmailId ?? null,
+          error: isSuccess ? null : result?.message ?? JSON.stringify(result),
+        });
         break;
+      }
+
+      case "email": {
+        await sendEmailOAuth2({
+          to: Array.isArray(notification.to) ? notification.to.join(",") : notification.to!,
+          subject: notification.subject,
+          html: notification.html || notification.message,
+        });
+
+        await saveNotification({ ...dbEntry, status: "sent" });
+        result = { success: true };
+        break;
+      }
 
       default:
-        throw new Error(`Canal desconocido: ${channel}`);
+        throw new Error(`Canal desconocido o no soportado: ${channel}`);
     }
 
-    console.log('✅ [Workflow] Notificación procesada con éxito');
-    return { success: true, message: 'Notificación procesada correctamente' };
+    console.log("✅ [Workflow] Notificación procesada correctamente");
+    return { success: true, message: "Notificación procesada correctamente", result };
+
   } catch (error: any) {
-    console.error('❌ [Workflow] Error:', error.message ?? error);
-    return { success: false, message: error.message ?? 'Error desconocido' };
+    console.error("❌ [Workflow] Error en procesamiento:", error.message ?? error);
+
+    try {
+      if (notification?.to) {
+        await saveNotification({
+          to: notification.to,
+          subject: notification.subject ?? "(sin asunto)",
+          message: notification.message ?? "(sin mensaje)",
+          channel: notification.channel ?? "desconocido",
+          status: "failed",
+          error: error.message ?? JSON.stringify(error),
+          meta: { failedAt: new Date() },
+        });
+      }
+    } catch (innerErr) {
+      console.warn("⚠️ No se pudo registrar el error en BD:", innerErr);
+    }
+
+    return { success: false, message: error.message ?? "Error desconocido" };
   }
 }
-
->>>>>>> origin/dev/recode

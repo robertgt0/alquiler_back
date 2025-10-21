@@ -1,27 +1,34 @@
-<<<<<<< HEAD
+/**
+ * 📦 Tipo base de destinatario
+ */
 export interface Destination {
   email: string;
   name?: string;
 }
 
+/**
+ * 🚀 Canales posibles de envío
+ */
+export type NotificationChannel = "email" | "sms" | "push" | "n8n" | "webhook" | "desconocido";
+
+/**
+ * 📨 Estructura general de notificación
+ */
 export interface NotificationData {
+  _id?: string;
+  transactionId?: string;
+  to?: string | string[];
+  destinations?: Destination[];
   subject: string;
   message: string;
   html?: string;
-  to?: string | string[];
-  channel?: "email" | "webhook";
-  destinations?: Destination[];
-}
-=======
-// src/modules/notifications/types/notification.types.ts
-export type NotificationChannel = 'email' | 'console' | 'webhook';
-
-export interface NotificationData {
-  to: string;             // email o identificador según canal
-  subject: string;
-  message: string;
   channel?: NotificationChannel;
-  meta?: Record<string, any>; // opcional datos extra
+  type?: string;
+  meta?: Record<string, any>;
+  status?: "draft" | "pending" | "sent" | "failed";
+  attempts?: number;
+  sentAt?: Date | string | null;
+  providerResponse?: any;
+  externalId?: string | null;
+  error?: string | null;
 }
-
->>>>>>> origin/dev/recode

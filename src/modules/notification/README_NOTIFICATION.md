@@ -113,9 +113,10 @@ npm install validator
 
 npm i --save-dev @types/validator
 
-
-npm install nodemailer googleapis
-
-npm install -D @types/nodemailer
-
 npm install axios
+
+npm install axios dotenv
+
+npm install uuid
+
+npm install --save-dev @types/uuid
