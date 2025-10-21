@@ -48,9 +48,9 @@ export const validateData = async (req: Request, res: Response, next: NextFuncti
     return;
   }
     
-  if (!req.file || !req.file.buffer || !validarImagen(req.file.buffer)) {
+  /*if (!req.file || !req.file.buffer || !validarImagen(req.file.buffer)) {
       return res.status(400).json({ message: 'Solo se permiten imágenes PNG o JPG menores a 1MB' });
-  }
+  }*/
   
 
   if (terminosYCondiciones !== true) {
