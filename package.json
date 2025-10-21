@@ -34,6 +34,7 @@
     "mogoose": "^0.0.1-security",
     "mongoose": "^8.19.1",
     "nodemailer": "^7.0.9",
+    "uuid": "^13.0.0",
     "winston": "^3.18.3"
   },
   "devDependencies": {
