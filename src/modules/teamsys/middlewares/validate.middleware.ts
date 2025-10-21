@@ -60,7 +60,7 @@ export const validateData = (req: Request, res: Response, next: NextFunction): v
   if (!validarPassword(password)) {
     res.status(400).json({ success: false, message: 'La contraseña no cumple con los requisitos de seguridad' });
     return;
-
+  }
     
   if (!validarImagen(req.file.buffer)) {
       return res.status(400).json({ message: 'Solo se permiten imágenes PNG o JPG menores a 1MB' });
