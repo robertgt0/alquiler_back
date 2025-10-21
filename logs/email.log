@@ -297,3 +297,7 @@
 {"ts":"2025-10-19T23:14:53.104Z","level":"INFO","action":"send","to":["almanzaa9928@gmail.com"],"accepted":["almanzaa9928@gmail.com"],"rejected":[],"messageId":"<d8f81afd-19d3-37ca-6358-10c3ea4a0b4c@gmail.com>"}
 {"ts":"2025-10-19T23:14:53.741Z","level":"INFO","action":"n8n-trigger","transactionId":"b463f724-143b-4061-a266-27fa112507d2","status":200}
 {"ts":"2025-10-19T23:14:53.742Z","level":"INFO","action":"email-sent","transactionId":"b463f724-143b-4061-a266-27fa112507d2","to":["almanzaa9928@gmail.com"],"subject":"Notificación programada","attempt":1,"providerResponse":{"success":true,"messageId":"<d8f81afd-19d3-37ca-6358-10c3ea4a0b4c@gmail.com>","accepted":["almanzaa9928@gmail.com"],"rejected":[]}}
+
+
+
+AQUI TMAPOCO PONE NADA......

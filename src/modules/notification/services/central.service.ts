@@ -1,6 +1,7 @@
+// src/modules/notifications/services/central.service.ts
 import { v4 as uuidv4 } from "uuid";
-import { saveNotification, listNotifications } from "../models/notification.model";
-import { triggerN8nWebhook } from "../services/n8n.service";
+import { saveNotification } from "../models/notification.model";
+import { triggerN8nWebhook } from "./n8n.service"; // ajusta ruta si es ../services/n8n.service
 
 interface Destination {
   email: string;
@@ -11,16 +12,10 @@ interface CreateNotificationInput {
   subject: string;
   message: string;
   destinations: Destination[];
-  type?: string; // tipo de evento, ej: "nuevo_cliente", "asignacion_fixer"
+  type?: string;
+  fromName?: string; 
 }
 
-/**
- * Servicio central actualizado:
- * - Valida el payload
- * - Guarda registro en memoria
- * - Dispara el webhook de n8n
- * - Controla errores de manera segura
- */
 export class CentralNotificationService {
   async receiveAndSend(data: CreateNotificationInput) {
     this.validatePayload(data);
@@ -28,7 +23,6 @@ export class CentralNotificationService {
     const transactionId = uuidv4();
     const toEmails = data.destinations.map((d) => d.email);
 
-    // 1️⃣ Guardar en memoria como "pending"
     const notification = await saveNotification({
       transactionId,
       subject: data.subject,
@@ -36,27 +30,22 @@ export class CentralNotificationService {
       destinations: data.destinations,
       channel: "n8n",
       status: "pending",
-      createdAt: new Date(),
-    });
+      createdAt: new Date() as any,
+    } as any);
 
     try {
-      // 2️⃣ Disparar webhook n8n
       const result = await triggerN8nWebhook({
         fixerEmail: toEmails[0],
         subject: data.subject,
         message: data.message,
-        id: notification.transactionId,
+        id: notification.transactionId ?? transactionId,
         type: data.type ?? "generic",
       });
 
-      // 3️⃣ Actualizar estado (solo en memoria, simulado)
+      // actualizar campo en memoria directamente
       notification.status = result.success ? "sent" : "failed";
       notification.providerResponse = result;
       notification.sentAt = new Date();
-
-      console.log(
-        `📤 [CentralService] Notificación ${notification.status.toUpperCase()} para ${toEmails.join(", ")}`
-      );
 
       return {
         success: result.success,
@@ -64,14 +53,10 @@ export class CentralNotificationService {
         status: notification.status,
         response: result,
       };
-    } catch (err) {
+    } catch (err: any) {
       const error = err instanceof Error ? err.message : String(err);
-
       notification.status = "failed";
       notification.error = error;
-
-      console.error("❌ [CentralService] Error al enviar notificación:", error);
-
       return {
         success: false,
         transactionId,
