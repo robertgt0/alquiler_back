@@ -2,53 +2,39 @@ import { Request, Response, NextFunction } from 'express';
 import { CrearUsuarioDto } from '../types';
 import { limpiarInput, validarPassword, validarCorreoElectronico, validarImagen } from '../utils/validaciones';
 
-export const validateData = (req: Request, res: Response, next: NextFunction): void => {
+export const validateData = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   
   try{
   const { nombre, correo, telefono, password, terminosYCondiciones }: CrearUsuarioDto = limpiarInput(req.body)as CrearUsuarioDto;
   
-  const nombreValido = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{2,50}$/;
+  const nombreValido = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{2,15}$/;
   const telefonoValido = /^[1-9][0-9]{7}$/;
   const correoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   if (!nombre || typeof nombre !== 'string' || !nombreValido.test(nombre)) {
-    res.status(400).json({ success: false, message: 'El campo nombre es requerido y debe ser texto y debe tener entre 2 y 50 letras' });
+    res.status(400).json({ success: false, message: 'El campo nombre es requerido y debe ser texto y debe tener entre 2 y 15 letras' });
     return;
   }
 
-  if (nombre.length < 2) {
-  res.status(400).json({ success: false, message: 'El nombre debe tener al menos 2 caracteres' });
-  return;
-  }
-
-  if (nombre.length > 15) {
-  res.status(400).json({ success: false, message: 'El nombre no puede tener más de 10 caracteres' });
-  return;
-  }
-
-  if (!correoElectronico || typeof correoElectronico !== 'string') {
+  if (!correo || typeof correo !== 'string') {
     res.status(400).json({ success: false, message: 'El correo electrónico es requerido y debe ser texto' });
     return;
   }
   if(telefono!=null){
-  if (!telefono || typeof telefono !== 'string'||!telefonoValido.test(telefono)) {
-    res.status(400).json({ success: false, message: 'El teléfono es requerido y debe tener 8 digitos y no comenzar con 0' });
-    return;
-  }}
+    if (!telefono || typeof telefono !== 'string'||!telefonoValido.test(telefono)) {
+      res.status(400).json({ success: false, message: 'El teléfono es requerido y debe tener 8 digitos y no comenzar con 0' });
+      return;
+    }
+  }
 
-  const correoValido = await validarCorreoElectronico(correoElectronico);
-  if (!correoValido) {
+  const correoValido2 = await validarCorreoElectronico(correo);
+  if (!correoValido2) {
     res.status(400).json({ success: false, message: 'El correo electrónico no tiene un formato válido' });
     return;
   }
 
   if (!telefono || typeof telefono !== 'string') {
     res.status(400).json({ success: false, message: 'El teléfono es requerido y debe ser texto' });
-    return;g
-  }
-
-  if (!/^\d{8}$/.test(telefono)) {
-    res.status(400).json({ success: false, message: 'El teléfono debe tener exactamente 8 dígitos' });
     return;
   }
 
@@ -62,7 +48,7 @@ export const validateData = (req: Request, res: Response, next: NextFunction): v
     return;
   }
     
-  if (!validarImagen(req.file.buffer)) {
+  if (!req.file || !req.file.buffer || !validarImagen(req.file.buffer)) {
       return res.status(400).json({ message: 'Solo se permiten imágenes PNG o JPG menores a 1MB' });
   }
   
