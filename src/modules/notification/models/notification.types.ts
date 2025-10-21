@@ -1,35 +1,43 @@
-// src/modules/notifications/models/notification.types.ts
+// src/modules/notifications/types/notification.types.ts
 
-export type NotificationStatus = "pending" | "sent" | "failed";
-
-export type NotificationChannel = "email" | "sms" | "push"; // para futuras extensiones
-
-// Estructura del destinatario (destino)
+/**
+ * Destino individual dentro de una notificación.
+ */
 export interface Destination {
-  email?: string;          // email del destinatario (si channel === 'email')
-  phone?: string;          // número si es sms (opcional para futuro)
-  name?: string;           // nombre opcional
+  email: string;
+  name?: string;
 }
 
-// Paquete de datos principal que recibirá el endpoint
-export interface NotificationPayload {
-  message: string;         // cuerpo del mensaje (texto / html)
-  subject: string;         // asunto (para email)
-  destinations: Destination[]; // lista de destinatarios (mínimo 1)
-  type?: string;           // tipo de notificación (ej: "alquiler_recordatorio")
-  channel?: NotificationChannel; // canal a usar (email por defecto)
-  metadata?: Record<string, any>; // datos arbitrarios (por ejemplo: {rentalId: "..."})
-}
+/**
+ * Canales posibles para envío de notificaciones.
+ */
+export type NotificationChannel = 'email' | 'sms' | 'push' | 'n8n' | 'desconocido';
 
-// Documento de persistencia y trazabilidad
-export interface NotificationDoc extends NotificationPayload {
-  //_id?: string;            // id generado por DB (ObjectId en Mongo)
-  transactionId: string;   // id único rastreable (UUID / string)
-  status: NotificationStatus; // estado actual
-  attempts: number;        // intentos realizados
-  lastError?: string | null; // ultimo error textual si ocurrió
-  providerResponse?: any;  // respuesta cruda del proveedor (Gmail/nodemailer)
-  createdAt?: Date;
-  updatedAt?: Date;
-  sentAt?: Date | null;    // timestamp si fue enviado
+/**
+ * Estructura principal para una notificación.
+ * Incluye campos opcionales para tracking y respuesta del proveedor (Gmail / n8n).
+ */
+export interface NotificationData {
+  // Identificadores
+  _id?: string;                 // id de la BD (si aplica)
+  transactionId?: string;       // id que genera tu servicio (uuid)
+
+  // Contenido
+  to?: string;                  // destinatario principal (legacy)
+  destinations?: Destination[]; // lista de destinos (recomendado)
+  subject: string;
+  message: string;
+
+  // Metadatos / routing
+  channel?: NotificationChannel;
+  type?: string;
+  meta?: Record<string, any>;
+
+  // Tracking / estado
+  status?: 'draft' | 'pending' | 'sent' | 'failed';
+  attempts?: number;
+  sentAt?: Date | null;
+  providerResponse?: any;       // respuesta cruda del proveedor (n8n / gmail)
+  externalId?: string | null;   // id del proveedor (ej. gmailId)
+  error?: string | null;
 }
