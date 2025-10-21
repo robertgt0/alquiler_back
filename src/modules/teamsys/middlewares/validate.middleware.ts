@@ -55,7 +55,7 @@ export const validateData = (req: Request, res: Response, next: NextFunction): v
   if (!password || typeof password !== 'string') {
     res.status(400).json({ success: false, message: 'La contraseña es requerida y debe ser texto' });
     return;
-  }}
+  }
 
   if (!validarPassword(password)) {
     res.status(400).json({ success: false, message: 'La contraseña no cumple con los requisitos de seguridad' });
