@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { sendEmail } from "../providers/email.provider";
 import { NotificationModel } from "../models/notification.model";
 import { v4 as uuidv4 } from "uuid";
@@ -5,21 +6,23 @@ import fs from "fs";
 import path from "path";
 import { bookingConfirmationTemplate } from "../templates";
 import { NotificationData } from "../types/notification.types";
+=======
+// src/modules/notifications/services/notification.service.ts
+import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+import { NotificationData } from '../types/notification.types';
+>>>>>>> origin/dev/recode
 
-const logFile = path.join(process.cwd(), "logs", "email.log");
+dotenv.config();
 
-function writeLog(entry: any) {
-  try {
-    fs.mkdirSync(path.dirname(logFile), { recursive: true });
-    fs.appendFileSync(
-      logFile,
-      JSON.stringify({ ts: new Date().toISOString(), ...entry }) + "\n"
-    );
-  } catch (err) {
-    console.error("Error al escribir log:", err);
-  }
+const GMAIL_USER = process.env.GMAIL_USER;
+const GMAIL_PASS = process.env.GMAIL_PASS;
+
+if (!GMAIL_USER || !GMAIL_PASS) {
+  console.warn('⚠️ GMAIL_USER o GMAIL_PASS no configurados en .env. Email no funcionará hasta configurarlos.');
 }
 
+<<<<<<< HEAD
 interface Destination {
   email: string;
   name?: string;
@@ -72,12 +75,22 @@ const toEmails: string[] =
     });
 
     return { transactionId, notification };
+=======
+export async function sendEmailNotification(data: NotificationData) {
+  if (!GMAIL_USER || !GMAIL_PASS) {
+    throw new Error('Credenciales de Gmail no configuradas');
+>>>>>>> origin/dev/recode
   }
 
-  async getByTransactionId(id: string) {
-    return NotificationModel.findOne({ transactionId: id });
-  }
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: GMAIL_USER,
+      pass: GMAIL_PASS,
+    },
+  });
 
+<<<<<<< HEAD
   async list(filters: any, limit = 20, page = 1) {
     const skip = (page - 1) * limit;
     const items = await NotificationModel.find(filters)
@@ -108,3 +121,16 @@ const toEmails: string[] =
     return this.createAndSend(input, "Sistema de Servicios");
   }
 }
+=======
+  const mailOptions = {
+    from: `"Sistema" <${GMAIL_USER}>`,
+    to: data.to,
+    subject: data.subject,
+    text: data.message,
+  };
+
+  await transporter.sendMail(mailOptions);
+  console.log(`📧 Email enviado a ${data.to}`);
+}
+
+>>>>>>> origin/dev/recode
