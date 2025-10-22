@@ -1,3 +1,8 @@
+/*
+
+
+
+
 import express, { Request, Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -30,9 +35,9 @@ app.use(helmet());
 // 🧩 Logger por request (antes de las rutas)
 app.use(requestLogger);
 
-/*
-Ruta raiz 1
-*/
+
+//Ruta raiz 1
+
 app.get("/", (req: Request, res: Response) => {
     res.json({
         message: " API Backend",
@@ -75,3 +80,9 @@ app.listen(PORT, () => {
     console.log(`   - /notifications`);
     console.log(`\n Listo para recibir peticiones!\n`);
 });
+
+
+
+
+
+*/

@@ -1,3 +1,5 @@
+/*
+
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 import { v4 as uuidv4 } from "uuid";
@@ -14,9 +16,9 @@ if (!GMAIL_USER || !GMAIL_PASS) {
 }
 
 export class NotificationService {
-  /**
-   * ✉️ Enviar correo base usando nodemailer
-   */
+  
+  // ✉️ Enviar correo base usando nodemailer
+   
   async sendEmailNotification(data: NotificationData) {
     if (!GMAIL_USER || !GMAIL_PASS) {
       throw new Error("Credenciales de Gmail no configuradas");
@@ -40,9 +42,9 @@ export class NotificationService {
     return { success: true, messageId: info.messageId, transactionId: uuidv4() };
   }
 
-  /**
-   * 📘 Enviar una notificación con template de reserva (T12)
-   */
+  
+  //📘 Enviar una notificación con template de reserva (T12)
+   
   async sendBookingNotification(data: {
     to: string;
     userName: string;
@@ -63,3 +65,5 @@ export class NotificationService {
     return this.sendEmailNotification(payload);
   }
 }
+
+*/
