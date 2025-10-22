@@ -1,5 +1,4 @@
 
-import dns from 'dns';
 
 export function validarPassword(password: string): boolean {
   if (typeof password !== "string") return false;
@@ -16,51 +15,7 @@ export function validarCoincidenciaPassword(password: string, confirmarPassword:
   return password === confirmarPassword;
 }
 
-/**
- * @param correo Correo electrónico a validar.
- * @returns Promise<boolean> → true si el formato y el dominio son válidos.
- */
-export async function validarCorreoElectronico(correo: string): Promise<boolean> {
-  if (typeof correo !== 'string') return false;
-  const patronCorreo = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  if (!patronCorreo.test(correo)) return false;
-  const partes = correo.split('@');
-  const dominio = partes[1];
-  const dominioValido = /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(dominio);
-  if (!dominioValido) return false;
-  return new Promise((resolve) => {
-    dns.resolveMx(dominio, (err, addresses) => {
-      if (err || !addresses || addresses.length === 0) {
-        resolve(false);
-      } else {
-        resolve(true);
-      }
-    });
-  });
-}
-
-/**
- * @param fileBuffer Contenido binario de la imagen
- * @param maxSizeBytes Tamaño máximo permitido (por defecto 1 MB)
- * @returns true si la imagen cumple los requisitos
- */
-export function validarImagen(fileBuffer: Buffer, maxSizeBytes = 1024 * 1024): boolean {
-  if (!Buffer.isBuffer(fileBuffer)) return false;
-  if (fileBuffer.length > maxSizeBytes) return false;
-  const esPNG =
-    fileBuffer[0] === 0x89 &&
-    fileBuffer[1] === 0x50 &&
-    fileBuffer[2] === 0x4E &&
-    fileBuffer[3] === 0x47;
-  const esJPG =
-    fileBuffer[0] === 0xFF &&
-    fileBuffer[1] === 0xD8 &&
-    fileBuffer[fileBuffer.length - 2] === 0xFF &&
-    fileBuffer[fileBuffer.length - 1] === 0xD9;
-  return esPNG || esJPG;
-}
-
-/*export function validarImagen(imagen: string): boolean {
+export function validarImagen(imagen: string): boolean {
   try {
     const buffer = Buffer.from(imagen, "base64");
     const maxBytes = 1024 * 1024;
@@ -85,7 +40,7 @@ export function validarImagen(fileBuffer: Buffer, maxSizeBytes = 1024 * 1024): b
     console.log(error);
     return false;
   }
-}*/
+}
 
 export function limpiarInput(valor: unknown): unknown {
   if (typeof valor === 'string') return valor;
