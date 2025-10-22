@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import connectDB from './config/database';
 import nombreGrupoEjemploRouter from './modules/nombre_grupo_ejemplo';
 import trabajosVengadoresRouter from './modules/los_vengadores_trabajos/routes/trabajo.routes';
-import losvengadores from './modules/los_vengadores_trabajos';
+import horarioRouter from './modules/los_vengadores_trabajos/routes/horario.routes';
 // Cargar variables de entorno
 dotenv.config();
 
@@ -12,7 +12,7 @@ dotenv.config();
 const app = express();
 
 // Conectar a MongoDB
-//connectDB(); esta linea es la conectara a la bd del proyecto
+connectDB(); //esta linea es la conectara a la bd del proyecto
 
 // Middlewares globales
 app.use(cors());
@@ -45,7 +45,9 @@ app.get('/api/health', (req: Request, res: Response) => {
 // Montar tus módulos aquí:
 app.use('/api/nombre_grupo_ejemplo', nombreGrupoEjemploRouter);
 app.use('/api/vengadores/trabajos', trabajosVengadoresRouter); //este el modulo de hu 1.7 y 1.8
-app.use('/api/los_vengadores', losvengadores);
+app.use('/api/los_vengadores', horarioRouter); //modulo hu 1
+
+
 // ============================================
 // Manejo de errores 404
 // ============================================
@@ -66,5 +68,6 @@ app.listen(PORT, () => {
   console.log(`\n Módulos cargados:`);
   console.log(`   - /api/nombre_grupo_ejemplo`);
   console.log(`   - /api/vengadores/trabajos`); // iniciar sevidor con con la api
+
   console.log(`\n Listo para recibir peticiones!\n`);
 });
