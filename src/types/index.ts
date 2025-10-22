@@ -1,21 +1,18 @@
-import { Request } from 'express';
+// src/modules/fixer/types/index.ts
 
-export interface IUser {
-  _id?: string;
-  name: string;
-  email: string;
-  password: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
+export type UpsertFixerDTO = {
+  userId: string;
+  ci?: string;
+  location?: { lat: number; lng: number; address?: string };
+  categories?: string[];
+};
 
-export interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
-  message?: string;
-  count?: number;
-}
-
-export interface CustomRequest extends Request {
-  user?: IUser;
-}
+export type FixerDTO = {
+  id: string;
+  userId: string;
+  ci?: string;
+  location?: { lat: number; lng: number; address?: string };
+  categories?: string[];
+  createdAt: string;
+  updatedAt: string;
+};

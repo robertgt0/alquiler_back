@@ -15,7 +15,7 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 const origins = (process.env.CORS_ORIGIN ?? '')
   .split(',')
-  .map(s => s.trim())
+  .map(origin => origin.trim())
   .filter(Boolean);
 
 app.use(cors({
@@ -41,9 +41,12 @@ app.get('/', (_req: Request, res: Response) => {
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
 app.get('/api/health', (_req: Request, res: Response) => {
+  const dbEnabled = (process.env.DB_ENABLED ?? 'true').toLowerCase() !== 'false';
+  const hasUri = Boolean(process.env.MONGODB_URI ?? process.env.MONGO_URI);
+
   res.json({
     status: 'healthy',
-    database: process.env.MONGODB_URI ? 'configured' : 'missing',
+    database: dbEnabled ? (hasUri ? 'enabled' : 'missing-uri') : 'disabled',
     uptime: process.uptime()
   });
 });
@@ -62,22 +65,36 @@ app.use((req: Request, res: Response) => {
 });
 
 const PORT = Number(process.env.PORT ?? 4000);
-const MONGODB_URI = process.env.MONGODB_URI;
+const dbEnabled = (process.env.DB_ENABLED ?? 'true').toLowerCase() !== 'false';
+const mongoUri = process.env.MONGODB_URI ?? process.env.MONGO_URI ?? '';
 
-if (!MONGODB_URI) {
-  console.error('❌ Falta MONGODB_URI en variables de entorno');
-  process.exit(1);
+async function bootstrap() {
+  if (dbEnabled) {
+    if (!mongoUri) {
+      console.error('❌ Falta MONGODB_URI (o MONGO_URI) en variables de entorno');
+      process.exit(1);
+    }
+
+    if (!process.env.MONGODB_URI && process.env.MONGO_URI) {
+      process.env.MONGODB_URI = process.env.MONGO_URI;
+    }
+
+    try {
+      await connectMongo();
+    } catch (error) {
+      console.error('❌ Error al iniciar el servidor');
+      console.error(error);
+      process.exit(1);
+    }
+  } else {
+    console.log('🔌 Base de datos desactivada (modo sin DB)');
+  }
+
+  app.listen(PORT, () => {
+    console.log(`🚀 API listening on port ${PORT}`);
+    console.log('📦 Módulos disponibles: /api/offers, /api/nombre_grupo_ejemplo, /api/fixer, /api/categories');
+    console.log(`🔌 Base de datos: ${dbEnabled ? 'ACTIVADA' : 'DESACTIVADA'}`);
+  });
 }
 
-connectMongo()
-  .then(() => {
-    app.listen(PORT, () => {
-      console.log(`🚀 API listening on port ${PORT}`);
-      console.log('📦 Módulos disponibles: /api/offers, /api/nombre_grupo_ejemplo, /api/fixer, /api/categories');
-    });
-  })
-  .catch((e) => {
-    console.error('❌ Error al iniciar el servidor');
-    console.error(e);
-    process.exit(1);
-  });
+bootstrap();
