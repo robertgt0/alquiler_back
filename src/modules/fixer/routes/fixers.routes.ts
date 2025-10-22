@@ -1,26 +1,25 @@
-import { Router } from "express";
-import {
-  createFixer,
-  updateFixer,
-  getFixer,
-  updateFixerCategories, // 👈 nuevo handler
-} from "../controllers/fixers.controller";
+import { Router, Request, Response } from "express";
+import { createFixer, getFixer, updateIdentity, checkCI } from "../controllers/fixers.controller";
 
 const router = Router();
 
-router.post("/", createFixer);
-router.put("/:id", updateFixer);
-router.get("/:id", getFixer);
-
-// 👇 NUEVA RUTA: guardar categorías seleccionadas para un fixer
-router.put("/:id/categories", updateFixerCategories);
-
-router.get("/", (_req, res) => {
+router.get("/", (_req: Request, res: Response) => {
   res.json({
     ok: true,
     module: "fixer",
-    endpoints: ["POST /", "GET /:id", "PUT /:id", "PUT /:id/categories"],
+    endpoints: [
+      "GET /check-ci?ci=123456",
+      "POST /",
+      "PUT /:id/identity",
+      "GET /:id",
+    ],
   });
 });
+
+// Handlers (ya asegurados como funciones)
+router.get("/check-ci", checkCI);
+router.post("/", createFixer);
+router.put("/:id/identity", updateIdentity);
+router.get("/:id", getFixer);
 
 export default router;
