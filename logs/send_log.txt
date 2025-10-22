@@ -14,3 +14,5 @@ AQUI SI PONE LOS LOGS!!!!!
 2025-10-22T00:56:21.164Z | TxID: df8868e6-2165-411a-87e6-abfea03704bc | To: adrianvallejosflores24@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
 2025-10-22T00:56:52.469Z | TxID: c9677f15-fae6-42bb-af1e-c3da63e02718 | To: adrianvallejosflores24@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
 2025-10-22T00:57:57.577Z | TxID: e590c425-7d24-4a5d-b22b-39d052592ff7 | To: adrdfgdfg@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-22T03:21:17.489Z | TxID: 5b67f504-4dcd-4ade-891e-5ec6689359ad | To: adrianvallejosflores24@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-22T03:22:54.695Z | TxID: c1cfbde3-1115-4380-85f2-93281df25036 | To: adrianvallejosflores24@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
