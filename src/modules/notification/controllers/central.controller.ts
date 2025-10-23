@@ -1,6 +1,13 @@
 // src/modules/notifications/controllers/central.controller.ts
 import { Request, Response } from "express";
 import { CentralNotificationService } from "../services/central.service";
+//import { NotificationModel } from "../models/Notification";
+
+declare global {
+  // eslint-disable-next-line no-var
+  var _sentEmails: Set<string> | undefined;
+}
+
 
 const service = new CentralNotificationService();
 
@@ -38,6 +45,24 @@ export const receiveNotificationHandler = async (req: Request, res: Response) =>
     if (!subject || !message || !Array.isArray(destinations) || destinations.length === 0) {
       return res.status(400).json({ ok: false, error: "Campos faltantes o inválidos" });
     }
+    
+   // ✅ Evitar correos duplicados (versión funcional con memoria temporal)
+const email = destinations?.[0]?.email?.trim().toLowerCase();
+
+if (email) {
+  if (!globalThis._sentEmails) globalThis._sentEmails = new Set();
+
+  if (globalThis._sentEmails.has(email)) {
+    return res.status(400).json({
+      ok: false,
+      error: `El correo ${email} ya fue registrado previamente.`,
+    });
+  }
+
+  globalThis._sentEmails.add(email);
+}
+
+
 
     // ✅ Llamada al servicio central
     const { transactionId, status, response } = await service.receiveAndSend({

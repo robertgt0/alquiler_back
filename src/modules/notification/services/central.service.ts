@@ -41,6 +41,7 @@ export class CentralNotificationService {
         attempts: 1
       });
 
+
       try {
         const result = await triggerN8nWebhook({
           fixerEmail: toEmails[0],
