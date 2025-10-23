@@ -1,4 +1,4 @@
-import { getAvailabilityService } from './availabilily.service';
+import { getAvailabilityService } from './availability.service';
 
 export const isSlotAvailable = async (providerId: string, date: string, time: string) => {
     const { slots } = await getAvailabilityService(providerId, date);

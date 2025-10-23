@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { getAvailabilityService } from '../services/availabilily.service';
+import { getAvailabilityService } from '../services/availability.service';
 
 export const getProviderAvailability = async (
   req: Request,

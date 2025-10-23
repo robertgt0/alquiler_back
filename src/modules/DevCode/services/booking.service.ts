@@ -1,7 +1,7 @@
-import Appointment, { AppointmentDocument, AppointmentStatus } from '../models/Appointments';
-import Provider from '../../../models/provider.model';
+import Appointment, { AppointmentDocument, AppointmentStatus } from '../../../models/cita.model';
+import Provider from '../../../models/proveedorInfo.model';
 import User from '../../../models/user.model';
-import { getAvailabilityService } from './availabilily.service';
+import { getAvailabilityService } from './availability.service';
 
 export interface CreateBookingPayload {
   clientId: string;

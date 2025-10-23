@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { isSlotAvailable } from '../services/overlap.service';
+import { isSlotAvailable } from '../services/solapamientoService.service';
 
 export const checkOverlap = async (req: Request, res: Response, next: NextFunction) => {
     try {

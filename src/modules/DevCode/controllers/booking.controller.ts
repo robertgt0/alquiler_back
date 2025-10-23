@@ -50,7 +50,7 @@ export const create = async (req: Request, res: Response) => {
     const status = err?.status || 500;
     return res.status(status).json({
       success: false,
-      message: err?.message || 'Error interno del servidor',
+      message: err?.message || 'Error de agendar cita',
     });
   }
 };
@@ -68,7 +68,7 @@ export const getById = async (req: Request, res: Response) => {
     const status = err?.status || 500;
     return res.status(status).json({
       success: false,
-      message: err?.message || 'Error interno del servidor',
+      message: err?.message || 'Error al obtener cita',
     });
   }
 };
@@ -91,7 +91,7 @@ export const updateStatus = async (req: Request, res: Response) => {
     const status = err?.status || 500;
     return res.status(status).json({
       success: false,
-      message: err?.message || 'Error interno del servidor',
+      message: err?.message || 'Error al modificar estado de cita',
     });
   }
 };

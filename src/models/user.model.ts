@@ -1,77 +1,31 @@
-import { IUser } from '@/types/user';
-import mongoose, { Schema, Document, Model, Types } from 'mongoose';
+import { Schema, model, Document } from "mongoose";
 
-export interface IUserDocument extends IUser, Document {
-  _id: Types.ObjectId;
-  comparePassword(password: string): Promise<boolean>;
+export interface IUser extends Document {
+  nombre: string;
+  apellido: string;
+  correo: string;
+  telefono: string;
+  contraseña: string;
+  foto_perfil?: string;
+  rol: "cliente" | "proveedor" | "admin";
+  fecha_creacion: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-const userSchema = new Schema<IUserDocument>(
+const userSchema = new Schema<IUser>(
   {
-    name: {
-      type: String,
-      required: [true, 'El nombre es requerido'],
-      trim: true,
-    },
-    lastName: {
-      type: String,
-      required: [true, 'El apellido es requerido'],
-      trim: true,
-    },
-    ci: {
-      type: String,
-      required: [true, 'El CI es requerido'],
-      trim: true,
-      unique: true,
-    },
-    email: {
-      type: String,
-      required: [true, 'El email es requerido'],
-      unique: true,
-      lowercase: true,
-      trim: true,
-      match: [/^\S+@\S+\.\S+$/, 'Email inválido'],
-    },
-    phone: {
-      type: String,
-      required: [true, 'El número de celular es requerido'],
-      trim: true,
-    },
-    password: {
-      type: String,
-      required: [true, 'La contraseña es requerida'],
-      minlength: [6, 'La contraseña debe tener al menos 6 caracteres'],
-    },
-    role: {
-      type: String,
-      enum: ['cliente', 'proveedor', 'admin'],
-      default: 'cliente',
-    },
+    nombre: { type: String, required: true },
+    apellido: { type: String, required: true },
+    correo: { type: String, required: true, unique: true },
+    telefono: { type: String, required: true },
+    contraseña: { type: String, required: true, select: false },
+    foto_perfil: { type: String },
+    rol: { type: String, required: true, enum: ["cliente", "proveedor", "admin"] },
+    fecha_creacion: { type: Date, default: Date.now },
   },
-  {
-    timestamps: true, 
-    toJSON: {
-      transform(_, ret: any) {
-        if (ret.password) delete ret.password; 
-        return ret;
-      },
-    },
-
-  }
+  { timestamps: true }
 );
 
-// 🔐 Método de instancia para comparar contraseñas
-userSchema.methods.comparePassword = async function (password: string) {
-  const bcrypt = await import('bcryptjs');
-  return bcrypt.compare(password, this.password);
-};
-
-// Exporta el modelo tipado
-const User: Model<IUserDocument> = mongoose.model<IUserDocument>('User', userSchema);
+export const User = model<IUser>("User", userSchema);
 export default User;
-
-
-
-
-
-
