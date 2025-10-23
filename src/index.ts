@@ -9,6 +9,7 @@ import dotenv from 'dotenv';
 // 🧱 Conexión a la base de datos
 // ============================================
 import connectDB from './config/database';
+import mongoose from 'mongoose';
 
 // ============================================
 // 🧱 Importación de rutas
@@ -74,9 +75,17 @@ app.use('/api/borbotones/filtros', filtrosRouter);
 // 🩺 Endpoint de salud (para monitoreo)
 // ============================================
 app.get('/api/health', (_req: Request, res: Response) => {
+  const state = mongoose.connection.readyState; // 0 disconnected, 1 connected, 2 connecting, 3 disconnecting
+  const stateMap: Record<number, string> = {
+    0: 'disconnected',
+    1: 'connected',
+    2: 'connecting',
+    3: 'disconnecting',
+  };
+
   res.json({
-    status: 'healthy',
-    database: 'connected',
+    status: state === 1 ? 'healthy' : 'degraded',
+    database: stateMap[state] || 'unknown',
     uptime: process.uptime(),
   });
 });
