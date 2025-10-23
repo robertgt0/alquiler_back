@@ -1,9 +1,10 @@
-// src/modules/notification/config/database.ts
 import mongoose from "mongoose";
 
 export default async function connectDB() {
   try {
-    const uri = process.env.MONGODB_URI || "mongodb://localhost:27017/alquiler_db";
+    // 🔧 Corregido: el nombre de variable coincide con .env
+    const uri = process.env.MONGO_URI || "mongodb://localhost:27017/alquiler_db";
+
     await mongoose.connect(uri);
     console.log("✅ Conectado a MongoDB");
   } catch (err) {
@@ -11,3 +12,4 @@ export default async function connectDB() {
     process.exit(1);
   }
 }
+

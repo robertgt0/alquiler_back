@@ -1,11 +1,11 @@
-import { v4 as uuidv4 } from "uuid";
-import { saveNotification } from "../models/notification.model";
+import { saveNotification, listNotifications } from "../models/notification.model";
 import { triggerN8nWebhook } from "./n8n.service";
-import { 
+import {
   InvalidNotificationDataError,
   NotificationCreationError,
   NotificationProviderError
 } from "../errors/notification.errors";
+import { v4 as uuidv4 } from "uuid";
 
 interface Destination {
   email: string;
@@ -26,6 +26,42 @@ export class CentralNotificationService {
 
     const transactionId = uuidv4();
     const toEmails = data.destinations.map((d) => d.email);
+      
+// 1) Normalizamos todos los correos entrantes
+const toEmailsNormalized = data.destinations.map(d =>
+  d.email.trim().toLowerCase()
+);
+// 2) Traemos posibles duplicados desde memoria (mismo asunto, sin usar Mongo)
+const allNotifications = await listNotifications();
+const possibleDuplicates = allNotifications.filter(n =>
+  n.subject.trim().toLowerCase() === data.subject.trim().toLowerCase()
+);
+console.log("🧠 possibleDuplicates:", JSON.stringify(possibleDuplicates, null, 2));
+
+console.log("🧩 possibleDuplicates:", JSON.stringify(possibleDuplicates, null, 2));
+// 3) Buscamos manualmente si alguno coincide con un correo ya guardado
+const existingNotification = possibleDuplicates.find(n =>
+  n.destinations?.some((dest: any) =>
+    toEmailsNormalized.includes((dest.email || "").trim().toLowerCase())
+  )
+);
+
+console.log("🔍 Buscando duplicado con:", {
+  subject: data.subject,
+  toEmails: toEmailsNormalized,
+});
+
+console.log("🟡 EXISTING:", existingNotification);
+
+// Si encontramos duplicado, no seguimos
+if (existingNotification) {
+  console.log("⛔ Notificación duplicada detectada. No se enviará nuevamente.");
+  return {
+    success: false,
+    message: "Duplicate notification detected — not sent again",
+  };
+}
+
 
     try {
       const notification = await saveNotification({
