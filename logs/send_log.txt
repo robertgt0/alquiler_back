@@ -26,3 +26,29 @@ AQUI SI PONE LOS LOGS!!!!!
 2025-10-22T23:42:38.981Z | TxID: c07f5549-dd75-4fdb-9e81-a2345d6a3156 | To: adrianvallejosflores24@gmail.com | Estado: NETWORK_ERROR | Error: Intento #2 | Error: The operation was aborted.
 2025-10-22T23:42:53.989Z | TxID: c07f5549-dd75-4fdb-9e81-a2345d6a3156 | To: adrianvallejosflores24@gmail.com | Estado: NETWORK_ERROR | Error: Intento #3 | Error: The operation was aborted.
 2025-10-22T23:45:06.353Z | TxID: d36473e3-eedd-46c4-8755-c46ddbd5d47b | To: adrianvallejosflores24@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-23T17:40:03.228Z | TxID: 17c9ffee-dfeb-4311-9a38-439d7c9fef86 | To: adrianvallejosflores24@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-23T17:47:09.528Z | TxID: 864276c7-e157-4922-83af-683c7e49d808 | To: adrianvallejosflores24@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-23T18:02:13.640Z | TxID: 33bb6dcd-795f-4ccc-9881-8f9b1aa6ed51 | To: bryan.vasquez.456@gmail.com | Estado: NETWORK_ERROR | Error: Intento #1 | Error: The operation was aborted.
+2025-10-23T18:02:28.663Z | TxID: 33bb6dcd-795f-4ccc-9881-8f9b1aa6ed51 | To: bryan.vasquez.456@gmail.com | Estado: NETWORK_ERROR | Error: Intento #2 | Error: The operation was aborted.
+2025-10-23T18:02:43.684Z | TxID: 33bb6dcd-795f-4ccc-9881-8f9b1aa6ed51 | To: bryan.vasquez.456@gmail.com | Estado: NETWORK_ERROR | Error: Intento #3 | Error: The operation was aborted.
+2025-10-23T18:04:39.130Z | TxID: 87c76698-7bb1-440f-ba7f-6d4613f996ab | To: bryan.vasquez.456@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-23T18:12:22.297Z | TxID: f459a0d0-a156-4069-9972-ff774603d7f5 | To: bryan.vasquez.456@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-23T18:15:01.042Z | TxID: bd73f5ef-a0a4-46c5-bc46-a6a9db33dace | To: adrianvallejosflores24@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-23T18:18:46.682Z | TxID: ee51d79a-fa47-480e-a7ca-2769b365ac1a | To: ricardovasquezovando@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-23T18:19:15.611Z | TxID: 28b70e37-1f1f-4b9e-986e-924ef7dbbb8f | To: adrianvallejosflores24@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-23T18:20:27.392Z | TxID: 3593fe40-3e28-4ac9-b33a-8c2f8743f118 | To: ricardovasquezovando@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-23T18:21:41.816Z | TxID: 7c7c3f33-771a-44e6-885e-f633457ec6f6 | To: ricardovasquezovando@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-23T18:22:07.917Z | TxID: f4d718a3-8241-4f21-9179-f18f5b81e0d2 | To: adrianvallejosflores24@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-23T18:35:01.547Z | TxID: 78fd2125-4589-407f-bfc5-1ba4b54029cb | To: ricardovasquezovando@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-23T18:35:23.091Z | TxID: 57629ca5-20b2-47fe-a57e-fee671bafdb7 | To: ricardovasquezovando@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-23T19:05:08.520Z | TxID: 8fd37996-5688-4625-8fc9-182f9e5f78cc | To: ricardovasquezovando@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-23T19:05:21.310Z | TxID: 0dfee0d9-a1bd-4be4-baa2-418e0126c3e4 | To: ricardovasquezovando@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-23T19:25:53.201Z | TxID: e531d869-391c-4434-928a-4afd8db69fa8 | To: ricardovasquezovando@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-23T19:25:58.056Z | TxID: 639aa0f9-7105-4855-8b13-21cb9a6c13d1 | To: ricardovasquezovando@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-23T19:43:02.917Z | TxID: d9335371-beac-4851-9e54-4177b091e2eb | To: ricardovasquezovando@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-23T19:43:08.113Z | TxID: 262d00e7-7111-45e9-80f0-a39db7a59bab | To: ricardovasquezovando@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-23T19:54:34.004Z | TxID: b47fe594-cc9f-434f-b0f1-cb750a8ecd0f | To: ricardovasquezovando@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-23T19:57:06.144Z | TxID: b8214458-a0a3-4abe-8a44-a9cfa9fd73ff | To: ricardovasquezovando@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-23T20:00:41.037Z | TxID: f95125bb-8baa-4290-8e7b-995240606f23 | To: ricardovasquezovando@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-23T20:03:45.765Z | TxID: d329a8ae-d3c3-4100-97cd-9cb48f1eeee3 | To: ricardovasquezovando@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-23T20:06:09.713Z | TxID: 8b7af63b-03f2-4a0a-8ea0-9ee5e3038142 | To: ricardovasquezovando@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
