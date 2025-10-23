@@ -4,8 +4,10 @@ Una donde haremos el clásico: npm run dev
 
 Y otra donde ejecutaremos: npx ts-node src/testsNotification/exitoSimple.ts
 
-Deberemos ver en ambas terminales la confirmación clásica. Además, se deberá ver que en el workflow, en la sección de "Executions" (Ejecuciones), se haya recorrido correctamente.
+Deberemos ver en ambas terminales la confirmación clásica. Además, se deberá ver que en el workflow, en la sección de "Executions" 
+(Ejecuciones), se haya recorrido correctamente.
 
 Y obvio, [comprobar] que haya llegado el correo al destino.
 
-Pueden hacer pruebas enviando campos vacíos, ya que correos ficticios no los detecta y lo toma como que sí o sí lo envió (aunque la dirección no exista).
+Pueden hacer pruebas enviando campos vacíos, ya que correos ficticios no los detecta 
+y lo toma como que sí o sí lo envió (aunque la dirección no exista).

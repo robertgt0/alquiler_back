@@ -4,3 +4,4 @@ NO LO ESTA PONIENDO NADA AQUI......
 {"ts":"2025-10-18T17:40:12.128Z","level":"INFO","message":"request:start","id":"4773abe2-f121-4586-b146-e6e095b59acc","method":"GET","url":"/","ip":"::1"}
 {"ts":"2025-10-18T17:40:12.283Z","level":"INFO","message":"request:finish","id":"4773abe2-f121-4586-b146-e6e095b59acc","status":200,"method":"GET","url":"/","duration":156}
 {"ts":"2025-10-19T23:17:38.828Z","level":"ERROR","message":"Ruta no encontrada: /api/nofications","code":"NOT_FOUND","status":404,"endpoint":"/api/nofications","method":"POST","ip":"::1","requestId":"N/A","userAgent":"axios/1.12.0"}
+{"ts":"2025-10-21T23:46:26.301Z","level":"ERROR","message":"Ruta no encontrada: /favicon.ico","code":"NOT_FOUND","status":404,"endpoint":"/favicon.ico","method":"GET","ip":"::1","requestId":"N/A","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36 Edg/141.0.0.0"}
