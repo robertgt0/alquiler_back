@@ -14,3 +14,11 @@ NO LO ESTA PONIENDO NADA AQUI......
 {"ts":"2025-10-22T03:21:17.494Z","level":"INFO","message":"request:finish","id":"ff0a1b74-8e59-4080-b823-353a40ae76dc","status":200,"method":"POST","url":"/api/notifications","duration":2736}
 {"ts":"2025-10-22T03:22:50.593Z","level":"INFO","message":"request:start","id":"f20f4e58-273a-409e-9b28-90d78daeb6d2","method":"POST","url":"/api/notifications","ip":"::1"}
 {"ts":"2025-10-22T03:22:54.699Z","level":"INFO","message":"request:finish","id":"f20f4e58-273a-409e-9b28-90d78daeb6d2","status":200,"method":"POST","url":"/api/notifications","duration":4106}
+{"ts":"2025-10-22T23:19:17.052Z","level":"INFO","message":"request:start","id":"66048c00-501f-4391-8592-f8e07c725498","method":"POST","url":"/api/notifications","ip":"::1"}
+{"ts":"2025-10-22T23:19:57.118Z","level":"INFO","message":"request:finish","id":"66048c00-501f-4391-8592-f8e07c725498","status":200,"method":"POST","url":"/api/notifications","duration":40067}
+{"ts":"2025-10-22T23:22:37.688Z","level":"INFO","message":"request:start","id":"af54325b-b363-4f61-b0c2-3dcaf32c936e","method":"POST","url":"/api/notifications","ip":"::1"}
+{"ts":"2025-10-22T23:23:17.744Z","level":"INFO","message":"request:finish","id":"af54325b-b363-4f61-b0c2-3dcaf32c936e","status":200,"method":"POST","url":"/api/notifications","duration":40056}
+{"ts":"2025-10-22T23:42:13.960Z","level":"INFO","message":"request:start","id":"39e7a4e0-a3d1-4d10-909d-8456ff61b331","method":"POST","url":"/api/notifications","ip":"::1"}
+{"ts":"2025-10-22T23:42:53.992Z","level":"INFO","message":"request:finish","id":"39e7a4e0-a3d1-4d10-909d-8456ff61b331","status":200,"method":"POST","url":"/api/notifications","duration":40032}
+{"ts":"2025-10-22T23:45:03.690Z","level":"INFO","message":"request:start","id":"695f2ca4-9fe6-4f77-8366-e0b696f72b65","method":"POST","url":"/api/notifications","ip":"::1"}
+{"ts":"2025-10-22T23:45:06.355Z","level":"INFO","message":"request:finish","id":"695f2ca4-9fe6-4f77-8366-e0b696f72b65","status":200,"method":"POST","url":"/api/notifications","duration":2665}
