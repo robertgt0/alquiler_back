@@ -6,3 +6,7 @@ NO LO ESTA PONIENDO NADA AQUI......
 {"ts":"2025-10-19T23:17:38.828Z","level":"ERROR","message":"Ruta no encontrada: /api/nofications","code":"NOT_FOUND","status":404,"endpoint":"/api/nofications","method":"POST","ip":"::1","requestId":"N/A","userAgent":"axios/1.12.0"}
 {"ts":"2025-10-22T03:39:06.595Z","level":"INFO","message":"request:start","id":"df7f2d01-fa6f-4699-813c-6b16fe4ee30b","method":"GET","url":"/","ip":"::1"}
 {"ts":"2025-10-22T03:39:06.609Z","level":"INFO","message":"request:finish","id":"df7f2d01-fa6f-4699-813c-6b16fe4ee30b","status":200,"method":"GET","url":"/","duration":15}
+{"ts":"2025-10-23T18:16:53.334Z","level":"INFO","message":"request:start","id":"43b810cc-6bfd-44ff-990b-0a7b73e9d0c1","method":"POST","url":"/notifications","ip":"::1"}
+{"ts":"2025-10-23T18:16:53.359Z","level":"INFO","message":"request:finish","id":"43b810cc-6bfd-44ff-990b-0a7b73e9d0c1","status":400,"method":"POST","url":"/notifications","duration":25}
+{"ts":"2025-10-23T18:16:57.302Z","level":"INFO","message":"request:start","id":"fc3a7cda-6644-43d9-bb3d-24dbfddc230a","method":"POST","url":"/notifications","ip":"::1"}
+{"ts":"2025-10-23T18:16:58.436Z","level":"INFO","message":"request:finish","id":"fc3a7cda-6644-43d9-bb3d-24dbfddc230a","status":200,"method":"POST","url":"/notifications","duration":1134}

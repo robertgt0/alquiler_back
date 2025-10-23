@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { CentralNotificationService } from "../services/central.service";
 import { NotificationService } from "../services/notification.service";
+import { InvalidNotificationDataError } from "../errors/notification.errors";
 
 const central = new CentralNotificationService();
 const service = new NotificationService();
@@ -20,7 +21,21 @@ export async function createNotification(req: Request, res: Response) {
     return res.status(result.success ? 200 : 400).json(result);
   } catch (err: any) {
     console.error("createNotification error:", err);
-    return res.status(500).json({ success: false, message: err.message ?? "Error interno" });
+
+    // Manejo específico si es error de validación de correo
+    if (err instanceof InvalidNotificationDataError) {
+      return res.status(400).json({
+        success: false,
+        message: "El correo no es válido o no existe.",
+        details: err.details,
+      });
+    }
+
+    // Otros errores generales
+    return res.status(500).json({
+      success: false,
+      message: err.message ?? "Error interno",
+    });
   }
 }
 
@@ -52,3 +67,4 @@ export const sendBookingTemplateHandler = async (req: Request, res: Response) =>
     });
   }
 };
+

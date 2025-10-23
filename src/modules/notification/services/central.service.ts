@@ -50,7 +50,7 @@ export class CentralNotificationService {
           type: data.type ?? "generic",
         });
 
-        // Update notification status based on result
+        // Actualizar estado de la notificación según resultado
         notification.status = result.success ? "sent" : "failed";
         notification.providerResponse = result;
         notification.sentAt = new Date();
@@ -62,7 +62,7 @@ export class CentralNotificationService {
           response: result,
         };
       } catch (error) {
-        // Handle provider-specific errors
+        // Errores del proveedor
         notification.status = "failed";
         notification.error = error instanceof Error ? error.message : String(error);
         
@@ -73,7 +73,7 @@ export class CentralNotificationService {
       }
     } catch (error) {
       if (error instanceof NotificationProviderError) {
-        throw error; // Re-throw already handled provider errors
+        throw error; // Re-lanzar errores de proveedor
       }
       
       throw new NotificationCreationError(
@@ -102,6 +102,7 @@ export class CentralNotificationService {
     if (!Array.isArray(data.destinations) || data.destinations.length === 0) {
       errors.destinations = "At least one destination is required";
     } else {
+      // Validación de formato de correo
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       data.destinations.forEach((d, index) => {
         if (!d.email || !emailRegex.test(d.email)) {
@@ -118,3 +119,4 @@ export class CentralNotificationService {
     }
   }
 }
+
