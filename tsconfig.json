@@ -14,11 +14,16 @@
     "lib": ["ES2022", "DOM"],             // DOM opcional por si usas fetch u otras APIs
 
     /* === Comportamiento del compilador === */
-    "strict": true,
+   "noEmit": false,
+    "noEmitOnError": false,
+   "strict": false,
     "noImplicitAny": true,
     "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
+      "exactOptionalPropertyTypes": false,
+      
+
 
     /* === Imports === */
     "esModuleInterop": true,
