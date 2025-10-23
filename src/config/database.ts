@@ -1,6 +1,10 @@
-import mongoose from 'mongoose'; // Importa Mongoose, la librería para conectarse y trabajar con MongoDB
+import mongoose from "mongoose"; // Importa Mongoose, la libreria para conectarse y trabajar con MongoDB
+import { config } from 'dotenv';
 
-// Función asíncrona para conectar la base de datos
+// Cargar variables de entorno
+config();
+
+// Función asincrona para conectar la base de datos
 const connectDB = async (): Promise<void> => {
   try {
     // Intenta conectarse a MongoDB usando la variable de entorno MONGO_URI

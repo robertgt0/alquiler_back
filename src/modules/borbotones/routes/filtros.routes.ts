@@ -7,12 +7,17 @@ import {
   usuariosPorDisponibilidad,
   provinciasPorCiudad,
   usuariosPorServicio, // 👈 nuevo
+  listarDepartamentos,
+  ciudadesPorDepartamento,
 } from "../controllers/filtros.controller";
 
 const router = Router();
 
 // Ciudades
 router.get("/ciudades", listarCiudades);
+
+// Departamentos (Bolivia) - ruta nueva
+router.get("/departamentos", listarDepartamentos);
 
 // Especialidades
 router.get("/especialidades", listarEspecialidades);
@@ -30,6 +35,9 @@ router.get("/usuarios/disponible", usuariosPorDisponibilidad);
 
 // Provincias por ciudad
 router.get("/ciudad/provincias", provinciasPorCiudad);
+
+// Ciudades por departamento (Bolivia)
+router.get("/ciudades/por-departamento", ciudadesPorDepartamento);
 
 // ✅ Nuevo: usuarios por nombre de servicio
 // http://localhost:5000/api/borbotones/filtros/usuarios/servicio?servicio=Cambio de cerraduras
