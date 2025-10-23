@@ -121,4 +121,4 @@ export async function triggerN8nWebhook(payload: Record<string, any>) {
     status: "failed",
     error: lastError?.message ?? lastError,
   };
-}
+}  
