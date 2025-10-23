@@ -16,13 +16,21 @@ function getRandomLocation() {
   const cities = boliviaDeptCities[randomDept];
   const randomCity = cities[Math.floor(Math.random() * cities.length)];
   return {
-    departamento: randomDept.charAt(0).toUpperCase() + randomDept.slice(1),
-    ciudad: randomCity
+    // Corregir capitalización a solo la primera letra
+    departamento: randomDept.charAt(0).toUpperCase() + randomDept.slice(1), 
+    ciudad: randomCity,
   };
 }
 
+// Campos comunes a proyectar en los resultados de usuario
+const USER_PROJECTION = {
+  _id: 1, id_usuario: 1, nombre: 1, email: 1, telefono: 1, activo: 1,
+  fecha_registro: 1, ciudad: 1, especialidades: 1, servicios: 1,
+};
+
+
 /* =======================================================
- *  Listado de CIUDADES
+ *  Listado de CIUDADES
  * ======================================================= */
 export const listarCiudades = async (req: Request, res: Response) => {
   try {
@@ -30,13 +38,10 @@ export const listarCiudades = async (req: Request, res: Response) => {
     const limitRaw = Number(req.query.limit ?? 50);
     const pageRaw = Number(req.query.page ?? 1);
 
-    // Soporte para filtrar solo ciudades de Bolivia
     const pais = (req.query.pais as string | undefined)?.trim()?.toLowerCase();
     const soloBolivia = pais === "bolivia" || pais === "bo" || req.query.soloBolivia === "true";
 
-    const pageSize = Number.isNaN(limitRaw)
-      ? 50
-      : Math.min(Math.max(limitRaw, 1), 200);
+    const pageSize = Number.isNaN(limitRaw) ? 50 : Math.min(Math.max(limitRaw, 1), 200);
     const page = Number.isNaN(pageRaw) ? 1 : Math.max(pageRaw, 1);
     const skip = (page - 1) * pageSize;
 
@@ -44,16 +49,15 @@ export const listarCiudades = async (req: Request, res: Response) => {
     if (q && q !== "") filter.nombre = new RegExp(escapeRegex(q), "i");
 
     if (soloBolivia) {
-      // Si el cliente pide solo Bolivia, restringimos la búsqueda a nombres presentes en la lista
-      // Construimos la lista a partir de boliviaDeptCities (concat + unique)
       const allCities = Object.values(boliviaDeptCities).flat().map((c) => c.toLowerCase());
       const unique = Array.from(new Set(allCities));
       const escaped = unique.map((c) => escapeRegex(c)).join("|");
-      const bolRegex = new RegExp(`^(${escaped})$`, "i");
-      // Si ya había q, combinamos (nombre que contiene q) y (pertenece a la lista)
+      // Buscamos coincidencia exacta con los nombres de ciudades bolivianas (case insensitive)
+      const bolRegex = new RegExp(`^(${escaped})$`, "i"); 
+      
       if (filter.nombre) {
-        // Se busca que el nombre contenga q y además sea una ciudad boliviana: usamos $and
-        filter.$and = [ { nombre: filter.nombre }, { nombre: bolRegex } ];
+        // Se busca que el nombre contenga 'q' Y además sea una ciudad boliviana
+        filter.$and = [{ nombre: filter.nombre }, { nombre: bolRegex }];
         delete filter.nombre;
       } else {
         filter.nombre = bolRegex;
@@ -69,13 +73,18 @@ export const listarCiudades = async (req: Request, res: Response) => {
       City.countDocuments(filter),
     ]);
 
-    // Añadir ubicación aleatoria a cada resultado
-    const dataWithLocation = data.map(item => {
+    // OJO: Añadir ubicación aleatoria a cada resultado
+    // Esto parece ser para datos de ejemplo/mock, podría ser innecesario
+    // si las ciudades en la DB ya tienen departamento/ciudad asociados.
+    const dataWithLocation = data.map((item: any) => {
       const location = getRandomLocation();
+      // Esto hace que la ciudad devuelta en el item (de la DB) 
+      // tenga un campo 'departamento' y 'ciudad' (de Bolivia) AL AZAR.
+      // La ciudad 'item.nombre' no está relacionada con 'location.departamento/ciudad'.
       return {
         ...item,
         departamento: location.departamento,
-        ciudad: location.ciudad
+        ciudad: location.ciudad, // Ojo: esto sobreescribe item.ciudad si existiera, pero en la proyección se quitó
       };
     });
 
@@ -87,12 +96,10 @@ export const listarCiudades = async (req: Request, res: Response) => {
 };
 
 /* =======================================================
- *  Listado de DEPARTAMENTOS (Bolivia)
- *  Endpoint simple que devuelve lista estática
+ *  Listado de DEPARTAMENTOS (Bolivia)
  * ======================================================= */
 export const listarDepartamentos = async (_req: Request, res: Response) => {
   try {
-    // Los departamentos ya son strings, no necesitamos mapear
     res.json({ success: true, total: boliviaDepartments.length, data: boliviaDepartments });
   } catch (err: any) {
     console.error("Error en /departamentos:", err);
@@ -101,8 +108,7 @@ export const listarDepartamentos = async (_req: Request, res: Response) => {
 };
 
 /* =======================================================
- *  Ciudades por departamento (Bolivia) - endpoint estático
- *  Query: ?departamento=Nombre
+ *  Ciudades por departamento (Bolivia) - endpoint estático
  * ======================================================= */
 export const ciudadesPorDepartamento = async (req: Request, res: Response) => {
   try {
@@ -120,7 +126,7 @@ export const ciudadesPorDepartamento = async (req: Request, res: Response) => {
 };
 
 /* =======================================================
- *  Listado de ESPECIALIDADES (únicas)
+ *  Listado de ESPECIALIDADES (únicas)
  * ======================================================= */
 export const listarEspecialidades = async (_req: Request, res: Response) => {
   try {
@@ -128,18 +134,11 @@ export const listarEspecialidades = async (_req: Request, res: Response) => {
       { $unwind: "$especialidades" },
       {
         $group: {
-          _id: {
-            id: "$especialidades.id_especialidad",
-            nombre: "$especialidades.nombre",
-          },
+          _id: { id: "$especialidades.id_especialidad", nombre: "$especialidades.nombre" },
         },
       },
       {
-        $project: {
-          _id: 0,
-          id_especialidad: "$_id.id",
-          nombre: "$_id.nombre",
-        },
+        $project: { _id: 0, id_especialidad: "$_id.id", nombre: "$_id.nombre" },
       },
       { $sort: { nombre: 1 } },
     ]);
@@ -151,7 +150,7 @@ export const listarEspecialidades = async (_req: Request, res: Response) => {
 };
 
 /* =======================================================
- *  Usuarios por CIUDAD
+ *  Usuarios por CIUDAD
  * ======================================================= */
 export const usuariosPorCiudad = async (req: Request, res: Response) => {
   try {
@@ -165,10 +164,7 @@ export const usuariosPorCiudad = async (req: Request, res: Response) => {
       const idCiudad = Number(idCiudadStr);
       const usuarios = await Usuario.find(
         { "ciudad.id_ciudad": idCiudad },
-        {
-          _id: 1, id_usuario: 1, nombre: 1, email: 1, telefono: 1, activo: 1,
-          fecha_registro: 1, ciudad: 1, especialidades: 1, servicios: 1,
-        }
+        USER_PROJECTION
       ).limit(200).lean();
       return res.json({ success: true, total: usuarios.length, data: usuarios });
     }
@@ -188,13 +184,10 @@ export const usuariosPorCiudad = async (req: Request, res: Response) => {
     if (ids.length > 0) or.push({ "ciudad.id_ciudad": { $in: ids } });
 
     const usuarios = await Usuario.find(
-      { $or: or },
-      {
-        _id: 1, id_usuario: 1, nombre: 1, email: 1, telefono: 1, activo: 1,
-        fecha_registro: 1, ciudad: 1, especialidades: 1, servicios: 1,
-      }
+      { $or: or }, 
+      USER_PROJECTION
     ).limit(200).lean();
-
+    
     res.json({ success: true, total: usuarios.length, data: usuarios });
   } catch (err: any) {
     console.error("Error en /usuarios/ciudad:", err);
@@ -203,7 +196,7 @@ export const usuariosPorCiudad = async (req: Request, res: Response) => {
 };
 
 /* =======================================================
- *  Usuarios por ESPECIALIDAD
+ *  Usuarios por ESPECIALIDAD
  * ======================================================= */
 export const usuariosPorEspecialidad = async (req: Request, res: Response) => {
   try {
@@ -230,12 +223,9 @@ export const usuariosPorEspecialidad = async (req: Request, res: Response) => {
 
     const usuarios = await Usuario.find(
       filtros,
-      {
-        _id: 1, id_usuario: 1, nombre: 1, email: 1, telefono: 1, activo: 1,
-        fecha_registro: 1, ciudad: 1, especialidades: 1, servicios: 1,
-      }
+      USER_PROJECTION
     ).limit(200).lean();
-
+    
     res.json({ success: true, total: usuarios.length, data: usuarios });
   } catch (err: any) {
     console.error("Error en /usuarios/especialidad:", err);
@@ -244,13 +234,13 @@ export const usuariosPorEspecialidad = async (req: Request, res: Response) => {
 };
 
 /* =======================================================
- *  Usuarios por DISPONIBILIDAD
+ *  Usuarios por DISPONIBILIDAD (Corregido)
  * ======================================================= */
 export const usuariosPorDisponibilidad = async (req: Request, res: Response) => {
   try {
     const disponibleStr = (req.query.disponible as string | undefined)?.trim();
-    const servicioIdStr = (req.query.servicio_id as string | undefined)?.trim();
-
+    
+    // Corregido: solo se necesita el filtro de disponibilidad (activo)
     if (disponibleStr !== "true" && disponibleStr !== "false") {
       return res.status(400).json({
         success: false,
@@ -258,23 +248,13 @@ export const usuariosPorDisponibilidad = async (req: Request, res: Response) => 
       });
     }
 
-    const disponible = disponibleStr === "true";
-    const filtro: any = { "servicios.disponible": disponible };
-
-    if (servicioIdStr) {
-      const sid = Number(servicioIdStr);
-      if (!Number.isNaN(sid)) filtro["servicios.id_servicio"] = sid;
-    }
-
+    const estaDisponible = disponibleStr === "true";
     const usuarios = await Usuario.find(
-      filtro,
-      {
-        _id: 1, id_usuario: 1, nombre: 1, email: 1, telefono: 1, activo: 1,
-        fecha_registro: 1, ciudad: 1, especialidades: 1, servicios: 1,
-      }
+      { activo: estaDisponible }, 
+      USER_PROJECTION
     ).limit(200).lean();
-
-    res.json({ success: true, total: usuarios.length, data: usuarios });
+    
+    return res.json({ success: true, total: usuarios.length, data: usuarios });
   } catch (err: any) {
     console.error("Error en /usuarios/disponible:", err);
     res.status(500).json({ success: false, message: err?.message ?? "Error interno" });
@@ -282,7 +262,9 @@ export const usuariosPorDisponibilidad = async (req: Request, res: Response) => 
 };
 
 /* =======================================================
- *  Provincias por CIUDAD
+ *  Provincias por CIUDAD
+ *  Asumo que este era el cuerpo al final del segundo bloque duplicado
+ *  y lo separo como una nueva función completa.
  * ======================================================= */
 export const provinciasPorCiudad = async (req: Request, res: Response) => {
   try {
@@ -293,14 +275,19 @@ export const provinciasPorCiudad = async (req: Request, res: Response) => {
     const nombreCiudad = rawNombre?.trim();
 
     let idCiudad: number | null = null;
+    let ciudadNombreEncontrada: string | undefined = undefined;
 
     if (idCiudadStr && !Number.isNaN(Number(idCiudadStr))) {
       idCiudad = Number(idCiudadStr);
+      // Buscamos el nombre si se proporciona el ID
+      const city = await City.findOne({ id_ciudad: idCiudad }, { nombre: 1 }).lean();
+      if (city) ciudadNombreEncontrada = city.nombre;
     } else if (nombreCiudad && nombreCiudad !== "") {
       const regex = new RegExp(escapeRegex(nombreCiudad), "i");
       const city = await City.findOne({ nombre: regex }, { id_ciudad: 1, nombre: 1 }).lean();
       if (!city) return res.status(404).json({ success: false, message: "Ciudad no encontrada" });
       idCiudad = city.id_ciudad;
+      ciudadNombreEncontrada = city.nombre;
     } else {
       return res.status(400).json({
         success: false,
@@ -315,9 +302,9 @@ export const provinciasPorCiudad = async (req: Request, res: Response) => {
 
     res.json({
       success: true,
-      ciudad: { id_ciudad: idCiudad, nombre: nombreCiudad ?? undefined },
+      ciudad: { id_ciudad: idCiudad, nombre: ciudadNombreEncontrada },
       total: provincias.length,
-      provincias,
+      data: provincias, // Cambiado 'provincias' a 'data' por consistencia
     });
   } catch (err: any) {
     console.error("Error en /ciudad/provincias:", err);
@@ -325,8 +312,9 @@ export const provinciasPorCiudad = async (req: Request, res: Response) => {
   }
 };
 
+
 /* =======================================================
- *  NUEVO: Usuarios por NOMBRE de SERVICIO
+ *  Usuarios por NOMBRE de SERVICIO (Corregido y Simplificado)
  * ======================================================= */
 export const usuariosPorServicio = async (req: Request, res: Response) => {
   try {
@@ -335,73 +323,51 @@ export const usuariosPorServicio = async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, message: "Debes enviar ?servicio=Nombre" });
 
     const disponibleStr = (req.query.disponible as string | undefined)?.trim();
-    const ciudadNombre = (req.query.ciudad as string | undefined)?.trim();
-    const idCiudadStr = (req.query.id_ciudad as string | undefined)?.trim();
-
     const limit = Math.min(Number(req.query.limit) || 50, 200);
     const page = Math.max(Number(req.query.page) || 1, 1);
     const skip = (page - 1) * limit;
 
     const servicioRegex = new RegExp(escapeRegex(servicioNombre), "i");
-    const elemCond: any = { nombre: { $regex: servicioRegex } };
-    if (disponibleStr === "true" || disponibleStr === "false")
-      elemCond.disponible = disponibleStr === "true";
 
-    const andMatch: any[] = [{ servicios: { $elemMatch: elemCond } }];
-
-    if (idCiudadStr && !Number.isNaN(Number(idCiudadStr))) {
-      andMatch.push({ "ciudad.id_ciudad": Number(idCiudadStr) });
-    } else if (ciudadNombre && ciudadNombre !== "") {
-      const ciudades = await City.find(
-        { nombre: new RegExp(escapeRegex(ciudadNombre), "i") },
-        { id_ciudad: 1 }
-      ).lean();
-      const ids = ciudades.map((c) => c.id_ciudad).filter((n) => typeof n === "number");
-      if (ids.length > 0) andMatch.push({ "ciudad.id_ciudad": { $in: ids } });
+    // 1. Condición para el $match inicial: El usuario debe tener al menos un servicio que coincida con el nombre.
+    const matchCondition: any = { "servicios.nombre": { $regex: servicioRegex } };
+    
+    // 2. Si se filtra por disponibilidad del servicio, añadimos la condición
+    if (disponibleStr === "true" || disponibleStr === "false") {
+      matchCondition["servicios.disponible"] = disponibleStr === "true";
     }
 
     const pipeline: any[] = [
-      { $match: { $and: andMatch } },
-      {
-        $addFields: {
-          servicios: {
-            $filter: {
-              input: "$servicios",
-              as: "s",
-              cond: {
+      { $match: matchCondition }, // Filtramos usuarios que contienen el servicio (y opcionalmente su disponibilidad)
+      { 
+        $addFields: { // Reemplazamos el array de servicios solo con los que cumplen el filtro
+          servicios: { 
+            $filter: { 
+              input: "$servicios", 
+              as: "s", 
+              cond: { 
                 $and: [
-                  // ✅ corregido: sin options
                   { $regexMatch: { input: "$$s.nombre", regex: servicioRegex } },
                   ...(disponibleStr === "true" || disponibleStr === "false"
                     ? [{ $eq: ["$$s.disponible", disponibleStr === "true"] }]
                     : []),
                 ],
-              },
-            },
-          },
-        },
+              } 
+            } 
+          } 
+        } 
       },
+      // { $match: { "servicios.0": { $exists: true } } }, // No es necesario si el $match inicial fue eficiente
       { $sort: { nombre: 1 } },
       { $skip: skip },
       { $limit: limit },
-      {
-        $project: {
-          _id: 1,
-          id_usuario: 1,
-          nombre: 1,
-          email: 1,
-          telefono: 1,
-          activo: 1,
-          fecha_registro: 1,
-          ciudad: 1,
-          especialidades: 1,
-          servicios: 1,
-        },
-      },
+      { $project: USER_PROJECTION },
     ];
 
     const data = await Usuario.aggregate(pipeline).exec();
-    const total = await Usuario.countDocuments({ $and: andMatch });
+    
+    // El total se calcula sobre la condición inicial del $match
+    const total = await Usuario.countDocuments(matchCondition); 
 
     res.json({ success: true, total, page, pageSize: limit, data });
   } catch (err: any) {
