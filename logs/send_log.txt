@@ -1,0 +1,28 @@
+AQUI SI PONE LOS LOGS!!!!!
+
+2025-10-21T04:32:45.714Z | TxID: ed8a9b7e-1e6a-4959-b523-7c5863037215 | To: adrianvallejosflores24@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-21T04:34:01.610Z | TxID: 4a7f1185-59b6-4a26-ad20-06c33c68cc8f | To: adrianvallejosflores24@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-21T19:31:41.690Z | TxID: a057d694-d446-4dd5-a95a-3a81e1e69ca6 | To: adrianvallejosflores24@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-21T19:42:03.421Z | TxID: 809dd3fc-1164-495e-9127-490f0254f985 | To: adrianvallejosflores24@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-21T19:42:24.313Z | TxID: 6c869a6f-6280-4b48-8dd7-29a81e4a3046 | To: adrianvallejosflores24@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-21T19:52:08.708Z | TxID: d211e874-e4f6-4624-9407-775ba2aa5611 | To: adrianvallejos24@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-21T19:54:11.360Z | TxID: 8d517730-9853-42fa-b2bc-f73780a4bb83 | To: adrianvallejosflores24@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-21T19:54:14.789Z | TxID: 5e8b973e-6a69-40ae-a92a-c23f0f9b78a1 | To: adrianvallejosflores24@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-21T19:56:20.511Z | TxID: a4dc8abc-5926-4f9e-bf30-d4e1471eb5b9 | To: adrianvallejosflores24@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-21T20:01:23.294Z | TxID: 10c39ea5-de08-4f90-84af-809cdabce54a | To: adrianvallejosflores24@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-21T20:15:11.682Z | TxID: d84b8389-5edc-480a-bb52-c7e37d90859d | To: adrianvallejosflores24@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-22T00:56:21.164Z | TxID: df8868e6-2165-411a-87e6-abfea03704bc | To: adrianvallejosflores24@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-22T00:56:52.469Z | TxID: c9677f15-fae6-42bb-af1e-c3da63e02718 | To: adrianvallejosflores24@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-22T00:57:57.577Z | TxID: e590c425-7d24-4a5d-b22b-39d052592ff7 | To: adrdfgdfg@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-22T03:21:17.489Z | TxID: 5b67f504-4dcd-4ade-891e-5ec6689359ad | To: adrianvallejosflores24@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-22T03:22:54.695Z | TxID: c1cfbde3-1115-4380-85f2-93281df25036 | To: adrianvallejosflores24@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200
+2025-10-22T23:19:27.076Z | TxID: dc7bd975-417d-4932-b21e-bd7b3f9b9bdc | To: adrianvallejosflores24@gmail.com | Estado: NETWORK_ERROR | Error: Intento #1 | Error: The operation was aborted.
+2025-10-22T23:19:42.088Z | TxID: dc7bd975-417d-4932-b21e-bd7b3f9b9bdc | To: adrianvallejosflores24@gmail.com | Estado: NETWORK_ERROR | Error: Intento #2 | Error: The operation was aborted.
+2025-10-22T23:19:57.114Z | TxID: dc7bd975-417d-4932-b21e-bd7b3f9b9bdc | To: adrianvallejosflores24@gmail.com | Estado: NETWORK_ERROR | Error: Intento #3 | Error: The operation was aborted.
+2025-10-22T23:22:47.701Z | TxID: de833f37-fa22-4732-8670-e557a90d4f09 | To: adrianvallejosflores24@gmail.com | Estado: NETWORK_ERROR | Error: Intento #1 | Error: The operation was aborted.
+2025-10-22T23:23:02.733Z | TxID: de833f37-fa22-4732-8670-e557a90d4f09 | To: adrianvallejosflores24@gmail.com | Estado: NETWORK_ERROR | Error: Intento #2 | Error: The operation was aborted.
+2025-10-22T23:23:17.742Z | TxID: de833f37-fa22-4732-8670-e557a90d4f09 | To: adrianvallejosflores24@gmail.com | Estado: NETWORK_ERROR | Error: Intento #3 | Error: The operation was aborted.
+2025-10-22T23:42:23.976Z | TxID: c07f5549-dd75-4fdb-9e81-a2345d6a3156 | To: adrianvallejosflores24@gmail.com | Estado: NETWORK_ERROR | Error: Intento #1 | Error: The operation was aborted.
+2025-10-22T23:42:38.981Z | TxID: c07f5549-dd75-4fdb-9e81-a2345d6a3156 | To: adrianvallejosflores24@gmail.com | Estado: NETWORK_ERROR | Error: Intento #2 | Error: The operation was aborted.
+2025-10-22T23:42:53.989Z | TxID: c07f5549-dd75-4fdb-9e81-a2345d6a3156 | To: adrianvallejosflores24@gmail.com | Estado: NETWORK_ERROR | Error: Intento #3 | Error: The operation was aborted.
+2025-10-22T23:45:06.353Z | TxID: d36473e3-eedd-46c4-8755-c46ddbd5d47b | To: adrianvallejosflores24@gmail.com | Estado: OK | Error: Intento #1 | HTTP 200

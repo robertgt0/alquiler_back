@@ -6,5 +6,5 @@ dist/
 build/
 coverage/
 .idea
-logs
+#logs
 workspace.xml
