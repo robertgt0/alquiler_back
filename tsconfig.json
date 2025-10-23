@@ -11,17 +11,7 @@
     "skipLibCheck": true,
     "sourceMap": false
   },
-  "include": [
-    "src/index.ts",
-    "src/config/**/*.ts",
-    "src/modules/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "src/models/User.ts",
-    "src/routes/userRoutes.ts",
-    "src/controllers/**",
-    "src/modules/**/tests/**"
-  ]
+   "include": ["src/**/*"],
+  "exclude": ["node_modules"]
 }
 
