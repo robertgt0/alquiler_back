@@ -19,11 +19,11 @@ const mockClientes = [
 
 // 3. coleccion de Trabajos Solicitados (datos simulados)
 const mockTrabajosSolicitados: ITrabajoSolicitado[] = [
-  { _id: "trabajo_xyz", id_proveedor: "proveedor_123", id_cliente: "cliente_abc", fecha: "25/9/25", horaInicio: "08:00", horaFin: "10:00", estado: "Confirmado" },
+  { _id: "trabajo_xyz", id_proveedor: "proveedor_123", id_cliente: "cliente_abc", fecha: "25/9/25", horaInicio: "08:00", horaFin: "10:00", estado: "Pendiente" },
   { _id: "trabajo_uvw", id_proveedor: "proveedor_123", id_cliente: "cliente_def", fecha: "27/9/25", horaInicio: "15:00", horaFin: "17:00", estado: "Pendiente" },
-  { _id: "trabajo_rst", id_proveedor: "proveedor_456", id_cliente: "cliente_abc", fecha: "28/9/25", horaInicio: "11:00", horaFin: "13:00", estado: "Cancelado" },
+  { _id: "trabajo_rst", id_proveedor: "proveedor_456", id_cliente: "cliente_abc", fecha: "28/9/25", horaInicio: "11:00", horaFin: "13:00", estado: "Pendiente" },
   { _id: "trabajo_pqr", id_proveedor: "proveedor_123", id_cliente: "cliente_ghi", fecha: "27/9/25", horaInicio: "15:00", horaFin: "17:00", estado: "Pendiente" },
-  { _id: "trabajo_lmn", id_proveedor: "proveedor_789", id_cliente: "cliente_abc", fecha: "30/9/25", horaInicio: "09:00", horaFin: "11:00", estado: "Terminado" },
+  { _id: "trabajo_lmn", id_proveedor: "proveedor_789", id_cliente: "cliente_abc", fecha: "30/9/25", horaInicio: "09:00", horaFin: "11:00", estado: "Pendiente" },
 ];
 
 // --- SERVICIOS ACTUALIZADOS CON LOGICA DE UNION ---
