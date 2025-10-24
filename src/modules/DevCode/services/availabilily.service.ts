@@ -1,6 +1,7 @@
 import { isValidObjectId, Types } from 'mongoose';
 import ProviderModel from '../../../models/provider.model';
-import AppointmentModel from '../models/Appointments'; 
+import AppointmentModel from "../../../models/appointment.model"; 
+import { IAppointment } from "../../../models/appointment.model"; 
 
 export interface AvailabilityResponse {
   providerId: string;
