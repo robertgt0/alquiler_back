@@ -17,6 +17,24 @@ export interface ApiResponse<T> {
   count?: number;
 }
 
+// types/index.ts
+export interface UsuarioAttrs {
+  nombre: string;
+  apellido?: string | null;
+  telefono?: string | null;
+  correo: string;
+  password?: string | null;
+  fotoPerfil: string;
+  ubicacion?: { type: 'Point'; coordinates: number[] } | null;
+  terminosYCondiciones?: boolean;
+  authProvider: 'local' | 'google';
+  googleId?: string | null;
+  rol: 'requester' | 'provider' | 'admin';
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+
 // Agrega más tipos según necesites
 export interface OtraInterface {
   // ...
@@ -29,7 +47,7 @@ export interface UsuarioDocument extends Document {
   telefono?: string;
   correo: string;
   password?: string;
-  fotoPerfil?: string; // Binario (imagen)
+  fotoPerfil?: string; // url (imagen)
   ubicacion?: {
     type: 'Point';
     coordinates: [number, number]; // [longitud, latitud]

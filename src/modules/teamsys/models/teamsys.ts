@@ -1,5 +1,28 @@
 import { Schema, model, InferSchemaType, HydratedDocument } from 'mongoose';
 
+export interface Usuario1 {
+  _id?:string | null;
+  nombre: string;
+  apellido?: string | null;
+  telefono?: string | null;
+
+  correo: string;
+  password?: string | null;
+
+  fotoPerfil: string;
+
+  ubicacion?: {
+    type: 'Point';
+    coordinates: number[]; // [lng, lat]
+  } | null;
+
+  terminosYCondiciones?: boolean;
+
+  authProvider: 'local' | 'google';
+  googleId?: string | null;
+
+  rol: 'requester' | 'provider' | 'admin';
+}
 const userSchema = new Schema(
   {
     nombre: { type: String,

@@ -1,13 +1,14 @@
 import { Request, Response } from 'express';
 import teamsysService from '../services/teamsys.service';
-import { ApiResponse, UsuarioDocument } from '../types/index';
+import { ApiResponse} from '../types/index';
+import Usuario, { UserDocument } from '../models/teamsys';
 import { handleError } from '../errors/errorHandler';
 
 /*obtener todos los registros de usuario */
 export const getAll = async (req: Request, res: Response): Promise<void> => {
   try {
     const data = await teamsysService.getAll();
-    const response: ApiResponse<UsuarioDocument[]> = {
+    const response: ApiResponse<UserDocument[]> = {
       success: true,
       count: data.length,
       data,
@@ -46,7 +47,7 @@ export const getById = async (req: Request, res: Response): Promise<void> => {
       });
       return;
     }
-    const response: ApiResponse<UsuarioDocument> = {
+    const response: ApiResponse<UserDocument> = {
       success: true,
       data,
     };
@@ -62,7 +63,7 @@ export const getById = async (req: Request, res: Response): Promise<void> => {
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
     const data = await teamsysService.create(req.body);
-    const response: ApiResponse<UsuarioDocument> = {
+    const response: ApiResponse<UserDocument | null> = {
       success: true,
       data,
       message: 'Registro creado exitosamente'
@@ -84,7 +85,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       });
       return;
     }
-    const response: ApiResponse<UsuarioDocument> = {
+    const response: ApiResponse<UserDocument> = {
       success: true,
       data,
       message: 'Registro actualizado exitosamente'

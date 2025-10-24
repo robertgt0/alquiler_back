@@ -1,5 +1,5 @@
-import Usuario from '../models/teamsys';
-import { CrearUsuarioDto, UsuarioDocument } from '../types/index';
+import Usuario, { UserDocument } from '../models/teamsys';
+import { CrearUsuarioDto} from '../types/index';
 import { validarPassword } from '../utils/validaciones';
 
 export class UsuarioService {
@@ -8,7 +8,7 @@ export class UsuarioService {
    * @param data - Datos básicos del usuario (DTO)
    * @returns Usuario creado
    */
-  async registrarUsuario(data: CrearUsuarioDto ): Promise<UsuarioDocument > {
+  async registrarUsuario(data: CrearUsuarioDto ): Promise<UserDocument | null > {
     // Validación de contraseña
     if (data.password!=null) {
     if (!validarPassword(data.password)) {
@@ -42,9 +42,9 @@ export class UsuarioService {
  * Verifica que el correo y la contraseña coincidan con un usuario registrado
  * @param correo - Correo electrónico del usuario que intenta iniciar sesión
  * @param password - Contraseña a verificiar, comparar e impedir si no es el caso
- * @returns UsuarioDocument si las contraseñas coinciden, null si no
+ * @returns User si las contraseñas coinciden, null si no
  */
-async autenticarUsuario(correoE: string, password: string): Promise<UsuarioDocument | null> {
+async autenticarUsuario(correoE: string, password: string): Promise<UserDocument | null> {
   const usuario = await Usuario.findOne({ correo: correoE });
   if (!usuario) return null;
   if (usuario.password !== password) return null;
@@ -55,35 +55,35 @@ async autenticarUsuario(correoE: string, password: string): Promise<UsuarioDocum
   /**
    * Obtener todos los usuarios
    */
-  async getAll(): Promise<UsuarioDocument[]> {
+  async getAll(): Promise<UserDocument[]> {
     return await Usuario.find();
   }
 
   /**
    * Obtener un usuario por ID
    */
-  async getById(id: string): Promise<UsuarioDocument | null> {
+  async getById(id: string): Promise<UserDocument | null> {
     return await Usuario.findById(id);
   }
 
   /**
    * Crear un nuevo usuario (usado por el controlador)
    */
-  async create(data: CrearUsuarioDto): Promise<UsuarioDocument> {
+  async create(data: CrearUsuarioDto): Promise<UserDocument | null> {
     return await this.registrarUsuario(data);
   }
 
   /**
    * Actualizar un usuario existente
    */
-  async update(id: string, data: Partial<CrearUsuarioDto>): Promise<UsuarioDocument | null> {
+  async update(id: string, data: Partial<CrearUsuarioDto>): Promise<UserDocument | null> {
     return await Usuario.findByIdAndUpdate(id, data, { new: true });
   }
 
   /**
    * Eliminar un usuario por ID
    */
-  async delete(id: string): Promise<UsuarioDocument | null> {
+  async delete(id: string): Promise<UserDocument | null> {
     return await Usuario.findByIdAndDelete(id);
   }
 

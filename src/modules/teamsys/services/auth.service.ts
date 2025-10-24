@@ -1,27 +1,31 @@
 import axios from "axios";
-import jwt from "jsonwebtoken";
+import * as jwt from 'jsonwebtoken';
 import { UsuarioDocument, CrearUsuarioDto } from "../types";
 import { AuthTokens, GoogleTokenResponse, GoogleUserProfile, JWTPayload } from "../types/auth.types";
 import { TokenResponse } from "../types/token.types";
 import teamsysService from '../services/teamsys.service';
-
+type Secret = jwt.Secret;
+type SignOptions = jwt.SignOptions;
+type JwtPayload = jwt.JwtPayload;
+type AppJWTPayload = JwtPayload & { userId: string; email: string };
 export class AuthService  {
+    
     private readonly googleTokenUrl = "https://oauth2.googleapis.com/token";
     private readonly googleUserInfoUrl = "https://www.googleapis.com/oauth2/v2/userinfo";
-    private readonly jwtSecret: string;
-    private readonly jwtRefreshSecret: string;
+    private readonly jwtSecret: Secret;
+    private readonly jwtRefreshSecret: Secret;
     private readonly accessTokenExpiry: string;
     private readonly refreshTokenExpiry: string;
 
     constructor() {
-        this.jwtSecret = process.env.JWT_SECRET! || 'servineoapptest123';
-        this.jwtRefreshSecret = process.env.JWT_REFRESH_SECRET! || 'servineoapptest123';
-        this.accessTokenExpiry = process.env.JWT_EXPIRES_IN || '1h';
-        this.refreshTokenExpiry = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
+        const s = process.env.JWT_SECRET ?? "servineoapptest123";
+    const rs = process.env.JWT_REFRESH_SECRET ?? "servineoapptest123";
+    if (!s || !rs) throw new Error("JWT secrets no estan configurados");
 
-        if(! this.jwtSecret || ! this.jwtRefreshSecret) {
-            throw new Error('JWT secrets no estan configurados');
-        }
+    this.jwtSecret = s as Secret;
+    this.jwtRefreshSecret = rs as Secret;
+    this.accessTokenExpiry = process.env.JWT_EXPIRES_IN ?? "1h";
+    this.refreshTokenExpiry = process.env.JWT_REFRESH_EXPIRES_IN ?? "7d";
     }
 
     async exchangeCodeForTokens(code: string): Promise<GoogleTokenResponse> {
@@ -59,7 +63,7 @@ return data; // ahora sí es GoogleUserProfile
 }
 
 
-    async findOrCreateUser(profile: GoogleUserProfile): Promise<CrearUsuarioDto> {
+    async findOrCreateUser(profile: GoogleUserProfile): Promise<CrearUsuarioDto | null> {
         let user = await teamsysService.verificarCorreo(profile.email);
         console.log(user)
         if (!user) {
@@ -74,17 +78,19 @@ return data; // ahora sí es GoogleUserProfile
         return null;
     }
 
+    private signToken(payload: AppJWTPayload, secret: Secret, expiresIn: string): string {
+      const opts = { expiresIn } as SignOptions;
+      return jwt.sign(payload, secret, opts);
+` `}
+
     generateAccessToken(payload: JWTPayload): string {
-        return jwt.sign(payload, this.jwtSecret, {
-            expiresIn: this.accessTokenExpiry,
-        });
+        return this.signToken(payload, this.jwtSecret, this.accessTokenExpiry 
+        );
     }
 
-    generateRefreshToken(payload: JWTPayload): string {
-        return jwt.sign(payload, this.jwtRefreshSecret, {
-            expiresIn: this.refreshTokenExpiry,
-        });
-    }
+    generateRefreshToken(payload: AppJWTPayload): string {
+    return this.signToken(payload, this.jwtRefreshSecret, this.refreshTokenExpiry);
+  }
 
     generateTokens(user: UsuarioDocument): AuthTokens {
         console.log({user})
@@ -99,7 +105,7 @@ return data; // ahora sí es GoogleUserProfile
         return { accessToken, refreshToken };
     }
 
-    async loginWithGoogle(code: string): Promise<TokenResponse> {
+    async loginWithGoogle(code: string): Promise<TokenResponse | null> {
         const googleTokens = await this.exchangeCodeForTokens(code);
 
         const profile = await this.getGoogleUserProfile(googleTokens.access_token);
