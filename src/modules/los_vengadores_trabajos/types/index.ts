@@ -32,13 +32,6 @@ export interface DiaDisponibilidad{
   fecha: string; // Formato YYYY-MM-DD
   horarios: HorarioDisponible[];
 }
-
-export interface CalendarioMensual {
-  proveedorId: string;
-  mes: number;
-  anio: number;
-  dias: DiaDisponibilidad[];
-}
 ///
 
 
