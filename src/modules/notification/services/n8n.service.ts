@@ -1,8 +1,8 @@
 // src/modules/notifications/services/n8n.service.ts
 import fetch from "node-fetch";
-import { logNotification } from "../../../utils/logger"; // ⚠️ ajusta la ruta según tu proyecto
+import { logNotification } from "../../../utils/logger"; // ⚠️ ajusta la ruta si cambia
 
-const N8N_WEBHOOK_URL = "https://dev-recode.app.n8n.cloud/webhook/notify-email";
+const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL || "https://dev-recode.app.n8n.cloud/webhook/notify-email";
 const N8N_TIMEOUT_MS = Number(process.env.N8N_TIMEOUT_MS || 10000);
 const N8N_MAX_RETRIES = Number(process.env.N8N_MAX_RETRIES || 3);
 const N8N_RETRY_DELAY_MS = Number(process.env.N8N_RETRY_DELAY_MS || 5000);
@@ -52,8 +52,24 @@ export async function triggerN8nWebhook(payload: Record<string, any>) {
         data = { raw: text };
       }
 
+      // ✅ Si la petición fue exitosa
       if (res.ok) {
-        // 🔹 Log de éxito
+        const statusLower = (data?.status ?? "").toLowerCase();
+
+        // 🚫 Si n8n indica que el correo no existe o es inválido
+        if (statusLower.includes("undeliverable") || statusLower.includes("invalid")) {
+          console.warn("📭 Correo no existente detectado por n8n:", payload.to);
+
+          // No registrar en logs, solo devolver error
+          return {
+            success: false,
+            status: "undeliverable",
+            message: data?.message ?? "El correo no existe o es inválido",
+            data,
+          };
+        }
+
+        // ✅ Si todo bien, registrar y devolver éxito
         logNotification(
           payload.fixerEmail ?? "sin-email",
           "OK",
@@ -67,27 +83,28 @@ export async function triggerN8nWebhook(payload: Record<string, any>) {
           httpStatus: res.status,
           data,
         };
-      } else {
-        // 🔹 Log de error HTTP
-        logNotification(
-          payload.fixerEmail ?? "sin-email",
-          "HTTP_ERROR",
-          payload.id ?? `n8n-${Date.now()}`,
-          `Intento #${attempt} | Código: ${res.status} | Mensaje: ${data?.message ?? "Error HTTP"}`
-        );
-
-        return {
-          success: false,
-          status: "http_error",
-          httpStatus: res.status,
-          data,
-          message: data?.message ?? "HTTP error",
-        };
       }
+
+      // ❌ Si el servidor respondió con error HTTP
+      logNotification(
+        payload.fixerEmail ?? "sin-email",
+        "HTTP_ERROR",
+        payload.id ?? `n8n-${Date.now()}`,
+        `Intento #${attempt} | Código: ${res.status} | Mensaje: ${data?.message ?? "Error HTTP"}`
+      );
+
+      return {
+        success: false,
+        status: "http_error",
+        httpStatus: res.status,
+        data,
+        message: data?.message ?? "HTTP error",
+      };
+
     } catch (err: any) {
       lastError = err;
 
-      // 🔹 Log de error de red
+      // ⚠️ Error de red o timeout
       logNotification(
         payload.fixerEmail ?? "sin-email",
         "NETWORK_ERROR",
@@ -108,7 +125,7 @@ export async function triggerN8nWebhook(payload: Record<string, any>) {
     }
   }
 
-  // 🔹 Log final si fallaron todos los intentos
+  // ❌ Si fallaron todos los intentos
   logNotification(
     payload.fixerEmail ?? "sin-email",
     "FAILED",
