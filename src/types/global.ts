@@ -23,3 +23,6 @@ export interface ApiResponse<T> {
   message?: string;
   count?: number;
 }
+
+// Permite importar "multer" sin errores de tipo
+declare module "multer";
