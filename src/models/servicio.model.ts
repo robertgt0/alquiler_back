@@ -5,6 +5,7 @@ export interface IServicio {
   descripcion: string;
   duracion: number; // en minutos
   precio: number;
+  rating: number;
   proveedorId: Types.ObjectId; // <-- usar ObjectId
 }
 
@@ -13,6 +14,7 @@ const ServicioSchema = new Schema<IServicio>({
   descripcion: { type: String },
   duracion: { type: Number, required: true },
   precio: { type: Number, required: true },
+  rating: { type: Number, required: true },
   proveedorId: { type: Schema.Types.ObjectId, ref: 'Proveedor', required: true }
 });
 

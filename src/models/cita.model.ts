@@ -3,10 +3,11 @@ import { Schema, model, Document, Types } from 'mongoose';
 export interface ICita extends Document {
   proveedorId: Types.ObjectId;
   servicioId: Types.ObjectId;
-  fecha: string; // formato YYYY-MM-DD
+  clienteId: Types.ObjectId; // 👈 agregar este campo
+  fecha: string;
   horario: {
-    inicio: string; // "10:00"
-    fin: string;    // "10:30"
+    inicio: string;
+    fin: string;
   };
   ubicacion?: {
     lat: number;
@@ -22,7 +23,8 @@ export interface ICita extends Document {
 const CitaSchema = new Schema<ICita>(
   {
     proveedorId: { type: Schema.Types.ObjectId, ref: 'Proveedor', required: true },
-    servicioId: { type: Schema.Types.ObjectId, required: true },
+    servicioId: { type: Schema.Types.ObjectId, ref: 'Servicio', required: true }, // ✅ agregado ref
+    clienteId: { type: Schema.Types.ObjectId, ref: 'Cliente', required: true },
     fecha: { type: String, required: true },
     horario: {
       inicio: { type: String, required: true },
