@@ -20,7 +20,7 @@ TENER EN CUENTA PARA EVITAR CONFUCIONES
 para enviarlo desde postman: Postman -- n8n cloud --> Gmail APi
 
 {
-  "fixerEmail": "adrianvallejosflores24@gmail.com",
+  "email": "adrianvallejosflores24@gmail.com",
   "subject": "PRUEBA TAREA T9",
   "message": "<html>hola mundito :)</html>", 
   "id": "ID interno (opcional)",

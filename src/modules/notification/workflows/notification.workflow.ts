@@ -38,7 +38,13 @@ export async function processNotification(notification: NotificationData) {
           type: notification.type ?? "generic",
         });
 
+        // 🚫 Si n8n devuelve que el correo no existe, detener flujo sin guardar log
+        if (result?.status === "undeliverable") {
+          console.warn("🚫 Correo no válido detectado:", notification.to);
+          throw new Error(result.message ?? "Correo inválido o inexistente");
+        }
 
+        // ✅ Si fue exitoso, guardar notificación normalmente
         const isSuccess = result?.success ?? false;
         await saveNotification({
           ...dbEntry,
@@ -71,6 +77,13 @@ export async function processNotification(notification: NotificationData) {
   } catch (error: any) {
     console.error("❌ [Workflow] Error en procesamiento:", error.message ?? error);
 
+    // ⚠️ Si el error fue correo no válido, no registrar en BD
+    if (error.message?.toLowerCase().includes("correo inválido") || 
+        error.message?.toLowerCase().includes("correo no existe")) {
+      return { success: false, message: error.message };
+    }
+
+    // Guardar otros errores normales en BD
     try {
       if (notification?.to) {
         await saveNotification({
