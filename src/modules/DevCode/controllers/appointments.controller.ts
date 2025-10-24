@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import AppointmentModel from "../models/appointment.model";
+import AppointmentModel from "../../../models/appointment.model";
 import { Types } from "mongoose";
 
 export const createAppointment = async (req: Request, res: Response, next: NextFunction) => {
