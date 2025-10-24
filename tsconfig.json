@@ -1,16 +1,47 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "CommonJS",
+    /* === Salida y estructura === */
     "outDir": "./dist",
     "rootDir": "./src",
+    "sourceMap": true,
+    "declaration": false,                 // No generar .d.ts para evitar ruido
+    "removeComments": true,
+
+    /* === Módulos y compatibilidad === */
+    "target": "ES2022",                   // Mejor rendimiento y soporte moderno
+    "module": "NodeNext",                 // Recomendado para Node 18+ / 20+
+    "moduleResolution": "NodeNext",       // Compatible con imports ESM/CommonJS
+    "lib": ["ES2022", "DOM"],             // DOM opcional por si usas fetch u otras APIs
+
+    /* === Comportamiento del compilador === */
     "strict": true,
-    "esModuleInterop": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
+
+    /* === Imports === */
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
-    "forceConsistentCasingInFileNames": true
-    /* ❌ No pongas "allowImportingTsExtensions" aquí */
+
+    /* === Alias === */
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["*"],
+      "@config/*": ["config/*"],
+      "@modules/*": ["modules/*"],
+      "@controllers/*": ["modules/*/controllers/*"],
+      "@services/*": ["modules/*/services/*"],
+      "@models/*": ["modules/*/models/*"],
+      "@utils/*": ["utils/*"]
+    },
+
+    /* === Nueva opción para desarrolladores === */
+    "allowImportingTsExtensions": true,   // Útil con moduleResolution NodeNext
+    "noUncheckedIndexedAccess": false,    // Puedes activarlo para aún más seguridad
+    "incremental": true                   // Compilación incremental más rápida
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }

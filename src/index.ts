@@ -1,10 +1,10 @@
-// src/index.ts
-import express, { Request, Response } from "express";
-import cors from "cors";
-import dotenv from "dotenv";
-
-// ⬇️ Carga variables del entorno (Railway las inyecta)
-//    No uses path aquí para que NO dependa de un archivo .env
+import express, { Request, Response } from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import connectDB from './config/database';
+import nombreGrupoEjemploRouter from './modules/nombre_grupo_ejemplo';
+import availabilityRoutes from "./modules/DevCode/routes/availability.routes";
+// Cargar variables de entorno
 dotenv.config();
 
 import connectDB from "./config/database";
@@ -59,10 +59,15 @@ app.get("/api/health", (_req: Request, res: Response) => {
   });
 });
 
-app.use("/api/nombre_grupo_ejemplo", nombreGrupoEjemploRouter);
-app.use("/api/fixer", fixerModule);
-app.use("/api/categories", categoriesModule);
-
+// ============================================
+// MONTAR MÓDULOS/GRUPOS AQUÍ
+// ============================================
+// Montar tus módulos aquí:
+app.use('/api/nombre_grupo_ejemplo', nombreGrupoEjemploRouter);
+app.use('/api/devcode', availabilityRoutes)
+// ============================================
+// Manejo de errores 404
+// ============================================
 app.use((req: Request, res: Response) => {
   res.status(404).json({ success: false, message: "Ruta no encontrada", path: req.path });
 });
