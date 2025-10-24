@@ -1,4 +1,3 @@
-// src/config/database.ts
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
@@ -12,23 +11,21 @@ export async function connectDB(strict: boolean = true): Promise<void> {
   const uri = getMongoUri();
 
   if (!uri) {
-    const message = 'La variable MONGODB_URI no está definida en .env';
+    const message = 'MONGODB_URI no está definida en el entorno';
     if (strict) {
       throw new Error(message);
     }
-    console.warn(`⚠️  ${message}`);
+    console.warn(`⚠️ ${message}`);
     return;
   }
 
   try {
     await mongoose.connect(uri);
-    console.log(strict ? 'MongoDB conectado correctamente' : '✅ MongoDB conectado');
+    console.log('✅ MongoDB conectado correctamente');
   } catch (error) {
+    console.error('❌ Error al conectar con MongoDB:', error);
     if (strict) {
-      console.error('Error al conectar con MongoDB:', error);
       process.exit(1);
-    } else {
-      console.error('❌ Error al conectar MongoDB:', error);
     }
   }
 }

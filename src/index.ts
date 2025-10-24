@@ -1,16 +1,12 @@
-// src/index.ts
+import 'dotenv/config';
 import express, { Request, Response } from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
-import path from 'path';
-import { connectDB } from './config/database';
+import { connectMongo } from './config/mongoose';
 import offersRouter from './routes/offers';
 import nombreGrupoEjemploRouter from './modules/nombre_grupo_ejemplo';
 import fixerModule from './modules/fixer';
 import categoriesModule from './modules/categories';
 import ofertasModule from './modules/ofertas/routes/ofertas.routes';
-
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const app = express();
 
@@ -75,16 +71,18 @@ app.use((req: Request, res: Response) => {
 
 const PORT = Number(process.env.PORT ?? 4000);
 const dbEnabled = (process.env.DB_ENABLED ?? 'true').toLowerCase() !== 'false';
+const mongoUri = process.env.MONGODB_URI ?? process.env.MONGO_URI;
 
 async function bootstrap() {
-  if (dbEnabled) {
+  if (dbEnabled && mongoUri) {
     try {
-      await connectDB();
+      await connectMongo();
     } catch (error) {
-      console.error('❌ Error al iniciar el servidor');
-      console.error(error);
+      console.error('❌ Error al conectar con MongoDB:', error);
       process.exit(1);
     }
+  } else if (dbEnabled) {
+    console.warn('⚠️ DB_ENABLED=true pero falta MONGODB_URI. No se conectará a Mongo.');
   } else {
     console.log('🔌 Base de datos desactivada (modo sin DB)');
   }
@@ -92,7 +90,7 @@ async function bootstrap() {
   app.listen(PORT, () => {
     console.log(`🚀 API listening on port ${PORT}`);
     console.log('📦 Módulos disponibles: /api/offers, /api/ofertas, /api/nombre_grupo_ejemplo, /api/fixer, /api/categories');
-    console.log(`🔌 Base de datos: ${dbEnabled ? 'ACTIVADA' : 'DESACTIVADA'}`);
+    console.log(`🔌 Base de datos: ${dbEnabled ? (mongoUri ? 'ACTIVADA' : 'HABILITADA SIN URI') : 'DESACTIVADA'}`);
   });
 }
 
