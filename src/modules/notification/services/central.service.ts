@@ -34,7 +34,7 @@ interface N8nWebhookResponse {
 // =======================================
 
 export class CentralNotificationService {
-  private ABSTRACT_API_KEY = "461d7a6858124c719fc58d8f20da5170";
+  private ABSTRACT_API_KEY = "e8e63c9be7cc445cafce6ce6e2d11c51";
   private ABSTRACT_TIMEOUT_MS = 5000;
 
   async receiveAndSend(data: CreateNotificationInput) {
