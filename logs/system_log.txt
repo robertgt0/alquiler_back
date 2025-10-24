@@ -22,3 +22,9 @@ NO LO ESTA PONIENDO NADA AQUI......
 {"ts":"2025-10-22T23:42:53.992Z","level":"INFO","message":"request:finish","id":"39e7a4e0-a3d1-4d10-909d-8456ff61b331","status":200,"method":"POST","url":"/api/notifications","duration":40032}
 {"ts":"2025-10-22T23:45:03.690Z","level":"INFO","message":"request:start","id":"695f2ca4-9fe6-4f77-8366-e0b696f72b65","method":"POST","url":"/api/notifications","ip":"::1"}
 {"ts":"2025-10-22T23:45:06.355Z","level":"INFO","message":"request:finish","id":"695f2ca4-9fe6-4f77-8366-e0b696f72b65","status":200,"method":"POST","url":"/api/notifications","duration":2665}
+{"ts":"2025-10-24T00:31:14.664Z","level":"INFO","message":"request:start","id":"84ec165b-7a44-4ccf-b5dd-454bc1c53733","method":"POST","url":"/api/notifications","ip":"::1"}
+{"ts":"2025-10-24T00:31:14.672Z","level":"INFO","message":"request:finish","id":"84ec165b-7a44-4ccf-b5dd-454bc1c53733","status":200,"method":"POST","url":"/api/notifications","duration":8}
+{"ts":"2025-10-24T00:34:41.605Z","level":"INFO","message":"request:start","id":"6fe121de-1f1a-447e-b7c4-9cfa59e9ea2d","method":"POST","url":"/api/notifications","ip":"::1"}
+{"ts":"2025-10-24T00:34:41.609Z","level":"INFO","message":"request:finish","id":"6fe121de-1f1a-447e-b7c4-9cfa59e9ea2d","status":200,"method":"POST","url":"/api/notifications","duration":4}
+{"ts":"2025-10-24T00:35:36.975Z","level":"INFO","message":"request:start","id":"a025da45-eb64-4011-a664-b82147ffb8e6","method":"POST","url":"/api/notifications","ip":"::1"}
+{"ts":"2025-10-24T00:35:36.987Z","level":"INFO","message":"request:finish","id":"a025da45-eb64-4011-a664-b82147ffb8e6","status":200,"method":"POST","url":"/api/notifications","duration":12}

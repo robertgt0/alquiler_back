@@ -4,7 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ccb29092-aeb2-45ef-90c8-599ee07314e7" name="Changes" comment="ignore" />
+    <list default="true" id="ccb29092-aeb2-45ef-90c8-599ee07314e7" name="Changes" comment="ignore">
+      <change beforePath="$PROJECT_DIR$/logs/system_log.txt" beforeDir="false" afterPath="$PROJECT_DIR$/logs/system_log.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/modules/notification/controllers/notification.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/modules/notification/controllers/notification.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/modules/notification/services/central.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/modules/notification/services/central.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/modules/notification/services/n8n.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/modules/notification/services/n8n.service.ts" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -61,7 +66,7 @@
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "#37 on dev/recode-MiguelAngelAlmanzaSilvestre",
+    "git-widget-placeholder": "dev/recode-Miguel-pruebarapida",
     "junie.onboarding.icon.badge.shown": "true",
     "last_opened_file_path": "D:/ProyectosUMSS/Servineo_IS/Servineo_back/alquiler_back",
     "node.js.detected.package.eslint": "true",
@@ -70,7 +75,7 @@
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "to.speed.mode.migration.done": "true",
-    "ts.external.directory.path": "D:\\ProyectosUMSS\\Servineo_IS\\Servineo_back\\alquiler_back\\node_modules\\typescript\\lib",
+    "ts.external.directory.path": "D:\\IS\\alquiler_back\\node_modules\\typescript\\lib",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {
