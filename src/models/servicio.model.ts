@@ -1,20 +1,19 @@
-import { Schema, model, Document } from "mongoose";
+import { Schema, model, Types } from 'mongoose';
 
-export interface IServicio extends Document {
-  nombre_servicio: string;
-  descripcion?: string;
-  precio_por_hora?: number;
-  createdAt: Date;
-  updatedAt: Date;
+export interface IServicio {
+  nombre: string;
+  descripcion: string;
+  duracion: number; // en minutos
+  precio: number;
+  proveedorId: Types.ObjectId; // <-- usar ObjectId
 }
 
-const servicioSchema = new Schema<IServicio>(
-  {
-    nombre_servicio: { type: String, required: true },
-    descripcion: { type: String },
-    precio_por_hora: { type: Number },
-  },
-  { timestamps: true }
-);
+const ServicioSchema = new Schema<IServicio>({
+  nombre: { type: String, required: true },
+  descripcion: { type: String },
+  duracion: { type: Number, required: true },
+  precio: { type: Number, required: true },
+  proveedorId: { type: Schema.Types.ObjectId, ref: 'Proveedor', required: true }
+});
 
-export const Servicio = model<IServicio>("Servicio", servicioSchema);
+export const Servicio = model<IServicio>('Servicio', ServicioSchema);

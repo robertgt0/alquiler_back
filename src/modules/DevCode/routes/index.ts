@@ -1,21 +1,25 @@
-import { Router } from "express";
-import userRoutes from "./userRoutes.routes";
-import proveedorRoutes from "./proveedorRoutes.routes";
-import servicioRoutes from "./servicioRoutes.routes";
-import ofertaRoutes from "./ofertaRoutes.routes";
-import notificacionRoutes from "./notificacionRoutes.routes";
-import calendarioRoutes from "./calendarioRoutes.routes";
-import clienteRoutes from "@modules/DevCode/routes/cliente.routes";
-
+import { Router } from 'express';
+import proveedorRoutes from './proveedor.routes';
+import citaRoutes from './cita.routes';
+import servicioRoutes from './servicio.routes';
 
 const router = Router();
 
-router.use("/users", userRoutes);
-router.use("/proveedores", proveedorRoutes);
-router.use("/servicios", servicioRoutes);
-router.use("/ofertas", ofertaRoutes);
-router.use("/notificaciones", notificacionRoutes);
-router.use("/calendarios", calendarioRoutes);
-router.use("/clientes", clienteRoutes);
+// Monta las rutas específicas del módulo
+router.use('/proveedores', proveedorRoutes);
+router.use('/citas', citaRoutes);
+router.use('/servicios', servicioRoutes);
+
+// Ruta base de prueba del módulo
+router.get('/', (req, res) => {
+  res.json({
+    message: 'Módulo DevCode funcionando correctamente 🚀',
+    endpoints: [
+      '/api/devcode/proveedores',
+      '/api/devcode/citas',
+      '/api/devcode/servicios'
+    ]
+  });
+});
 
 export default router;
