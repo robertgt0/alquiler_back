@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import Appointment from "../models/Appointment";
+import AppointmentModel from "../models/appointment.model";
 import { Types } from "mongoose";
 
 export const createAppointment = async (req: Request, res: Response, next: NextFunction) => {
@@ -28,7 +28,7 @@ export const createAppointment = async (req: Request, res: Response, next: NextF
     const fin = new Date(horaFin);
     if (!(ini < fin)) return res.status(400).json({ message: "Rango horario inválido" });
 
-    const overlap = await Appointment.findOne({
+    const overlap = await AppointmentModel.findOne({
       proveedor: new Types.ObjectId(proveedor),
       estado: { $in: ["pendiente", "confirmada"] },
       $or: [{ horaInicio: { $lt: fin }, horaFin: { $gt: ini } }],
@@ -36,7 +36,7 @@ export const createAppointment = async (req: Request, res: Response, next: NextF
 
     if (overlap) return res.status(409).json({ message: "El proveedor ya tiene una cita en ese horario" });
 
-    const doc = await Appointment.create({
+    const doc = await AppointmentModel.create({
       cliente,
       proveedor,
       fecha: new Date(`${fecha}T00:00:00.000Z`),
