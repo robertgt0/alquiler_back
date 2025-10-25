@@ -2,10 +2,13 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/database';
+
 import nombreGrupoEjemploRouter from './modules/nombre_grupo_ejemplo';
 import trabajosVengadoresRouter from './modules/los_vengadores_trabajos/routes/trabajo.routes';
 import horarioRouter from './modules/los_vengadores_trabajos/routes/horario.routes';
 import disponibilidadRouter from './modules/los_vengadores_trabajos/routes/calendario-disponibilidad.routes';
+import trabajoSolicitadoRouter from './modules/los_vengadores_trabajos/routes/trabajo-solicitado.routes';
+
 // Cargar variables de entorno
 dotenv.config();
 
@@ -48,6 +51,7 @@ app.use('/api/nombre_grupo_ejemplo', nombreGrupoEjemploRouter);
 app.use('/api/vengadores/trabajos', trabajosVengadoresRouter); //este el modulo de hu 1.7 y 1.8
 app.use('/api/los_vengadores', horarioRouter); //modulo hu 1
 app.use('/api/los_vengadores/calendario-disponibilidad', disponibilidadRouter); //modulo de la hu2
+app.use('/api/los_vengadores/trabajo-solicitado', trabajoSolicitadoRouter);
 
 // ============================================
 // Manejo de errores 404
