@@ -128,7 +128,7 @@ export class DisponibilidadService {
         const horariosBD = await HorarioModel.find({ fecha }).sort({ horaInicio: 1 });
         const trabajosBD = await TrabajoSolicitadoModel.find({ fecha });
 
-        if (!horariosBD.length) return { fecha, mensaje: "No hay horarios disponibles en BD" };
+        if (!horariosBD.length) return { fecha, mensaje: "No existen horarios disponibles" };
 
         const trabajosSimplificados = trabajosBD.map(t => ({
           horaInicio: t.hora_inicio,
@@ -173,7 +173,7 @@ export class DisponibilidadService {
       t => t.proveedorId === proveedor._id && t.fecha === fecha && t.estado !== "Cancelado"
     );
 
-    if (!horariosDia.length) return { fecha, mensaje: "No hay horarios disponibles (mock)" };
+    if (!horariosDia.length) return { fecha, mensaje: "No hay horarios disponibles" };
 
     const fragmentados = horariosDia.flatMap(h =>
       fragmentarHorarioPorSolapamientos(h.horaInicio, h.horaFin, trabajosDia).map(f => ({
@@ -182,7 +182,7 @@ export class DisponibilidadService {
       }))
     );
 
-    if (!fragmentados.length) return { fecha, mensaje: "Todos los horarios ocupados (mock)" };
+    if (!fragmentados.length) return { fecha, mensaje: "Todos los horarios ocupados" };
 
     return { fecha, horarios: fragmentados.sort((a, b) => a.horaInicio.localeCompare(b.horaInicio)) };
   }
@@ -215,7 +215,7 @@ export class DisponibilidadService {
     if (!proveedor) return {
       nombre: "Proveedor No Encontrado",
       profesion: "Servicio",
-      descripcion: "Este proveedor no existe en el sistema (mock)",
+      descripcion: "Este proveedor no existe en el sistema",
     };
 
     return {
