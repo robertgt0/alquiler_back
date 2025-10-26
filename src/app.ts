@@ -16,6 +16,13 @@ dotenv.config();
 export const createApp = () => {
   const app = express();
 
+  // Configuración de CORS con opciones específicas
+  app.use(cors({
+    origin: ['http://localhost:3000', 'http://localhost:3001'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true
+  }));
+
   // Conexión a BD (evitar múltiples conexiones en tests: solo conectar si no existe)
   if (process.env.NODE_ENV !== 'test') {
     connectDB();

@@ -23,9 +23,18 @@ function getRandomLocation() {
 }
 
 // Campos comunes a proyectar en los resultados de usuario
+// Asegurarnos de que id_usuario siempre esté presente y sea el identificador principal
 const USER_PROJECTION = {
-  _id: 1, id_usuario: 1, nombre: 1, email: 1, telefono: 1, activo: 1,
-  fecha_registro: 1, ciudad: 1, especialidades: 1, servicios: 1,
+  id_usuario: 1, // ID principal para navegación y referencia
+  nombre: 1,
+  email: 1,
+  telefono: 1,
+  activo: 1,
+  fecha_registro: 1,
+  ciudad: 1,
+  especialidades: 1,
+  servicios: 1,
+  descripcion: 1, // descripción del profesional (mostrada en las tarjetas)
 };
 
 

@@ -9,7 +9,7 @@ export interface IUsuario extends Document {
   fecha_registro: Date;
   ciudad: { id_ciudad: number; nombre?: string; codigo_postal?: string };
   especialidades?: Array<{ id_especialidad: number; nombre?: string }>;
-  servicios?: Array<{ id_servicio: number; nombre?: string }>;
+  servicios?: Array<{ id_servicio: number; nombre?: string; precio?: number; precio_personalizado?: number }>;
 }
 
 const UsuarioSchema = new Schema<IUsuario>(
@@ -26,7 +26,7 @@ const UsuarioSchema = new Schema<IUsuario>(
       codigo_postal: String,
     },
     especialidades: [{ id_especialidad: Number, nombre: String }],
-    servicios: [{ id_servicio: Number, nombre: String }],
+  servicios: [{ id_servicio: Number, nombre: String, precio: Number, precio_personalizado: Number }],
   },
   { collection: "usuarios", timestamps: false }
 );

@@ -196,4 +196,45 @@ export const getUsuariosPaginados = async (req: Request, res: Response) => {
   }
 };
 
+export const getUsuarioById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const db = await getDatabase();
+    if (!db) {
+      return res.status(500).json({ success: false, message: 'Error al obtener la conexión a la base de datos' });
+    }
+
+    const usuariosCollection = db.collection('usuarios');
+
+    // Intentar buscar por ObjectId si es válido, sino por id_usuario numérico
+    const { ObjectId } = require('mongodb');
+    let query: any = { };
+
+    if (ObjectId.isValid(id)) {
+      try {
+        query = { _id: new ObjectId(id) };
+      } catch (e) {
+        // fallback
+        query = { _id: id };
+      }
+    } else if (!isNaN(Number(id))) {
+      query = { id_usuario: Number(id) };
+    } else {
+      // buscar por campo string _id igual o por email/nombre (como último recurso)
+      query = { $or: [{ _id: id }, { email: id }, { nombre: { $regex: id, $options: 'i' } }] };
+    }
+
+    const usuario = await usuariosCollection.findOne(query);
+
+    if (!usuario) {
+      return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+    }
+
+    return res.json({ success: true, data: usuario });
+  } catch (error) {
+    console.error('Error en getUsuarioById:', error);
+    return res.status(500).json({ success: false, message: 'Error interno del servidor', error: error instanceof Error ? error.message : String(error) });
+  }
+};
+
 
