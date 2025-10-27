@@ -1,5 +1,5 @@
 // src/index.ts
-import 'dotenv/config';                 // <-- NUEVO
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import { connectMongo } from './config/mongoose';
@@ -10,17 +10,40 @@ const app = express();
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
-app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:3000' }));
+// Permite lista separada por comas en CORS_ORIGIN
+const origins = (process.env.CORS_ORIGIN ?? '')
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean);
+
+app.use(
+  cors({
+    origin: origins.length ? origins : true,
+    credentials: true,
+  })
+);
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
+
 app.use('/api/offers', offersRouter);
 
-connectMongo().then(() => {
-  app.listen(Number(process.env.PORT || 4000), () => {
-    console.log(`🚀 API running on http://localhost:${process.env.PORT || 4000}`);
+const PORT = Number(process.env.PORT ?? 4000);
+const MONGODB_URI = process.env.MONGODB_URI;
+
+if (!MONGODB_URI) {
+  console.error('? Falta MONGODB_URI en variables de entorno');
+  process.exit(1);
+}
+
+connectMongo()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`?? API listening on port ${PORT}`);
+    });
+  })
+  .catch((e) => {
+    console.error('? Error al iniciar el servidor');
+    console.error(e);
+    process.exit(1);
   });
-}).catch((e) => {
-  console.error('❌ Error al iniciar el servidor');
-  console.error(e);
-});
 
