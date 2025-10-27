@@ -1,12 +1,14 @@
 {
   "name": "alquiler_back",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "API Alquiler - lista para Render",
+  "type": "commonjs",
+  "engines": { "node": ">=18" },
+  "main": "dist/index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "seed": "ts-node-dev --transpile-only src/seed/seedOffers.ts",
-    "build": "tsc",
+    "build": "rimraf dist && tsc",
     "start": "node dist/index.js",
     "start:dev": "npm run build && npm start",
     "clean": "rimraf dist"
@@ -15,13 +17,7 @@
     "type": "git",
     "url": "git+https://github.com/robertgt0/alquiler_back.git"
   },
-  "keywords": [],
-  "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/robertgt0/alquiler_back/issues"
-  },
-  "homepage": "https://github.com/robertgt0/alquiler_back#readme",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
