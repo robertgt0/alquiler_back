@@ -34,4 +34,11 @@ export class CitaService {
       .populate('clienteId')
       .populate('servicioId'); // ✅ incluir el servicio
   }
+  static async actualizarCita(id: string, data: any) {
+    return await Cita.findByIdAndUpdate(id, data, { new: true });
+  }
+
+  static async eliminarCita(id: string) {
+    return await Cita.findByIdAndDelete(id);
+  }
 }
