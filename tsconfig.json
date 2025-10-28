@@ -4,14 +4,14 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "sourceMap": true,
-    "declaration": false,                 // No generar .d.ts para evitar ruido
+    "declaration": false,
     "removeComments": true,
 
     /* === Módulos y compatibilidad === */
-    "target": "ES2022",                   // Mejor rendimiento y soporte moderno
-    "module": "NodeNext",                 // Recomendado para Node 18+ / 20+
-    "moduleResolution": "NodeNext",       // Compatible con imports ESM/CommonJS
-    "lib": ["ES2022", "DOM"],             // DOM opcional por si usas fetch u otras APIs
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2022", "DOM"],
 
     /* === Comportamiento del compilador === */
     "strict": true,
@@ -33,14 +33,14 @@
       "@modules/*": ["modules/*"],
       "@controllers/*": ["modules/*/controllers/*"],
       "@services/*": ["modules/*/services/*"],
-      "@models/*": ["modules/*/models/*"],
+      "@models/*": ["models/*", "modules/*/models/*"],
       "@utils/*": ["utils/*"]
     },
 
     /* === Nueva opción para desarrolladores === */
-    "allowImportingTsExtensions": true,   // Útil con moduleResolution NodeNext
-    "noUncheckedIndexedAccess": false,    // Puedes activarlo para aún más seguridad
-    "incremental": true                   // Compilación incremental más rápida
+    "allowImportingTsExtensions": true,
+    "noUncheckedIndexedAccess": false,
+    "incremental": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "**/*.test.ts"]

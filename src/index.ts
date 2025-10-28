@@ -2,8 +2,8 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/database';
-import nombreGrupoEjemploRouter from './modules/nombre_grupo_ejemplo';
-import availabilityRoutes from "./modules/DevCode/routes/availability.routes";
+
+import routesDevcode from "./modules/DevCode/routes"
 // Cargar variables de entorno
 dotenv.config();
 
@@ -17,6 +17,7 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 
 // Ruta raíz
 app.get('/', (req: Request, res: Response) => {
@@ -42,8 +43,11 @@ app.get('/api/health', (req: Request, res: Response) => {
 // MONTAR MÓDULOS/GRUPOS AQUÍ
 // ============================================
 // Montar tus módulos aquí:
-app.use('/api/nombre_grupo_ejemplo', nombreGrupoEjemploRouter);
-app.use('/api/devcode', availabilityRoutes)
+
+// app.use('/api/nombre_grupo_ejemplo', nombreGrupoEjemploRouter);
+
+// ROUTES DEVCODE
+app.use('/api/devcode', routesDevcode)
 // ============================================
 // Manejo de errores 404
 // ============================================
