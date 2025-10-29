@@ -1,0 +1,10 @@
+{"ts":"2025-10-29T09:34:09.970Z","level":"INFO","message":"🚀 Servidor corriendo en puerto 5000"}
+{"ts":"2025-10-29T09:34:09.972Z","level":"INFO","message":"🔧 Modo: development"}
+{"ts":"2025-10-29T09:34:09.973Z","level":"INFO","message":"🌐 URL: http://localhost:5000"}
+{"ts":"2025-10-29T09:34:09.973Z","level":"INFO","message":"📦 Módulos activos: \n/gmail-notifications, \n/api/gmail-notifications, \n/whatsapp-notifications, \n/api/whatsapp-notifications"}
+{"ts":"2025-10-29T09:34:09.974Z","level":"INFO","message":"✅ Listo para recibir peticiones!"}
+{"ts":"2025-10-29T09:36:37.650Z","level":"INFO","message":"🚀 Servidor corriendo en puerto 5000"}
+{"ts":"2025-10-29T09:36:37.652Z","level":"INFO","message":"🔧 Modo: development"}
+{"ts":"2025-10-29T09:36:37.653Z","level":"INFO","message":"🌐 URL: http://localhost:5000"}
+{"ts":"2025-10-29T09:36:37.654Z","level":"INFO","message":"📦 Módulos activos: \n/gmail-notifications, \n/api/gmail-notifications, \n/whatsapp-notifications, \n/api/whatsapp-notifications"}
+{"ts":"2025-10-29T09:36:37.656Z","level":"INFO","message":"✅ Listo para recibir peticiones!"}
