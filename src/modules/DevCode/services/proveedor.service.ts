@@ -1,4 +1,4 @@
-import { Proveedor, IProveedor } from '@models/proveedor.model';
+import { Proveedor, IProveedor,IRangoHorario,IDisponibilidad } from '@models/proveedor.model';
 import { Cita } from '@models/cita.model';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
@@ -26,12 +26,10 @@ export class ProveedorService {
     const proveedor = await Proveedor.findById(proveedorId);
     if (!proveedor) throw new Error('Proveedor no encontrado');
 
-    const { dias, horaInicio, horaFin, duracionTurno } = proveedor.disponibilidad;
-
-    // Traemos todas las citas del rango
+    const { dias, duracionTurno } = proveedor.disponibilidad; 
     const citas = await Cita.find({
-      proveedorId,
-      fecha: { $gte: fechaInicio, $lte: fechaFin }
+        proveedorId,
+        fecha: { $gte: fechaInicio, $lte: fechaFin }
     });
 
     const disponibilidad: Record<string, string[]> = {};
@@ -40,39 +38,61 @@ export class ProveedorService {
     const end = dayjs(fechaFin);
 
     while (current.isBefore(end) || current.isSame(end)) {
-      const diaSemana = current.day();
-      const fechaStr = current.format('YYYY-MM-DD');
-      disponibilidad[fechaStr] = [];
+        const diaSemana = current.day(); // Número del día (0-6)
+        const fechaStr = current.format('YYYY-MM-DD');
+        disponibilidad[fechaStr] = [];
 
-      if (dias.includes(diaSemana)) {
-        const horarios: string[] = [];
-        let hora = dayjs(`${fechaStr} ${horaInicio}`, 'YYYY-MM-DD HH:mm');
-        const limite = dayjs(`${fechaStr} ${horaFin}`, 'YYYY-MM-DD HH:mm');
+        const rangosDelDia = dias.filter(r => r.numeroDia === diaSemana);
 
-        while (hora.isBefore(limite)) {
-          horarios.push(hora.format('HH:mm'));
-          hora = hora.add(duracionTurno, 'minute');
+        if (rangosDelDia.length > 0) {
+            const horarios: string[] = [];
+
+            for (const rango of rangosDelDia) {
+                let hora = dayjs(`${fechaStr} ${rango.inicio}`, 'YYYY-MM-DD HH:mm');
+                const limite = dayjs(`${fechaStr} ${rango.fin}`, 'YYYY-MM-DD HH:mm');
+
+                while (hora.isBefore(limite)) {
+                    horarios.push(hora.format('HH:mm'));
+                    hora = hora.add(duracionTurno, 'minute');
+                }
+            }
+
+            const citasDelDia = citas.filter(c => c.fecha === fechaStr);
+            disponibilidad[fechaStr] = horarios.filter(h => {
+                return !citasDelDia.some(cita => {
+                    const citaInicio = dayjs(`${cita.fecha} ${cita.horario.inicio}`, 'YYYY-MM-DD HH:mm');
+                    const citaFin = dayjs(`${cita.fecha} ${cita.horario.fin}`, 'YYYY-MM-DD HH:mm');
+                    const slotStart = dayjs(`${fechaStr} ${h}`, 'YYYY-MM-DD HH:mm');
+                    const slotEnd = slotStart.add(duracionTurno, 'minute');
+
+                    // Retornamos false si hay solapamiento
+                    return slotStart.isBefore(citaFin) && slotEnd.isAfter(citaInicio);
+                });
+            });
         }
 
-        // Filtrar horarios ocupados
-        const citasDelDia = citas.filter(c => c.fecha === fechaStr);
-        disponibilidad[fechaStr] = horarios.filter(h => {
-          return !citasDelDia.some(cita => {
-            const citaInicio = dayjs(`${cita.fecha} ${cita.horario.inicio}`, 'YYYY-MM-DD HH:mm');
-            const citaFin = dayjs(`${cita.fecha} ${cita.horario.fin}`, 'YYYY-MM-DD HH:mm');
-            const slotStart = dayjs(`${fechaStr} ${h}`, 'YYYY-MM-DD HH:mm');
-            const slotEnd = slotStart.add(duracionTurno, 'minute');
-
-            // Retornamos false si hay solapamiento
-            return slotStart.isBefore(citaFin) && slotEnd.isAfter(citaInicio);
-          });
-        });
+        current = current.add(1, 'day');
       }
 
-      current = current.add(1, 'day');
-    }
+      return disponibilidad;
+  }
+  
+  // ProveedorService.ts
 
-    return disponibilidad;
+  static async guardarHorario(idProveedor: string, disponibilidad: IDisponibilidad) {
+      const proveedor = await Proveedor.findById(idProveedor);
+      if (!proveedor) throw new Error('Proveedor no encontrado');
+      proveedor.disponibilidad = disponibilidad;
+
+      await proveedor.save();
+      return proveedor;
   }
 
+
+ 
+  static async obtenerHorario(idProveedor: string) {
+    const proveedor = await Proveedor.findById(idProveedor).select('disponibilidad');
+    if (!proveedor) throw new Error('Proveedor no encontrado');
+    return proveedor.disponibilidad;
+  }
 }

@@ -43,4 +43,19 @@ export class ProveedorController {
       res.status(400).json({ error: err.message });
     }
   }
+  // En tu archivo del Controller
+  static async crearHorariosPersonalizados(req: Request, res: Response) {
+    try {
+          // 💡 CAMBIO AQUÍ: Obtenemos la disponibilidad completa directamente de req.body
+        const disponibilidad = req.body; 
+          
+        const nuevo = await ProveedorService.guardarHorario(
+          req.params.id,
+          disponibilidad as any, // Asegúrate de que IDisponibilidad sea correcta
+        );
+        res.json(nuevo);
+    } catch (err: any) {
+      res.status(400).json({ error: err.message });
+    }
+  }
 }

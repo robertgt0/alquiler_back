@@ -8,12 +8,22 @@ export interface IServicio {
   precio: number;
   rating?: number;
 }
+export interface IHorarioDia {
+    numeroDia: number; // 0=Dom, 1=Lun, ..., 6=Sab
+    inicio: string;    // "09:00"
+    fin: string;       // "12:30"
+}
 
+// 2. Nueva Interfaz de Disponibilidad (más simple)
 export interface IDisponibilidad {
-  dias: number[]; // 0 = domingo, 6 = sábado
-  horaInicio: string; // "08:00"
-  horaFin: string;    // "18:00"
-  duracionTurno: number; // minutos
+    dias: IHorarioDia[]; 
+    horaInicio: string; // "08:00" (Horario más temprano)
+    horaFin: string;    // "18:00" (Horario más tarde)
+    duracionTurno: number; // minutos
+}
+export interface IRangoHorario {
+ inicio: string; // Es un string de hora, ej. "09:00"
+ fin: string;    // Es un string de hora, ej. "12:30"
 }
 
 export interface IProveedor extends Document {
@@ -39,14 +49,20 @@ const ServicioSchema = new Schema<IServicio>({
   precio: { type: Number, required: true },
   rating: { type: Number, default: 0 },
 });
-
-const DisponibilidadSchema = new Schema<IDisponibilidad>({
-  dias: { type: [Number], required: true },
-  horaInicio: { type: String, required: true },
-  horaFin: { type: String, required: true },
-  duracionTurno: { type: Number, required: true },
+const HorarioDiaSchema = new Schema({
+    numeroDia: { type: Number, required: true, min: 0, max: 6 },
+    inicio: { type: String, required: true },
+    fin: { type: String, required: true },
 });
-
+const DisponibilidadSchema = new Schema<IDisponibilidad>({
+    dias: {
+        type: [HorarioDiaSchema], // Array de subdocumentos
+        required: true,
+    },
+    horaInicio: { type: String, required: true },
+    horaFin: { type: String, required: true },
+    duracionTurno: { type: Number, required: true },
+});
 const ProveedorSchema = new Schema<IProveedor>(
   {
     nombre: { type: String, required: true },
