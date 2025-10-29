@@ -43,4 +43,24 @@ export class ProveedorController {
       res.status(400).json({ error: err.message });
     }
   }
+
+  static async guardarHorarioLaboral(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const horario = req.body;
+
+      const proveedor = await ProveedorService.guardarHorarioLaboral(id, horario);
+
+      return res.status(200).json({
+        mensaje: 'Horario laboral guardado exitosamente',
+        datos: proveedor.horarioLaboral
+      });
+
+    } catch (error) {
+      return res.status(500).json({
+        mensaje: 'Error al guardar el horario laboral',
+        error: error instanceof Error ? error.message : 'Error desconocido'
+      });
+    }
+  }
 }

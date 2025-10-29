@@ -1,4 +1,4 @@
-import { Proveedor, IProveedor } from '@models/proveedor.model';
+import { Proveedor, IProveedor, IHorarioLaboral } from '@models/proveedor.model';
 import { Cita } from '@models/cita.model';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
@@ -75,4 +75,22 @@ export class ProveedorService {
     return disponibilidad;
   }
 
+  static async guardarHorarioLaboral(proveedorId: string, horario: IHorarioLaboral) {
+    const actualizado = await Proveedor.findByIdAndUpdate(
+      proveedorId,
+      { 
+        horarioLaboral: {
+          ...horario,
+          updatedAt: new Date()
+        }
+      },
+      { new: true }
+    );
+
+    if (!actualizado) {
+      throw new Error('Proveedor no encontrado');
+    }
+
+    return actualizado;
+  }
 }
