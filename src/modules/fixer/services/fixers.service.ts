@@ -1,10 +1,21 @@
-// Servicio EN MEMORIA para Fixers (sin Mongo por ahora)
 import { randomUUID } from "crypto";
+
+export type PaymentMethod = "card" | "qr" | "cash";
+
+export type PaymentAccount = {
+  holder: string;
+  accountNumber: string;
+};
 
 export type FixerMem = {
   id: string;
   userId: string;
-  ci?: string; // <- CI puede existir o no aún (lo ponemos opcional)
+  ci?: string;
+  location?: { lat: number; lng: number; address?: string };
+  categories?: string[];
+  paymentMethods?: PaymentMethod[];
+  paymentAccounts?: Partial<Record<PaymentMethod, PaymentAccount>>;
+  termsAccepted?: boolean;
   createdAt: string;
   updatedAt: string;
 };
@@ -12,6 +23,11 @@ export type FixerMem = {
 export type CreateFixerDTO = {
   userId: string;
   ci?: string;
+  location?: { lat: number; lng: number; address?: string };
+  categories?: string[];
+  paymentMethods?: PaymentMethod[];
+  paymentAccounts?: Partial<Record<PaymentMethod, PaymentAccount>>;
+  termsAccepted?: boolean;
 };
 
 export type UpdateFixerDTO = Partial<CreateFixerDTO>;
@@ -19,14 +35,18 @@ export type UpdateFixerDTO = Partial<CreateFixerDTO>;
 const store = new Map<string, FixerMem>();
 
 class FixersService {
-  // Crear un fixer (puede venir ya con CI)
   create(data: CreateFixerDTO) {
     const now = new Date().toISOString();
     const id = randomUUID();
     const fixer: FixerMem = {
       id,
       userId: data.userId,
-      ci: data.ci, // puede ser undefined si todavía no se registró
+      ci: data.ci,
+      location: data.location,
+      categories: data.categories ?? [],
+      paymentMethods: data.paymentMethods ?? [],
+      paymentAccounts: data.paymentAccounts ?? {},
+      termsAccepted: Boolean(data.termsAccepted),
       createdAt: now,
       updatedAt: now,
     };
@@ -34,7 +54,6 @@ class FixersService {
     return fixer;
   }
 
-  // Actualizar (por ejemplo, para guardar/editar CI)
   update(id: string, data: UpdateFixerDTO) {
     const current = store.get(id);
     if (!current) return null;
@@ -43,6 +62,11 @@ class FixersService {
       ...current,
       ...(data.userId !== undefined ? { userId: data.userId } : {}),
       ...(data.ci !== undefined ? { ci: data.ci } : {}),
+      ...(data.location !== undefined ? { location: data.location } : {}),
+      ...(data.categories !== undefined ? { categories: data.categories } : {}),
+      ...(data.paymentMethods !== undefined ? { paymentMethods: data.paymentMethods } : {}),
+      ...(data.paymentAccounts !== undefined ? { paymentAccounts: data.paymentAccounts } : {}),
+      ...(data.termsAccepted !== undefined ? { termsAccepted: Boolean(data.termsAccepted) } : {}),
       updatedAt: new Date().toISOString(),
     };
 
@@ -54,28 +78,36 @@ class FixersService {
     return store.get(id) || null;
   }
 
-  // -------- HU01: utilidades para CI --------
-
-  // Buscar si existe un fixer con ese CI
   findByCI(ci: string) {
-    for (const f of store.values()) {
-      if (f.ci === ci) return f;
+    for (const fixer of store.values()) {
+      if (fixer.ci === ci) return fixer;
     }
     return null;
   }
 
-  /**
-   * Verifica si un CI es único.
-   * - Si no existe ningún fixer con ese CI => true.
-   * - Si existe, pero es el mismo fixer (excludeId) => true.
-   * - Si existe con otro fixer => false.
-   */
   isCIUnique(ci: string, excludeId?: string) {
     const found = this.findByCI(ci);
     if (!found) return true;
     if (excludeId && found.id === excludeId) return true;
     return false;
   }
+
+  updateLocation(id: string, location: { lat: number; lng: number; address?: string }) {
+    return this.update(id, { location });
+  }
+
+  updateCategories(id: string, categories: string[]) {
+    return this.update(id, { categories });
+  }
+
+  updatePaymentInfo(id: string, methods: PaymentMethod[], accounts?: Partial<Record<PaymentMethod, PaymentAccount>>) {
+    return this.update(id, { paymentMethods: methods, paymentAccounts: accounts ?? {} });
+  }
+
+  setTermsAccepted(id: string, accepted: boolean) {
+    return this.update(id, { termsAccepted: accepted });
+  }
 }
 
 export default new FixersService();
+

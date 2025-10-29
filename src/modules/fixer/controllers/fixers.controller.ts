@@ -1,70 +1,200 @@
 import { Request, Response } from "express";
-import service from "../services/fixers.service";
+import service, { PaymentAccount, PaymentMethod } from "../services/fixers.service";
 
-function onlyDigits(v: string) { return /^\d+$/.test(v); }
-function isLengthOK(v: string) { return v.length >= 6 && v.length <= 10; }
+const ALLOWED_PAYMENTS: PaymentMethod[] = ["card", "qr", "cash"];
+
+function onlyDigits(value: string) {
+  return /^\d+$/.test(value);
+}
+
+function isLengthOK(value: string) {
+  return value.length >= 6 && value.length <= 10;
+}
+
+function normalizeCI(raw: unknown) {
+  const ci = String(raw ?? "").trim();
+  if (!ci) throw new Error("El campo C.I. es obligatorio");
+  if (!onlyDigits(ci)) throw new Error("C.I. invalido - solo numeros");
+  if (!isLengthOK(ci)) throw new Error("El C.I. no cumple la longitud 6-10");
+  return ci;
+}
+
+function normalizeLocation(raw: any) {
+  if (!raw) return undefined;
+  const lat = Number(raw.lat);
+  const lng = Number(raw.lng);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+    throw new Error("Ubicacion invalida");
+  }
+  if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+    throw new Error("Ubicacion invalida");
+  }
+  const location = { lat, lng } as { lat: number; lng: number; address?: string };
+  if (raw.address) location.address = String(raw.address).trim();
+  return location;
+}
+
+function normalizeCategories(raw: any): string[] | undefined {
+  if (raw === undefined) return undefined;
+  if (!Array.isArray(raw)) throw new Error("Las categorias deben ser un arreglo");
+  const categories = raw
+    .map((item) => String(item || "").trim())
+    .filter(Boolean);
+  if (!categories.length) throw new Error("Debes indicar al menos una categoria");
+  return categories;
+}
+
+function normalizePaymentMethods(raw: any): PaymentMethod[] {
+  const list = Array.isArray(raw) ? raw : [];
+  const methods = list
+    .map((value) => String(value || "").toLowerCase())
+    .filter((value): value is PaymentMethod => (ALLOWED_PAYMENTS as readonly string[]).includes(value));
+  return Array.from(new Set(methods));
+}
+
+function normalizeAccounts(raw: any, methods: PaymentMethod[]): Partial<Record<PaymentMethod, PaymentAccount>> {
+  if (!raw) return {};
+  const out: Partial<Record<PaymentMethod, PaymentAccount>> = {};
+
+  methods.forEach((method) => {
+    const data = raw[method];
+    if (!data) return;
+    const holder = String(data.holder ?? "").trim();
+    const accountNumber = String(data.accountNumber ?? "").trim();
+    if (!holder || !accountNumber) return;
+    out[method] = { holder, accountNumber };
+  });
+
+  return out;
+}
 
 export const checkCI = (req: Request, res: Response) => {
-  const ci = String(req.query.ci || "").trim();
-  const excludeId = req.query.excludeId ? String(req.query.excludeId) : undefined;
-
-  if (!ci) return res.status(400).json({ success: false, message: "El campo C.I. es obligatorio" });
-  if (!onlyDigits(ci)) return res.status(400).json({ success: false, message: "C.I. inválido — solo números" });
-  if (!isLengthOK(ci)) return res.status(400).json({ success: false, message: "El C.I. no cumple con la longitud permitida" });
-
-  const unique = service.isCIUnique(ci, excludeId);
-  if (!unique) return res.json({ success: true, unique: false, message: "Este C.I. ya se encuentra registrado" });
-  res.json({ success: true, unique: true, message: "Disponible" });
+  try {
+    const ci = normalizeCI(req.query.ci);
+    const excludeId = req.query.excludeId ? String(req.query.excludeId) : undefined;
+    const unique = service.isCIUnique(ci, excludeId);
+    if (!unique) {
+      return res.json({ success: true, unique: false, message: "Este C.I. ya esta registrado" });
+    }
+    res.json({ success: true, unique: true, message: "Disponible" });
+  } catch (err: any) {
+    res.status(400).json({ success: false, message: String(err.message || "Error") });
+  }
 };
 
 export const createFixer = (req: Request, res: Response) => {
   try {
-    const { userId, ci } = req.body || {};
-    if (!userId) return res.status(400).json({ success: false, message: "userId requerido" });
+    const { userId } = req.body || {};
+    if (!userId) {
+      return res.status(400).json({ success: false, message: "userId requerido" });
+    }
 
-    if (ci === undefined || ci === null || String(ci).trim() === "")
-      return res.status(400).json({ success: false, message: "El campo C.I. es obligatorio" });
+    const ci = normalizeCI(req.body?.ci);
+    if (!service.isCIUnique(ci)) {
+      return res.status(400).json({ success: false, message: "Este C.I. ya esta registrado" });
+    }
 
-    const ciStr = String(ci).trim();
-    if (!onlyDigits(ciStr)) return res.status(400).json({ success: false, message: "C.I. inválido — solo números" });
-    if (!isLengthOK(ciStr)) return res.status(400).json({ success: false, message: "El C.I. no cumple con la longitud permitida" });
-    if (!service.isCIUnique(ciStr)) return res.status(400).json({ success: false, message: "Este C.I. ya se encuentra registrado" });
+    const location = normalizeLocation(req.body?.location);
+    const categories = normalizeCategories(req.body?.categories);
+    const methods = normalizePaymentMethods(req.body?.paymentMethods);
+    const accounts = normalizeAccounts(req.body?.paymentAccounts, methods);
 
-    const created = service.create({ userId, ci: ciStr });
+    const created = service.create({
+      userId: String(userId),
+      ci,
+      location,
+      categories,
+      paymentMethods: methods,
+      paymentAccounts: accounts,
+      termsAccepted: Boolean(req.body?.termsAccepted),
+    });
+
     res.status(201).json({ success: true, data: created });
-  } catch (e: any) {
-    res.status(400).json({ success: false, message: e.message });
+  } catch (err: any) {
+    res.status(400).json({ success: false, message: String(err.message || "Error") });
   }
 };
 
 export const updateIdentity = (req: Request, res: Response) => {
   try {
     const id = req.params.id;
-    const ciRaw = req.body?.ci;
+    const ci = normalizeCI(req.body?.ci);
+    if (!service.isCIUnique(ci, id)) {
+      return res.status(400).json({ success: false, message: "Este C.I. ya esta registrado" });
+    }
 
-    if (ciRaw === undefined || ciRaw === null || String(ciRaw).trim() === "")
-      return res.status(400).json({ success: false, message: "El campo C.I. es obligatorio" });
-
-    const ciStr = String(ciRaw).trim();
-    if (!onlyDigits(ciStr)) return res.status(400).json({ success: false, message: "C.I. inválido — solo números" });
-    if (!isLengthOK(ciStr)) return res.status(400).json({ success: false, message: "El C.I. no cumple con la longitud permitida" });
-    if (!service.isCIUnique(ciStr, id)) return res.status(400).json({ success: false, message: "Este C.I. ya se encuentra registrado" });
-
-    const updated = service.update(id, { ci: ciStr });
+    const updated = service.update(id, { ci });
     if (!updated) return res.status(404).json({ success: false, message: "Fixer no encontrado" });
-
     res.json({ success: true, data: updated });
-  } catch (e: any) {
-    res.status(400).json({ success: false, message: e.message });
+  } catch (err: any) {
+    res.status(400).json({ success: false, message: String(err.message || "Error") });
   }
 };
 
 export const getFixer = (req: Request, res: Response) => {
   try {
     const fixer = service.getById(req.params.id);
-    if (!fixer) return res.status(404).json({ success: false, message: "Not found" });
+    if (!fixer) return res.status(404).json({ success: false, message: "Fixer no encontrado" });
     res.json({ success: true, data: fixer });
-  } catch (e: any) {
-    res.status(400).json({ success: false, message: e.message });
+  } catch (err: any) {
+    res.status(400).json({ success: false, message: String(err.message || "Error") });
+  }
+};
+
+export const updateLocation = (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    const location = normalizeLocation(req.body);
+    if (!location) return res.status(400).json({ success: false, message: "Ubicacion invalida" });
+
+    const updated = service.updateLocation(id, location);
+    if (!updated) return res.status(404).json({ success: false, message: "Fixer no encontrado" });
+    res.json({ success: true, data: updated });
+  } catch (err: any) {
+    res.status(400).json({ success: false, message: String(err.message || "Error") });
+  }
+};
+
+export const updateCategories = (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    const categories = normalizeCategories(req.body?.categories);
+    if (!categories) return res.status(400).json({ success: false, message: "Categorias invalidas" });
+
+    const updated = service.updateCategories(id, categories);
+    if (!updated) return res.status(404).json({ success: false, message: "Fixer no encontrado" });
+    res.json({ success: true, data: updated });
+  } catch (err: any) {
+    res.status(400).json({ success: false, message: String(err.message || "Error") });
+  }
+};
+
+export const updatePayments = (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    const methods = normalizePaymentMethods(req.body?.methods);
+    if (!methods.length) {
+      return res.status(400).json({ success: false, message: "Debes elegir al menos un metodo de pago" });
+    }
+    const accounts = normalizeAccounts(req.body?.accounts, methods);
+    const updated = service.updatePaymentInfo(id, methods, accounts);
+    if (!updated) return res.status(404).json({ success: false, message: "Fixer no encontrado" });
+    res.json({ success: true, data: updated });
+  } catch (err: any) {
+    res.status(400).json({ success: false, message: String(err.message || "Error") });
+  }
+};
+
+export const acceptTerms = (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    const accepted = Boolean(req.body?.accepted);
+    if (!accepted) return res.status(400).json({ success: false, message: "Debe aceptar los terminos" });
+
+    const updated = service.setTermsAccepted(id, true);
+    if (!updated) return res.status(404).json({ success: false, message: "Fixer no encontrado" });
+    res.json({ success: true, data: updated });
+  } catch (err: any) {
+    res.status(400).json({ success: false, message: String(err.message || "Error") });
   }
 };
