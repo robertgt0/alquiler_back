@@ -128,12 +128,18 @@ router.post('/', async (req, res) => {
 
     const now = new Date();
 
+    // Validaciones básicas HU06: descripción <= 100
+    const desc = (description ?? descripcion ?? '').toString();
+    if (desc.length > 100) {
+      return res.status(400).json({ error: 'La descripción debe ser de 100 caracteres o menos' });
+    }
+
     const doc = await OfferModel.create({
       // si te mandan un id lo respetas; si no, generas uno simple
       id: id ?? String(now.getTime()),
       ownerId: ownerId ?? 'fixer-1', // TODO: reemplazar cuando haya auth real
       title: title ?? descripcion ?? 'Oferta sin título',
-      description: description ?? descripcion ?? '',
+      description: desc,
       category: category ?? categoria ?? 'General',
       contact: contact ?? (whatsapp ? { whatsapp } : {}),
       images: Array.isArray(images) ? images.filter(x => typeof x === 'string') : [],

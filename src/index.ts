@@ -4,6 +4,8 @@ import express from 'express';
 import cors from 'cors';
 import { connectMongo } from './config/mongoose';
 import offersRouter from './routes/offers';
+import fixerRouter from './modules/fixer';
+import categoriesRouter from './modules/categories';
 
 const app = express();
 
@@ -26,6 +28,8 @@ app.use(
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
 app.use('/api/offers', offersRouter);
+app.use('/api/fixers', fixerRouter);
+app.use('/api/categories', categoriesRouter);
 
 const PORT = Number(process.env.PORT ?? 4000);
 const MONGODB_URI = process.env.MONGODB_URI;
