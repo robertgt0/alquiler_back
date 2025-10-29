@@ -2,6 +2,9 @@ node_modules/
 dist/
 .env
 .DS_Store
-*.log
+#*.log
 build/
 coverage/
+.idea
+#logs
+workspace.xml
