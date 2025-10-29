@@ -8,7 +8,11 @@ import helmet from "helmet";
 import path from "path";
 
 // 🔹 Cargar variables de entorno antes de cualquier import dinámico
+
+
 dotenv.config({ path: path.resolve(process.cwd(), ".env") });
+import routesDevcode from "./modules/DevCode/routes"
+// Cargar variables de entorno
 
 // ============================================
 // BASE DE DATOS (solo si se usa Gmail o registro de notificaciones)
@@ -56,10 +60,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
 app.use(requestLogger);
 
-// ============================================
-// RUTAS BASE
-// ============================================
-app.get("/", (req: Request, res: Response) => {
+
+
+// Ruta raíz
+app.get('/', (req: Request, res: Response) => {
   res.json({
     message: "API Backend de Notificaciones",
     status: "OK",
@@ -93,6 +97,11 @@ app.use("/api/gmail-notifications", gmailCentralRouter);
 app.use("/whatsapp-notifications", whatsappRoutes);
 app.use("/api/whatsapp-notifications", whatsappCentralRouter);
 
+
+// app.use('/api/nombre_grupo_ejemplo', nombreGrupoEjemploRouter);
+
+// ROUTES DEVCODE
+app.use('/api/devcode', routesDevcode)
 // ============================================
 // MANEJO DE ERRORES
 // ============================================

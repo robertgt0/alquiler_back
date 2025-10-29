@@ -100,3 +100,17 @@
 {"ts":"2025-10-28T06:37:11.623Z","level":"INFO","message":"request:finish","id":"47bcfa5d-9b36-4b12-a8b5-53cce07ef6cf","status":200,"method":"POST","url":"/api/whatsapp-notifications","duration":1843}
 {"ts":"2025-10-28T06:39:24.275Z","level":"INFO","message":"request:start","id":"f6b8c802-74da-49ba-a0d4-1f4ac830d431","method":"POST","url":"/api/whatsapp-notifications","ip":"::1"}
 {"ts":"2025-10-28T06:39:25.772Z","level":"INFO","message":"request:finish","id":"f6b8c802-74da-49ba-a0d4-1f4ac830d431","status":200,"method":"POST","url":"/api/whatsapp-notifications","duration":1497}
+{"ts":"2025-10-29T02:13:38.938Z","level":"INFO","message":"🚀 Servidor corriendo en puerto 5000"}
+{"ts":"2025-10-29T02:13:38.938Z","level":"INFO","message":"🔧 Modo: undefined"}
+{"ts":"2025-10-29T02:13:38.938Z","level":"INFO","message":"🌐 URL: http://localhost:5000"}
+{"ts":"2025-10-29T02:13:38.939Z","level":"INFO","message":"📦 Módulos activos: \n/gmail-notifications, \n/api/gmail-notifications, \n/whatsapp-notifications, \n/api/whatsapp-notifications"}
+{"ts":"2025-10-29T02:13:38.939Z","level":"INFO","message":"✅ Listo para recibir peticiones!"}
+{"ts":"2025-10-29T02:44:29.513Z","level":"INFO","message":"request:start","id":"5958f936-a72d-4aea-9ad5-851c92020962","method":"GET","url":"/api/notifications/gmail","ip":"::ffff:127.0.0.1"}
+{"ts":"2025-10-29T02:44:29.514Z","level":"ERROR","message":"Ruta no encontrada: /api/notifications/gmail","code":"NOT_FOUND","status":404,"endpoint":"/api/notifications/gmail","method":"GET","ip":"::ffff:127.0.0.1","requestId":"5958f936-a72d-4aea-9ad5-851c92020962","userAgent":"insomnia/11.6.2"}
+{"ts":"2025-10-29T02:44:29.518Z","level":"INFO","message":"request:finish","id":"5958f936-a72d-4aea-9ad5-851c92020962","status":404,"method":"GET","url":"/api/notifications/gmail","duration":5}
+{"ts":"2025-10-29T02:44:47.035Z","level":"INFO","message":"request:start","id":"59bbda33-83d0-4140-bb6b-635d3584ff3d","method":"POST","url":"/api/notifications/gmail","ip":"::ffff:127.0.0.1"}
+{"ts":"2025-10-29T02:44:47.036Z","level":"ERROR","message":"Ruta no encontrada: /api/notifications/gmail","code":"NOT_FOUND","status":404,"endpoint":"/api/notifications/gmail","method":"POST","ip":"::ffff:127.0.0.1","requestId":"59bbda33-83d0-4140-bb6b-635d3584ff3d","userAgent":"insomnia/11.6.2"}
+{"ts":"2025-10-29T02:44:47.037Z","level":"INFO","message":"request:finish","id":"59bbda33-83d0-4140-bb6b-635d3584ff3d","status":404,"method":"POST","url":"/api/notifications/gmail","duration":2}
+{"ts":"2025-10-29T02:47:08.755Z","level":"INFO","message":"request:start","id":"21cd8925-a078-465c-9cae-09c154f64877","method":"POST","url":"/api/notifications/gmail","ip":"::ffff:127.0.0.1"}
+{"ts":"2025-10-29T02:47:08.755Z","level":"ERROR","message":"Ruta no encontrada: /api/notifications/gmail","code":"NOT_FOUND","status":404,"endpoint":"/api/notifications/gmail","method":"POST","ip":"::ffff:127.0.0.1","requestId":"21cd8925-a078-465c-9cae-09c154f64877","userAgent":"insomnia/11.6.2"}
+{"ts":"2025-10-29T02:47:08.756Z","level":"INFO","message":"request:finish","id":"21cd8925-a078-465c-9cae-09c154f64877","status":404,"method":"POST","url":"/api/notifications/gmail","duration":1}
