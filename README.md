@@ -87,3 +87,5 @@ Cada equipo trabaja en su propio módulo sin interferir con otros:
 - **Equipo C** → `modules/modulo_c/`
 
 Una vez terminado, cada equipo monta su módulo en `src/index.ts`
+
+esto no estaba en el git
