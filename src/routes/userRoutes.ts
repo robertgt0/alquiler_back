@@ -1,10 +1,10 @@
-import { Router } from "express";
-import devCodeRoutes from "../modules/DevCode";
-//import ejemploRoutes from "../modules/nombre_grupo_ejemplo";
+// import { Router } from "express";
+// import devCodeRoutes from "../modules/DevCode";
+// //import ejemploRoutes from "../modules/nombre_grupo_ejemplo";
 
 
-// const router = Router();
+// // const router = Router();
 
 
 
-// export default router;
+// // export default router;

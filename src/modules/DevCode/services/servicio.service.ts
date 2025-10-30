@@ -1,4 +1,4 @@
-import { Servicio, IServicio } from '@models/servicio.model';
+import { Servicio, IServicio } from '../../../models/servicio.model';
 
 export class ServicioService {
   static async crear(data: Partial<IServicio>) {

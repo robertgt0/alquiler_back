@@ -1,156 +1,122 @@
 // ============================================
-// 🧱 Importación de dependencias principales
+// IMPORTS BASE
 // ============================================
-import express, { Request, Response } from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
+import express, { Request, Response } from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import helmet from "helmet";
+import path from "path";
 
-// ============================================
-// 🧱 Conexión a la base de datos
-// ============================================
-import connectDB from './config/database';
-import mongoose from 'mongoose';
-
-// ============================================
-// 🧱 Importación de rutas
-// ============================================
-import paginationRouter from './modules/borbotones/routes/pagination.router';
-import ordenamientoRouter from './modules/borbotones/routes/ordering.routes';
-import busquedaRouter from './modules/borbotones/routes/busqueda.router';
-import filtrosRouter from './modules/borbotones/routes/filtros.routes';
-import usersRouter from './modules/borbotones/routes/users.router';
+// 🔹 Cargar variables de entorno antes de cualquier import dinámico
 
 
-// ============================================
-// 🔹 Cargar variables de entorno
-// ============================================
-
+dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 import routesDevcode from "./modules/DevCode/routes"
 // Cargar variables de entorno
-dotenv.config();
 
 // ============================================
-// 🔹 Crear aplicación Express
+// BASE DE DATOS (solo si se usa Gmail o registro de notificaciones)
+// ============================================
+import connectDB from "./modules/notification_Gmail/config/database";
+
+connectDB().catch((err) => {
+  console.error("❌ Error al conectar con la base de datos:", err.message);
+});
+
+// ============================================
+// MIDDLEWARES GLOBALES
+// ============================================
+import { requestLogger } from "./modules/notification_Gmail/middlewares/request.middleware";
+import { notFoundHandler } from "./modules/notification_Gmail/middlewares/notFound.middleware";
+import { globalErrorHandler } from "./modules/notification_Gmail/middlewares/error.middleware";
+
+// ============================================
+// IMPORT UTILIDADES INTERNAS (LOCAL LOGGER)
+// ============================================
+import { logSystem } from "./modules/notification_Gmail/utils/loggerExtended";
+import { generateCode } from "./modules/notification_Gmail/utils/helpers";
+
+// ============================================
+// RUTAS: GMAIL MODULE
+// ============================================
+import gmailRoutes from "./modules/notification_Gmail/routes/notification.routes";
+import gmailCentralRouter from "./modules/notification_Gmail/routes/central.router";
+
+// ============================================
+// RUTAS: WHATSAPP MODULE
+// ============================================
+import whatsappRoutes from "./modules/notification_WhatsApp/routes/notification.routes";
+import whatsappCentralRouter from "./modules/notification_WhatsApp/routes/central.router";
+
+// ============================================
+// INICIALIZACIÓN DE APP
 // ============================================
 const app = express();
 
-// ============================================
-// 🔹 Conectar a la base de datos MongoDB
-// ============================================
-connectDB();
-
-// ============================================
-// 🔹 Middlewares globales
-// ============================================
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-  credentials: true
-}));
+// --- Middlewares base ---
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(helmet());
+app.use(requestLogger);
 
-// Middleware de logging
-import { loggingMiddleware } from './middlewares/logging.middleware';
-app.use(loggingMiddleware);
 
-// Configurar cabeceras y cors
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
-    res.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
-    res.header('Content-Type', 'application/json; charset=utf-8');
-    next();
-});
 
-// ============================================
-// 🔹 Ruta raíz de prueba
-// ============================================
 // Ruta raíz
 app.get('/', (req: Request, res: Response) => {
   res.json({
-    message: 'API Backend',
-    status: 'OK',
-    version: '1.0.0',
-    modules: ['/api/borbotones', '/api/busqueda'],
+    message: "API Backend de Notificaciones",
+    status: "OK",
+    version: "1.0.0",
     timestamp: new Date().toISOString(),
+    modules: {
+      gmail: ["/api/gmail-notifications", "/gmail-notifications"],
+      whatsapp: ["/api/whatsapp-notifications", "/whatsapp-notifications"],
+    },
   });
 });
 
-// ============================================
-// 🧩 Rutas principales
-// ============================================
-
-// Módulo de filtros (debe ir primero para que las rutas específicas tengan prioridad)
-app.use('/api/borbotones/filtros', filtrosRouter);
-
-// Historia de usuario P01: paginación
-app.use('/api/borbotones', paginationRouter);
-
-// Historia de usuario O01: ordenamiento
-app.use('/api/borbotones', ordenamientoRouter);
-
-// Módulo de búsqueda
-app.use('/api/borbotones/search', busquedaRouter);
-
-// Módulo de usuarios
-app.use('/api/borbotones', usersRouter);
-
-// ============================================
-// 🩺 Endpoint de salud (para monitoreo)
-// ============================================
-app.get('/api/health', (_req: Request, res: Response) => {
-  const state = mongoose.connection.readyState; // 0 disconnected, 1 connected, 2 connecting, 3 disconnecting
-  const stateMap: Record<number, string> = {
-    0: 'disconnected',
-    1: 'connected',
-    2: 'connecting',
-    3: 'disconnecting',
-  };
-
+// Health check
+app.get("/api/health", (req: Request, res: Response) => {
   res.json({
-    status: state === 1 ? 'healthy' : 'degraded',
-    database: stateMap[state] || 'unknown',
+    status: "healthy",
+    database: "connected",
     uptime: process.uptime(),
   });
 });
 
-
-// MONTAR MÓDULOS/GRUPOS AQUÍ
 // ============================================
-// Montar tus módulos aquí:
+// MÓDULOS ACTIVOS
+// ============================================
+
+// --- Gmail Notifications ---
+app.use("/gmail-notifications", gmailRoutes);
+app.use("/api/gmail-notifications", gmailCentralRouter);
+
+// --- WhatsApp Notifications ---
+app.use("/whatsapp-notifications", whatsappRoutes);
+app.use("/api/whatsapp-notifications", whatsappCentralRouter);
+
 
 // app.use('/api/nombre_grupo_ejemplo', nombreGrupoEjemploRouter);
 
 // ROUTES DEVCODE
 app.use('/api/devcode', routesDevcode)
 // ============================================
-// Manejo de errores 404
+// MANEJO DE ERRORES
 // ============================================
-app.use((req: Request, res: Response) => {
-  res.status(404).json({
-    success: false,
-    message: 'Ruta no encontrada',
-    path: req.path,
-  });
-});
+app.use(notFoundHandler);
+app.use(globalErrorHandler);
 
 // ============================================
-// 🚀 Inicialización del servidor
+// INICIO DEL SERVIDOR
 // ============================================
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`✅ Servidor corriendo en puerto ${PORT}`);
-  console.log(`🌐 URL: http://localhost:${PORT}`);
-  console.log(`⚙️  Modo: ${process.env.NODE_ENV || 'development'}`);
-  
-  // Listar todas las rutas montadas
-  console.log('\n📍 Rutas principales montadas:');
-  console.log('- /api/borbotones/filtros/*');
-  console.log('- /api/borbotones/usuarios/*');
-  console.log('- /api/borbotones/search/*');
+  logSystem("INFO", `🚀 Servidor corriendo en puerto ${PORT}`);
+  logSystem("INFO", `🔧 Modo: ${process.env.NODE_ENV}`);
+  logSystem("INFO", `🌐 URL: http://localhost:${PORT}`);
+  logSystem("INFO", `📦 Módulos activos: \n/gmail-notifications, \n/api/gmail-notifications, \n/whatsapp-notifications, \n/api/whatsapp-notifications`);
+  logSystem("INFO", "✅ Listo para recibir peticiones!");
 });
-
-export default app;
-
