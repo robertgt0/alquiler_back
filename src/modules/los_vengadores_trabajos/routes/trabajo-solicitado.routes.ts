@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { crearTrabajoSolicitado } from '../controllers/trabajo-solicitado.controller';
+/*import { crearTrabajoSolicitado } from '../controllers/trabajo-solicitado.controller';
 
 const router = Router();
 
@@ -10,3 +10,4 @@ router.get('/ping', (_req, res) => res.json({ ok: true, scope: 'trabajo-solicita
 router.post('/', crearTrabajoSolicitado);
 
 export default router;
+*/
