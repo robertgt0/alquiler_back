@@ -9,4 +9,5 @@ router.get('/:id', ProveedorController.obtener);
 router.get('/:id/disponibilidad', ProveedorController.disponibilidad);
 router.post('/:id/horario', ProveedorController.crearHorariosPersonalizados);
 
+router.post('/:id/horarioLaboral', ProveedorController.guardarHorarioLaboral);
 export default router;

@@ -1,4 +1,4 @@
-import { Proveedor, IProveedor,IRangoHorario,IDisponibilidad } from '@models/proveedor.model';
+import { Proveedor, IProveedor,IRangoHorario,IDisponibilidad, IHorarioLaboral} from '@models/proveedor.model';
 import { Cita } from '@models/cita.model';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
@@ -94,5 +94,24 @@ export class ProveedorService {
     const proveedor = await Proveedor.findById(idProveedor).select('disponibilidad');
     if (!proveedor) throw new Error('Proveedor no encontrado');
     return proveedor.disponibilidad;
+  }
+
+  static async guardarHorarioLaboral(proveedorId: string, horario: IHorarioLaboral) {
+    const actualizado = await Proveedor.findByIdAndUpdate(
+      proveedorId,
+      { 
+        horarioLaboral: {
+          ...horario,
+          updatedAt: new Date()
+        }
+      },
+      { new: true }
+    );
+
+    if (!actualizado) {
+      throw new Error('Proveedor no encontrado');
+    }
+
+    return actualizado;
   }
 }
