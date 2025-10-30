@@ -9,6 +9,16 @@ import path from "path";
 
 // 🔹 Cargar variables de entorno antes de cualquier import dinámico
 
+// 🧱 Importación de rutas
+// ============================================
+import paginationRouter from './modules/borbotones/routes/pagination.router';
+import ordenamientoRouter from './modules/borbotones/routes/ordering.routes';
+import busquedaRouter from './modules/borbotones/routes/busqueda.router';
+import filtrosRouter from './modules/borbotones/routes/filtros.routes';
+import usersRouter from './modules/borbotones/routes/users.router';
+
+
+
 
 dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 import routesDevcode from "./modules/DevCode/routes"
@@ -88,6 +98,25 @@ app.get("/api/health", (req: Request, res: Response) => {
 // ============================================
 // MÓDULOS ACTIVOS
 // ============================================
+
+
+// los borbotones
+// Módulo de filtros (debe ir primero para que las rutas específicas tengan prioridad)
+app.use('/api/borbotones/filtros', filtrosRouter);
+
+// Historia de usuario P01: paginación
+app.use('/api/borbotones', paginationRouter);
+
+// Historia de usuario O01: ordenamiento
+app.use('/api/borbotones', ordenamientoRouter);
+
+// Módulo de búsqueda
+app.use('/api/borbotones/search', busquedaRouter);
+
+// Módulo de usuarios
+app.use('/api/borbotones', usersRouter);
+
+
 
 // --- Gmail Notifications ---
 app.use("/gmail-notifications", gmailRoutes);

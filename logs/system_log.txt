@@ -114,3 +114,27 @@
 {"ts":"2025-10-29T02:47:08.755Z","level":"INFO","message":"request:start","id":"21cd8925-a078-465c-9cae-09c154f64877","method":"POST","url":"/api/notifications/gmail","ip":"::ffff:127.0.0.1"}
 {"ts":"2025-10-29T02:47:08.755Z","level":"ERROR","message":"Ruta no encontrada: /api/notifications/gmail","code":"NOT_FOUND","status":404,"endpoint":"/api/notifications/gmail","method":"POST","ip":"::ffff:127.0.0.1","requestId":"21cd8925-a078-465c-9cae-09c154f64877","userAgent":"insomnia/11.6.2"}
 {"ts":"2025-10-29T02:47:08.756Z","level":"INFO","message":"request:finish","id":"21cd8925-a078-465c-9cae-09c154f64877","status":404,"method":"POST","url":"/api/notifications/gmail","duration":1}
+{"ts":"2025-10-30T11:58:11.011Z","level":"INFO","message":"🚀 Servidor corriendo en puerto 5000"}
+{"ts":"2025-10-30T11:58:11.012Z","level":"INFO","message":"🔧 Modo: development"}
+{"ts":"2025-10-30T11:58:11.012Z","level":"INFO","message":"🌐 URL: http://localhost:5000"}
+{"ts":"2025-10-30T11:58:11.012Z","level":"INFO","message":"📦 Módulos activos: \n/gmail-notifications, \n/api/gmail-notifications, \n/whatsapp-notifications, \n/api/whatsapp-notifications"}
+{"ts":"2025-10-30T11:58:11.013Z","level":"INFO","message":"✅ Listo para recibir peticiones!"}
+{"ts":"2025-10-30T11:58:20.959Z","level":"INFO","message":"request:start","id":"0eef37b9-7aef-4a07-b06a-bb892baeb4b3","method":"GET","url":"/api/borbotones/usuarios","ip":"::ffff:127.0.0.1"}
+{"ts":"2025-10-30T11:58:21.181Z","level":"INFO","message":"request:finish","id":"0eef37b9-7aef-4a07-b06a-bb892baeb4b3","status":200,"method":"GET","url":"/api/borbotones/usuarios","duration":222}
+{"ts":"2025-10-30T11:58:26.276Z","level":"INFO","message":"request:start","id":"db279952-97cb-4d48-be7e-8e9b41efb4cd","method":"GET","url":"/api/borbotones/usuarios","ip":"::ffff:127.0.0.1"}
+{"ts":"2025-10-30T11:58:26.437Z","level":"INFO","message":"request:finish","id":"db279952-97cb-4d48-be7e-8e9b41efb4cd","status":200,"method":"GET","url":"/api/borbotones/usuarios","duration":161}
+{"ts":"2025-10-30T12:00:25.511Z","level":"INFO","message":"🚀 Servidor corriendo en puerto 5000"}
+{"ts":"2025-10-30T12:00:25.512Z","level":"INFO","message":"🔧 Modo: development"}
+{"ts":"2025-10-30T12:00:25.512Z","level":"INFO","message":"🌐 URL: http://localhost:5000"}
+{"ts":"2025-10-30T12:00:25.512Z","level":"INFO","message":"📦 Módulos activos: \n/gmail-notifications, \n/api/gmail-notifications, \n/whatsapp-notifications, \n/api/whatsapp-notifications"}
+{"ts":"2025-10-30T12:00:25.512Z","level":"INFO","message":"✅ Listo para recibir peticiones!"}
+{"ts":"2025-10-30T12:00:40.962Z","level":"INFO","message":"🚀 Servidor corriendo en puerto 5000"}
+{"ts":"2025-10-30T12:00:40.963Z","level":"INFO","message":"🔧 Modo: development"}
+{"ts":"2025-10-30T12:00:40.963Z","level":"INFO","message":"🌐 URL: http://localhost:5000"}
+{"ts":"2025-10-30T12:00:40.964Z","level":"INFO","message":"📦 Módulos activos: \n/gmail-notifications, \n/api/gmail-notifications, \n/whatsapp-notifications, \n/api/whatsapp-notifications"}
+{"ts":"2025-10-30T12:00:40.964Z","level":"INFO","message":"✅ Listo para recibir peticiones!"}
+{"ts":"2025-10-30T12:00:58.155Z","level":"INFO","message":"🚀 Servidor corriendo en puerto 5000"}
+{"ts":"2025-10-30T12:00:58.156Z","level":"INFO","message":"🔧 Modo: development"}
+{"ts":"2025-10-30T12:00:58.156Z","level":"INFO","message":"🌐 URL: http://localhost:5000"}
+{"ts":"2025-10-30T12:00:58.156Z","level":"INFO","message":"📦 Módulos activos: \n/gmail-notifications, \n/api/gmail-notifications, \n/whatsapp-notifications, \n/api/whatsapp-notifications"}
+{"ts":"2025-10-30T12:00:58.156Z","level":"INFO","message":"✅ Listo para recibir peticiones!"}

@@ -15,7 +15,7 @@ export const updateUser = async (req: Request, res: Response) => {
       });
     }
 
-    const usuariosCollection = db.collection('usuarios');
+    const usuariosCollection = db.collection('proveedors  ');
     let query: any = {};
 
     if (ObjectId.isValid(id)) {
