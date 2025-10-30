@@ -16,7 +16,7 @@ const test = async () => {
         message: "🚀 Hola, este es un mensaje de prueba enviado desde el backend vía Evolution API.",
         destinations: [
           {
-            phone: process.env.TEST_PHONE || "59177484270", // número con código de país
+            phone: process.env.TEST_PHONE || "59177484270",
             name: "Usuario de prueba",
           },
         ],

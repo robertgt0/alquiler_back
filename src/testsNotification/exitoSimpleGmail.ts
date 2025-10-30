@@ -15,7 +15,7 @@ const test = async () => {
       body: JSON.stringify({
         subject: "🔔 Prueba simple desde código",
         message: "hola mundito",
-        destinations: [{ email: "adrianvallejosflores24@gmail.com", name: "Adrián" }],
+        destinations: [{ email: "adrivall1234@gmail.com", name: "Adrián" }],
         fromName: "Prueba Interna"
       }),
     });

@@ -79,11 +79,8 @@ Gracias por confiar en nosotros.
     `.trim();
 
     const result = await central.receiveAndSend({
-      subject: "Confirmación de Reserva",
       message,
-      destinations: [{ phone }],
-      fromName: "Sistema",
-      channel: "whatsapp",
+      destinations: [{ phone }]
     });
 
     return res.status(200).json({
