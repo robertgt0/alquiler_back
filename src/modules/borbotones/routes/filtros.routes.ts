@@ -13,14 +13,34 @@ import {
 
 const router = Router();
 
+// Rutas base
+router.get("/", (req, res) => {
+  res.json({
+    message: "Módulo de filtros",
+    endpoints: {
+      departamentos: "/departamentos",
+      especialidades: "/especialidades",
+      ciudades: "/ciudades",
+      "usuarios-por-ciudad": "/usuarios/ciudad",
+      "usuarios-por-especialidad": "/usuarios/especialidad"
+    }
+  });
+});
+
 // Ciudades
 router.get("/ciudades", listarCiudades);
 
-// Departamentos (Bolivia) - ruta nueva
-router.get("/departamentos", listarDepartamentos);
+// Departamentos (Bolivia)
+router.get("/departamentos", (req, res) => {
+  console.log("🔍 Procesando petición GET /departamentos");
+  return listarDepartamentos(req, res);
+});
 
 // Especialidades
-router.get("/especialidades", listarEspecialidades);
+router.get("/especialidades", (req, res) => {
+  console.log("🔍 Procesando petición GET /especialidades");
+  return listarEspecialidades(req, res);
+});
 
 // Usuarios por ciudad
 // http://localhost:5000/api/borbotones/filtros/usuarios/ciudad?ciudad=cochabamba

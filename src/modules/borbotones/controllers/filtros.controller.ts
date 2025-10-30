@@ -105,13 +105,20 @@ export const listarCiudades = async (req: Request, res: Response) => {
 };
 
 /* =======================================================
- *  Listado de DEPARTAMENTOS (Bolivia)
+ *  Listado de DEPARTAMENTOS (Bolivia)
  * ======================================================= */
 export const listarDepartamentos = async (_req: Request, res: Response) => {
+  console.log("📋 Ejecutando listarDepartamentos");
   try {
-    res.json({ success: true, total: boliviaDepartments.length, data: boliviaDepartments });
+    const response = {
+      success: true,
+      total: boliviaDepartments.length,
+      data: boliviaDepartments
+    };
+    console.log("✅ Respuesta:", response);
+    res.json(response);
   } catch (err: any) {
-    console.error("Error en /departamentos:", err);
+    console.error("❌ Error en /departamentos:", err);
     res.status(500).json({ success: false, message: err?.message ?? "Error interno" });
   }
 };
