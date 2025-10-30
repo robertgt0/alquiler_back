@@ -24,6 +24,9 @@ import usersRouter from './modules/borbotones/routes/users.router';
 // ============================================
 // 🔹 Cargar variables de entorno
 // ============================================
+
+import routesDevcode from "./modules/DevCode/routes"
+// Cargar variables de entorno
 dotenv.config();
 
 // ============================================
@@ -63,6 +66,7 @@ app.use((req, res, next) => {
 // ============================================
 // 🔹 Ruta raíz de prueba
 // ============================================
+// Ruta raíz
 app.get('/', (req: Request, res: Response) => {
   res.json({
     message: 'API Backend',
@@ -111,8 +115,17 @@ app.get('/api/health', (_req: Request, res: Response) => {
   });
 });
 
+
+// MONTAR MÓDULOS/GRUPOS AQUÍ
 // ============================================
-// ⚠️ Middleware para rutas no encontradas
+// Montar tus módulos aquí:
+
+// app.use('/api/nombre_grupo_ejemplo', nombreGrupoEjemploRouter);
+
+// ROUTES DEVCODE
+app.use('/api/devcode', routesDevcode)
+// ============================================
+// Manejo de errores 404
 // ============================================
 app.use((req: Request, res: Response) => {
   res.status(404).json({
