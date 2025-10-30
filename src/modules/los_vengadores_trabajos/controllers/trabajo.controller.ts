@@ -1,31 +1,44 @@
-// src/modules/los_vengadores_trabajos/controllers/trabajo.controller.ts
-import { Request, Response, NextFunction } from 'express';
-import { getTrabajosProveedorService, getTrabajosClienteService } from '../services/trabajo.service';
-import { TrabajoStatus } from '../models/trabajo.model';
+import { Request, Response } from "express";
+import {crearTrabajo,obtenerTrabajos, obtenerTrabajoPorId, eliminarTrabajo} from "../services/trabajo.service";
 
-export const getTrabajosProveedor = async (req: Request, res: Response, next: NextFunction) => {
+// Crear nuevo trabajo
+export const crearTrabajoController = async (req: Request, res: Response) => {
   try {
-    
-    const proveedorId = 'proveedor_123'; //id que con consida con losd atos falsos
-    const estado = req.query.estado as string | undefined;
-
-    const trabajos = await getTrabajosProveedorService(proveedorId, estado);
-    res.json(trabajos);
-  } catch (err) {
-    next(err);
+    const trabajo = await crearTrabajo(req.body);
+    res.status(201).json(trabajo);
+  } catch (error: any) {
+    res.status(500).json({ message: "Error al crear trabajo", error: error.message });
   }
 };
 
-// controlador para la HU 1.8 (Vista del Cliente)
-export const getTrabajosCliente = async (req: Request, res: Response, next: NextFunction) => {
+// Obtener todos los trabajos
+export const obtenerTrabajosController = async (req: Request, res: Response) => {
   try {
-    // Tomamos el ID del cliente 
-    const { clienteId } = req.params;
-    const estado = req.query.estado as TrabajoStatus | undefined;
-
-    const trabajos = await getTrabajosClienteService(clienteId, estado);
+    const trabajos = await obtenerTrabajos();
     res.json(trabajos);
-  } catch (err) {
-    next(err);
+  } catch (error: any) {
+    res.status(500).json({ message: "Error al obtener trabajos", error: error.message });
+  }
+};
+
+// Obtener trabajo por ID
+export const obtenerTrabajoPorIdController = async (req: Request, res: Response) => {
+  try {
+    const trabajo = await obtenerTrabajoPorId(req.params.id);
+    if (!trabajo) return res.status(404).json({ message: "Trabajo no encontrado" });
+    res.json(trabajo);
+  } catch (error: any) {
+    res.status(500).json({ message: "Error al obtener trabajo", error: error.message });
+  }
+};
+
+// Eliminar trabajo
+export const eliminarTrabajoController = async (req: Request, res: Response) => {
+  try {
+    const trabajoEliminado = await eliminarTrabajo(req.params.id);
+    if (!trabajoEliminado) return res.status(404).json({ message: "Trabajo no encontrado" });
+    res.json({ message: "Trabajo eliminado correctamente" });
+  } catch (error: any) {
+    res.status(500).json({ message: "Error al eliminar trabajo", error: error.message });
   }
 };

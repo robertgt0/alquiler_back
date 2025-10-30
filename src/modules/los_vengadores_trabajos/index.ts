@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import trabajoRoutes from './routes/trabajo.routes';
-import disponibilidad from './routes/calendario-disponibilidad.routes';
-import horarioRouter from './routes/horario.routes';
-
+import trabajoRoutes from "./routes/trabajo.routes";
+import horarioRoutes from "./routes/horario_disponible.routes";
+import clienteRoutes from "./routes/cliente.routes";
+import proveedorRoutes from "./routes/proveedor.routes";
 const router = Router();
 
 router.get('/', (req, res) => {
@@ -11,17 +11,18 @@ router.get('/', (req, res) => {
     version: '1.0.0',
     description: 'Endpoints para listar trabajos agendados y horarios.',
     endpoints: {
-      proveedor: '/api/vengadores/trabajos/proveedor',
-      cliente: '/api/vengadores/trabajos/cliente/:clienteId',
-      calendarioDisponibilidad: '/api/los_vengadores/calendario-disponibilidad',
-      horarios: '/api/los_vengadores/horarios'
+      trabajos: "/trabajos",
+      horarios: "/horarios",
+      clientes: "/clientes",
+      proveedores: "/proveedores"
     }
   });
 });
 
 // Montar rutas
-router.use('/', trabajoRoutes);
-router.use('/calendario-disponibilidad', disponibilidad);
-router.use("/horarios", horarioRouter);
+router.use("/trabajos", trabajoRoutes);         // crear y eliminar trabajos
+router.use("/horarios", horarioRoutes);         // crear o modificar horarios disponibles
+router.use("/clientes", clienteRoutes);         // recuperar información de clientes
+router.use("/proveedores", proveedorRoutes);   // recuperar información de proveedores
 
 export default router;
