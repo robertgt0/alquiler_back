@@ -57,9 +57,11 @@ export class ProveedorController {
       });
 
     } catch (error) {
-      return res.status(500).json({
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    
+      return res.status(400).json({ // 🟢 ¡Cambiado de 500 a 400!
         mensaje: 'Error al guardar el horario laboral',
-        error: error instanceof Error ? error.message : 'Error desconocido'
+        error: errorMessage
       });
     }
   }
