@@ -1,33 +1,51 @@
-// src/modules/los_vengadores_trabajos/models/trabajo.model.ts
+import mongoose, { Schema, Document } from "mongoose";
 
-// ahora este tipo se puede importar desde otros archivos.
-export type TrabajoStatus = 'Pendiente' | 'Confirmado' | 'Cancelado' | 'Terminado';
-
-// Esta es la estructura que nuestra API devolverá al frontend
-export interface ITrabajoCompleto {
-  _id: string;
-  proveedor: {
-    nombre: string;
-    id: string;
-  };
-  cliente: {
-    nombre: string;
-    id: string;
-  };
+export interface ITrabajo extends Document {
+  id_cliente: mongoose.Schema.Types.ObjectId;
+  id_proveedor: mongoose.Schema.Types.ObjectId;
   fecha: string;
-  horaInicio: string;
-  horaFin: string;
-  servicio?: string;
-  estado: TrabajoStatus; // ahora puede usar el tipo reutilizable
+  servicio: string;
+  hora_inicio: string;
+  hora_fin: string;
+  costo: number;
+  descripcion_trabajo: string;
+  estado: string;
+  numero_estrellas?: number;
+  comentario_calificacion?: string;
+  ubicacion?: string;
+  justificacion_cancelacion?: string;
+  cancelado_por?: string;
 }
 
-// esta es la estructura de como se guarda en la base de datos
-export interface ITrabajoSolicitado {
-  _id: string;
-  id_proveedor: string;
-  id_cliente: string;
-  fecha: string;
-  horaInicio: string;
-  horaFin: string;
-  estado: TrabajoStatus; // ahora puede usar el tipo reutilizable
-}
+const TrabajoSchema = new Schema<ITrabajo>({
+  id_cliente: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Cliente", // referencia al modelo Cliente
+    required: true
+  },
+  id_proveedor: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Proveedor", // referencia al modelo Proveedor
+    required: true
+  },
+  fecha: { type: String, required: true },
+  servicio:{type: String, required: true},
+  hora_inicio: { type: String, required: true },
+  hora_fin: { type: String, required: true },
+  costo: { type: Number, required: true },
+  descripcion_trabajo: { type: String, required: true },
+  estado: {
+    type: String,
+    enum: ["pendiente", "en_proceso", "completado", "cancelado"],
+    default: "pendiente"
+  },
+  numero_estrellas: { type: Number, min: 1, max: 5 },
+  comentario_calificacion: { type: String },
+  ubicacion: { type: String },
+  justificacion_cancelacion: { type: String },
+  cancelado_por: { type: String } // puede ser "cliente" o "proveedor"
+}, { timestamps: true });
+
+const TrabajoModel = mongoose.model<ITrabajo>("Trabajo", TrabajoSchema);
+
+export default TrabajoModel;

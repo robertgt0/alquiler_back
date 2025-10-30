@@ -1,15 +1,15 @@
-// src/modules/los_vengadores_trabajos/services/trabajo.service.ts
-import { ITrabajoCompleto, ITrabajoSolicitado } from '../models/trabajo.model';
+import TrabajoModel from "../models/trabajo.model";
+import ClienteModel from "../models/cliente.model";
+import ProveedorModel from "../models/proveedor.model";
 
-// --- NUESTRAS BASES DE DATOS FALSAS QUE SIMULAN LAS COLECCIONES hasta que hagan la bd oficial ---
+export const crearTrabajo = async (data: any) => {
+  const cliente = await ClienteModel.findById(data.id_cliente);
+  const proveedor = await ProveedorModel.findById(data.id_proveedor);
 
-// 1. coleccion de Proveedores (datos simulados)
-const mockProveedores = [
-  { _id: "proveedor_123", nombre: "Juan Perez", profesion: "Electricista" },
-  { _id: "proveedor_456", nombre: "Maria Rojas", profesion: "Plomeria" },
-  { _id: "proveedor_789", nombre: "Sergio Romero", profesion: "Cerrajería" },
-];
+  if (!cliente) throw new Error("El cliente no existe");
+  if (!proveedor) throw new Error("El proveedor no existe");
 
+<<<<<<< HEAD
 // 2. coleccion de Clientes (datos simulados)
 const mockClientes = [
   { _id: "cliente_abc", nombre: "Ana Garcia" },
@@ -51,35 +51,35 @@ export const getTrabajosProveedorService = async (proveedorId: string, estado?: 
       servicio: proveedorInfo.profesion, // usamos la profesion como el servicio
       estado: trabajo.estado
     };
+=======
+  // Evitar trabajos duplicados el mismo día
+  const existeTrabajo = await TrabajoModel.findOne({
+    id_cliente: data.id_cliente,
+    id_proveedor: data.id_proveedor,
+    fecha: data.fecha
+>>>>>>> 34ec0f82b309f8187f1ec70c35f8ba0c12c8006e
   });
+  if (existeTrabajo) throw new Error("Ya existe un trabajo entre este cliente y proveedor en esa fecha");
 
-  return trabajosCompletos;
+  const nuevoTrabajo = new TrabajoModel(data);
+  return await nuevoTrabajo.save();
 };
 
-// logica para obtener trabajos de un CLIENTE
-export const getTrabajosClienteService = async (clienteId: string, estado?: string): Promise<ITrabajoCompleto[]> => {
-  // 1. filtramos los trabajos por el ID del cliente y opcionalmente por estado
-  let trabajosFiltrados = mockTrabajosSolicitados.filter(t => t.id_cliente === clienteId);
-  if (estado) {
-    trabajosFiltrados = trabajosFiltrados.filter(t => t.estado === estado);
-  }
+export const obtenerTrabajos = async () => {
+  return await TrabajoModel.find()
+    .populate("id_cliente", "nombre email")
+    .populate("id_proveedor", "nombre email")
+    .sort({ createdAt: -1 });
+};
 
-  // 2. unimos los datos
-  const trabajosCompletos = trabajosFiltrados.map(trabajo => {
-    const proveedorInfo = mockProveedores.find(p => p._id === trabajo.id_proveedor)!;
-    const clienteInfo = mockClientes.find(c => c._id === trabajo.id_cliente)!;
+// Obtener un trabajo por ID
+export const obtenerTrabajoPorId = async (id: string) => {
+  return await TrabajoModel.findById(id)
+    .populate("id_cliente", "nombre email")
+    .populate("id_proveedor", "nombre email");
+};
 
-    return {
-      _id: trabajo._id,
-      proveedor: { id: proveedorInfo._id, nombre: proveedorInfo.nombre },
-      cliente: { id: clienteInfo._id, nombre: clienteInfo.nombre },
-      fecha: trabajo.fecha,
-      horaInicio: trabajo.horaInicio,
-      horaFin: trabajo.horaFin,
-      servicio: proveedorInfo.profesion,
-      estado: trabajo.estado
-    };
-  });
-
-  return trabajosCompletos;
+// Eliminar un trabajo
+export const eliminarTrabajo = async (id: string) => {
+  return await TrabajoModel.findByIdAndDelete(id);
 };

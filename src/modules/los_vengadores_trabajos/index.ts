@@ -1,24 +1,28 @@
-// src/modules/los_vengadores_trabajos/index.ts
-
 import { Router } from 'express';
-import trabajoRoutes from './routes/trabajo.routes';
-
+import trabajoRoutes from "./routes/trabajo.routes";
+import horarioRoutes from "./routes/horario_disponible.routes";
+import clienteRoutes from "./routes/cliente.routes";
+import proveedorRoutes from "./routes/proveedor.routes";
 const router = Router();
 
-// Ruta de bienvenida/informativa para el modulo de trabajos
 router.get('/', (req, res) => {
   res.json({
     message: '📦 Módulo de Trabajos - Los Vengadores',
     version: '1.0.0',
-    description: 'Endpoints para listar trabajos agendados para proveedores y clientes.',
+    description: 'Endpoints para listar trabajos agendados y horarios.',
     endpoints: {
-      proveedor: '/api/vengadores/trabajos/proveedor',
-      cliente: '/api/vengadores/trabajos/cliente/:clienteId'
+      trabajos: "/trabajos",
+      horarios: "/horarios",
+      clientes: "/clientes",
+      proveedores: "/proveedores"
     }
   });
 });
 
-// Montar las sub-rutas funcionales del modulo (las que creamos)
-router.use('/', trabajoRoutes);
+// Montar rutas
+router.use("/trabajos", trabajoRoutes);         // crear y eliminar trabajos
+router.use("/horarios", horarioRoutes);         // crear o modificar horarios disponibles
+router.use("/clientes", clienteRoutes);         // recuperar información de clientes
+router.use("/proveedores", proveedorRoutes);   // recuperar información de proveedores
 
 export default router;
