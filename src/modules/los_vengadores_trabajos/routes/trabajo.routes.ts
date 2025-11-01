@@ -1,12 +1,13 @@
 import { Router } from "express";
 import {crearTrabajoController, obtenerTrabajosController, obtenerTrabajoPorIdController, eliminarTrabajoController,obtenerTrabajoProveedorController} from "../controllers/trabajo.controller";
-
+import {cancelarTrabajoProveedorController} from "../controllers/trabajo.controller";
 const router = Router();
 
 
 //obtener detalles del trabajo para el proveedor
-router.get("/detalle/proveedor/:id", obtenerTrabajoProveedorController);
-
+router.get("/detalles/proveedor/:id", obtenerTrabajoProveedorController);
+//cancelar trabajo por el proveedor
+router.put("/cancelar/proveedor/:trabajoId", cancelarTrabajoProveedorController);
 
 // Crear nuevo trabajo
 router.post("/", crearTrabajoController);
