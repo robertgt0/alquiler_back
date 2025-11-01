@@ -3,6 +3,8 @@ import { ApiResponse } from "@/types";
 import { TokenResponse } from "../types/token.types";
 import { AuthService} from "../services/auth.service";
 import { handleError } from "../errors/errorHandler";
+import { JWTPayload } from "../types/auth.types";
+import teamsysService from "../services/teamsys.service";
 
 export class AuthController {
   private authService: AuthService;
@@ -42,8 +44,16 @@ export class AuthController {
     }
   }
 
-  getCurrentUser() {
-    
+  getCurrentUser = async (req: Request, res: Response): Promise<void> => {
+    const { email, userId } = req.user as JWTPayload;
+
+    const user = await teamsysService.getById(userId);
+
+    res.status(200).json({
+        success: true,
+        data: user,
+        message: 'Usuario recuperado correctamente!',
+    });
   }
 }
 
