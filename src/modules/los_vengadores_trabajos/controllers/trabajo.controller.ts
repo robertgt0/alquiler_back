@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import {crearTrabajo,obtenerTrabajos, obtenerTrabajoPorId, eliminarTrabajo} from "../services/trabajo.service";
-import { DetallesTrabajo, CancelacionTrabajoPorProveedor } from "../services/cancelar-trabajo.service";
+import { DetallesTrabajo, CancelacionTrabajoPorProveedor,TerminarTrabajo} from "../services/cancelar-trabajo.service";
 // Crear nuevo trabajo
 export const crearTrabajoController = async (req: Request, res: Response) => {
   try {
@@ -79,11 +79,33 @@ export const cancelarTrabajoProveedorController = async (req: Request, res: Resp
 
     //Mensaje de confirmación al frontend
     res.json({
-      mensaje: "Tu cancelación ha sido enviada correctamente.",
+      mensaje: "Tu cancelación ha sido enviada al proveedor correctamente.",
     });
 
   } catch (error: any) {
     console.error("Error al cancelar trabajo:", error);
     res.status(500).json({ mensaje: "Error al procesar la cancelación.", error: error.message });
+  }
+};
+//terminar un trabajo
+export const TerminarTrabajoController = async (req: Request, res: Response) => {
+  try {
+    const { trabajoId } = req.params;
+
+    const trabajoTerminado = await TerminarTrabajo.marcarComoTerminado(trabajoId);
+
+    if (!trabajoTerminado) {
+      return res.status(404).json({ mensaje: "Trabajo no encontrado." });
+    }
+
+    res.json({
+      mensaje: "El trabajo ha sido marcado como terminado correctamente."
+    });
+  } catch (error: any) {
+    console.error("Error al finalizar trabajo:", error);
+    res.status(500).json({
+      mensaje: "Error al marcar el trabajo como terminado.",
+      error: error.message
+    });
   }
 };
