@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import {crearTrabajo,obtenerTrabajos, obtenerTrabajoPorId, eliminarTrabajo} from "../services/trabajo.service";
-import { DetallesTrabajo } from "../services/cancelar-trabajo.service";
+import { DetallesTrabajo, CancelacionTrabajoPorProveedor } from "../services/cancelar-trabajo.service";
 // Crear nuevo trabajo
 export const crearTrabajoController = async (req: Request, res: Response) => {
   try {
@@ -60,5 +60,30 @@ export const eliminarTrabajoController = async (req: Request, res: Response) => 
       message: "Error al obtener detalles del trabajo",
       error: error.message,
     });
+  }
+};
+export const cancelarTrabajoProveedorController = async (req: Request, res: Response) => {
+  try {
+    const { trabajoId } = req.params;
+    const { justificacion } = req.body;
+
+    if (!justificacion || justificacion.trim() === "") {
+      return res.status(400).json({ mensaje: "Debe ingresar una justificación antes de cancelar." });
+    }
+
+    const trabajoCancelado = await CancelacionTrabajoPorProveedor.cancelarTrabajo(trabajoId, justificacion);
+
+    if (!trabajoCancelado) {
+      return res.status(404).json({ mensaje: "Trabajo no encontrado." });
+    }
+
+    //Mensaje de confirmación al frontend
+    res.json({
+      mensaje: "Tu cancelación ha sido enviada correctamente.",
+    });
+
+  } catch (error: any) {
+    console.error("Error al cancelar trabajo:", error);
+    res.status(500).json({ mensaje: "Error al procesar la cancelación.", error: error.message });
   }
 };
