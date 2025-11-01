@@ -2,14 +2,14 @@ import { Request, Response, NextFunction } from 'express';
 import { CrearUsuarioDto } from '../types';
 import { limpiarInput, validarPassword, validarCorreoElectronico } from '../utils/validaciones';
 
-export const validateData = (req: Request, res: Response, next: NextFunction): void => {
+export const validateData = async (req: Request, res: Response, next: NextFunction): void => {
   
   try{
   const { nombre, correo, telefono, password, terminosYCondiciones }: CrearUsuarioDto = limpiarInput(req.body)as CrearUsuarioDto;
   
   const nombreValido = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{2,50}$/;
   const telefonoValido = /^[1-9][0-9]{7}$/;
-  const correoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+//  const correoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   if (!nombre || typeof nombre !== 'string' || !nombreValido.test(nombre)) {
     res.status(400).json({ success: false, message: 'El campo nombre es requerido y debe ser texto y debe tener entre 2 y 50 letras' });
@@ -26,7 +26,7 @@ export const validateData = (req: Request, res: Response, next: NextFunction): v
   return;
   }
 
-  if (!correoElectronico || typeof correoElectronico !== 'string') {
+  if (!correo || typeof correo !== 'string') {
     res.status(400).json({ success: false, message: 'El correo electrónico es requerido y debe ser texto' });
     return;
   }
@@ -36,7 +36,7 @@ export const validateData = (req: Request, res: Response, next: NextFunction): v
     return;
   }}
 
-  const correoValido = await validarCorreoElectronico(correoElectronico);
+  const correoValido = await validarCorreoElectronico(correo);
   if (!correoValido) {
     res.status(400).json({ success: false, message: 'El correo electrónico no tiene un formato válido' });
     return;
@@ -44,7 +44,7 @@ export const validateData = (req: Request, res: Response, next: NextFunction): v
 
   if (!telefono || typeof telefono !== 'string') {
     res.status(400).json({ success: false, message: 'El teléfono es requerido y debe ser texto' });
-    return;g
+    return;
   }
 
   if (!/^\d{8}$/.test(telefono)) {
@@ -55,18 +55,18 @@ export const validateData = (req: Request, res: Response, next: NextFunction): v
   if (!password || typeof password !== 'string') {
     res.status(400).json({ success: false, message: 'La contraseña es requerida y debe ser texto' });
     return;
-  }}
+  }
 
   if (!validarPassword(password)) {
     res.status(400).json({ success: false, message: 'La contraseña no cumple con los requisitos de seguridad' });
     return;
-  
+  }
 
   if (terminosYCondiciones !== true) {
     res.status(400).json({ success: false, message: 'Debes aceptar los términos y condiciones' });
     return;
   }
-  }catch(e){
+}catch(e){
     res.status(400).json({ success: false, message: 'modelo de usaurio no valido' });
     return;
   }

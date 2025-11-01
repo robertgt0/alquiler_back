@@ -1,7 +1,12 @@
 import { Request, Response } from 'express';
 import teamsysService from '../services/teamsys.service';
+import { SessionService } from '../services/session.service';
 import { ApiResponse, UsuarioDocument } from '../types/index';
 import { handleError } from '../errors/errorHandler';
+import { AuthService } from '../services/auth.service';
+
+const sessionService = new SessionService();
+const authService = new AuthService();
 
 /*obtener todos los registros de usuario */
 export const getAll = async (req: Request, res: Response): Promise<void> => {
@@ -61,12 +66,23 @@ export const getById = async (req: Request, res: Response): Promise<void> => {
 */
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
-    const data = await teamsysService.create(req.body);
-    const response: ApiResponse<UsuarioDocument> = {
+    const user = await teamsysService.create(req.body);
+
+    const userAgent = req.headers['user-agent'] || 'Unknown';
+    const ip = (req.ip || req.socket.remoteAddress || 'Unknown').replace('::ffff:', '');
+    const { accessToken, refreshToken } = authService.generateTokens(user);
+    const result = await sessionService.create(user.id, userAgent, ip, accessToken, refreshToken);
+
+    const response: ApiResponse<{accessToken: string, refreshToken: string, user: UsuarioDocument}> = {
       success: true,
-      data,
-      message: 'Registro creado exitosamente'
+      message: 'Registro creado exitosamente',
+      data: {
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        user: user,
+      },
     };
+
     res.status(201).json(response);
   } catch (error) {
     handleError(error, res);
@@ -123,6 +139,7 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
 export const registerUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const data = req.body;
+
     const nuevoUsuario = await teamsysService.create(data);
     res.status(201).json({
       success: true,
@@ -160,10 +177,22 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    // registarr en sessions
+    const userAgent = req.headers['user-agent'] || 'Unknown';
+    const ip = (req.ip || req.socket.remoteAddress || 'Unknown').replace('::ffff:', '');
+
+    // datos generados para test
+    const { accessToken, refreshToken } = authService.generateTokens(usuario);
+    await sessionService.create(usuario.id, userAgent, ip, accessToken, refreshToken);
+
     res.json({
       success: true,
       message: 'Inicio de sesión exitoso',
-      data: usuario,
+      data: {
+        accessToken,
+        refreshToken,
+        usuaer: usuario,
+      }
     });
   } catch (error) {
     handleError(error, res);

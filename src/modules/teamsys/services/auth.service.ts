@@ -4,6 +4,7 @@ import { UsuarioDocument, CrearUsuarioDto } from "../types";
 import { AuthTokens, GoogleTokenResponse, GoogleUserProfile, JWTPayload } from "../types/auth.types";
 import { TokenResponse } from "../types/token.types";
 import teamsysService from '../services/teamsys.service';
+import mongoose from "mongoose";
 
 export class AuthService  {
     private readonly googleTokenUrl = "https://oauth2.googleapis.com/token";
@@ -85,14 +86,22 @@ export class AuthService  {
     generateTokens(user: UsuarioDocument): AuthTokens {
         console.log({user})
         const payload: JWTPayload = {
-            userId: user._id.toString(),
-            email: user.correo,
+            userId: (user._id as mongoose.Types.ObjectId).toString(),
+            email: user.correo, 
         }
-        
+
         const accessToken = this.generateAccessToken(payload);
         const refreshToken = this.generateRefreshToken(payload);
 
         return { accessToken, refreshToken };
+    }
+
+    verifyAccessToken(token: string): JWTPayload {
+        try {
+            return jwt.verify(token, this.jwtSecret) as JWTPayload;
+        } catch (error) {
+            throw new Error('Invalid or expired access token');
+        }
     }
 
     async loginWithGoogle(code: string): Promise<{user: any}> {
@@ -111,6 +120,7 @@ export class AuthService  {
                 nombre: profile.given_name,
                 correo: profile.email,
                 fotoPerfil: profile.picture,
+                telefono: '121515454545'
                 // terminosYCondiciones: true
             }
         }

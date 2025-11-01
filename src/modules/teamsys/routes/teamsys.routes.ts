@@ -10,8 +10,8 @@ import {
 import { validateData } from '../middlewares/validate.middleware';
 import { authController } from '../controllers/auth.controller';
 import { registerUser, loginUser } from '../controllers/teamsys.controller';
-import { UsuarioService } from '../services/teamsys.service';
-
+import { sessionController } from '../controllers/session.controller';
+import { authMiddleware } from '../middlewares/auth.middleware';
 
 const router = Router();
 
@@ -30,10 +30,19 @@ router.delete('/usuario/:id', remove);
 router.post('/auth/register', validateData, registerUser);
 router.post('/auth/login', loginUser);
 router.get('/exists', existsByEmail);
+
 /**
  * Auth routes
  */
 router.post("/google/callback", authController.googleCallback);
-router.get("/me", authController.getCurrentUser);
+router.get("/me", authMiddleware, authController.getCurrentUser);
+
+
+/**
+ * sessions routes
+ */
+router.get("/sessions/user/:userId", authMiddleware, sessionController.getSessionsByUserId);
+router.delete("/sessions/:sessionId/", authMiddleware, sessionController.deleteSession);
+router.delete("/sessions/user/all-except-current", authMiddleware, sessionController.deleteAllSessionsExceptCurrent);
 
 export default router;
