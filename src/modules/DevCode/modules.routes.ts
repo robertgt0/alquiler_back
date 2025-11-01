@@ -1,7 +1,7 @@
 import { Router } from "express";
 
 import availabilityRoutes from "./routes/availability.routes";
-import providersRoutes from "./routes/providers.routes";
+import providersRoutes from "./routes/proveedor.routes";
 import appointmentsRoutes from "./routes/appointments.routes"; 
 
 const router = Router();
