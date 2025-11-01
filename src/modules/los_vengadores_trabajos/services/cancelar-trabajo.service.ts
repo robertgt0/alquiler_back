@@ -63,3 +63,16 @@ export class CancelacionTrabajoPorProveedor {
     return trabajo;
   }
 }
+
+export class TerminarTrabajo {
+  static async marcarComoTerminado(trabajoId: string) {
+    const trabajo = await TrabajoModel.findById(trabajoId);
+
+    if (!trabajo) return null;
+
+    trabajo.estado = "completado"; // cambia solo el estado
+
+    await trabajo.save();
+    return trabajo;
+  }
+}
