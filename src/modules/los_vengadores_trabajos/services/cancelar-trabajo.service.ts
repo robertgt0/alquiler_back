@@ -47,3 +47,19 @@ export class DetallesTrabajo {
         }
     }
 }
+
+export class CancelacionTrabajoPorProveedor {
+  static async cancelarTrabajo(trabajoId: string, justificacion: string) {
+    const trabajo = await TrabajoModel.findById(trabajoId)
+   .populate<{ id_proveedor: { nombre: string } }>("id_proveedor", "nombre -_id");
+
+    if (!trabajo) return null;
+
+    trabajo.estado = "cancelado";
+    trabajo.justificacion_cancelacion = justificacion;
+    trabajo.cancelado_por = "Cancelado por " + trabajo.id_proveedor.nombre;
+
+    await trabajo.save();
+    return trabajo;
+  }
+}
