@@ -1,7 +1,11 @@
 import { Router } from "express";
-import {crearTrabajoController, obtenerTrabajosController, obtenerTrabajoPorIdController, eliminarTrabajoController} from "../controllers/trabajo.controller";
+import {crearTrabajoController, obtenerTrabajosController, obtenerTrabajoPorIdController, eliminarTrabajoController,obtenerTrabajoProveedorController} from "../controllers/trabajo.controller";
 
 const router = Router();
+
+
+//obtener detalles del trabajo para el proveedor
+router.get("/detalle/proveedor/:id", obtenerTrabajoProveedorController);
 
 
 // Crear nuevo trabajo
