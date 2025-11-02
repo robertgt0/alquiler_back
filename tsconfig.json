@@ -1,47 +1,36 @@
 {
   "compilerOptions": {
-    /* === Salida y estructura === */
     "outDir": "./dist",
     "rootDir": "./src",
     "sourceMap": true,
-    "declaration": false,                 // No generar .d.ts para evitar ruido
+    "declaration": false,
     "removeComments": true,
-
-    /* === Módulos y compatibilidad === */
-    "target": "ES2022",                   // Mejor rendimiento y soporte moderno
-    "module": "NodeNext",                 // Recomendado para Node 18+ / 20+
-    "moduleResolution": "NodeNext",       // Compatible con imports ESM/CommonJS
-    "lib": ["ES2022", "DOM"],             // DOM opcional por si usas fetch u otras APIs
-
-    /* === Comportamiento del compilador === */
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "lib": ["ES2022", "DOM"],
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-
-    /* === Imports === */
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
-
-    /* === Alias === */
     "baseUrl": "./src",
     "paths": {
       "@/*": ["*"],
       "@config/*": ["config/*"],
       "@modules/*": ["modules/*"],
-      "@controllers/*": ["modules/*/controllers/*"],
-      "@services/*": ["modules/*/services/*"],
-      "@models/*": ["modules/*/models/*"],
+      "@controllers/*": ["modules/DevCode/controllers/*"],
+      "@services/*": ["modules/DevCode/services/*"],
+      "@models/*": ["modules/DevCode/models/*"],
       "@utils/*": ["utils/*"]
     },
-
-    /* === Nueva opción para desarrolladores === */
-    "allowImportingTsExtensions": true,   // Útil con moduleResolution NodeNext
-    "noUncheckedIndexedAccess": false,    // Puedes activarlo para aún más seguridad
-    "incremental": true                   // Compilación incremental más rápida
+    "allowImportingTsExtensions": false,
+    "noUncheckedIndexedAccess": false,
+    "incremental": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }
