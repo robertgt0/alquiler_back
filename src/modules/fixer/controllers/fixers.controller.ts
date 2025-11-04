@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
-import service, { PaymentAccount, PaymentMethod } from "../services/fixers.service";
+import service from "../services/fixers.service";
+import type { PaymentAccount, PaymentMethod } from "../models/Fixer";
 
 const ALLOWED_PAYMENTS: PaymentMethod[] = ["card", "qr", "cash"];
 
@@ -52,7 +53,10 @@ function normalizePaymentMethods(raw: any): PaymentMethod[] {
   return Array.from(new Set(methods));
 }
 
-function normalizeAccounts(raw: any, methods: PaymentMethod[]): Partial<Record<PaymentMethod, PaymentAccount>> {
+function normalizeAccounts(
+  raw: any,
+  methods: PaymentMethod[]
+): Partial<Record<PaymentMethod, PaymentAccount>> {
   if (!raw) return {};
   const out: Partial<Record<PaymentMethod, PaymentAccount>> = {};
 
@@ -68,11 +72,11 @@ function normalizeAccounts(raw: any, methods: PaymentMethod[]): Partial<Record<P
   return out;
 }
 
-export const checkCI = (req: Request, res: Response) => {
+export const checkCI = async (req: Request, res: Response) => {
   try {
     const ci = normalizeCI(req.query.ci);
     const excludeId = req.query.excludeId ? String(req.query.excludeId) : undefined;
-    const unique = service.isCIUnique(ci, excludeId);
+    const unique = await service.isCIUnique(ci, excludeId);
     if (!unique) {
       return res.json({ success: true, unique: false, message: "Este C.I. ya esta registrado" });
     }
@@ -82,15 +86,18 @@ export const checkCI = (req: Request, res: Response) => {
   }
 };
 
-export const createFixer = (req: Request, res: Response) => {
+export const createFixer = async (req: Request, res: Response) => {
   try {
     const { userId } = req.body || {};
     if (!userId) {
       return res.status(400).json({ success: false, message: "userId requerido" });
     }
 
+    const userIdStr = String(userId);
     const ci = normalizeCI(req.body?.ci);
-    if (!service.isCIUnique(ci)) {
+    const existingFixer = await service.getByUserId(userIdStr);
+    const ciUnique = await service.isCIUnique(ci, existingFixer?.id);
+    if (!ciUnique) {
       return res.status(400).json({ success: false, message: "Este C.I. ya esta registrado" });
     }
 
@@ -99,31 +106,42 @@ export const createFixer = (req: Request, res: Response) => {
     const methods = normalizePaymentMethods(req.body?.paymentMethods);
     const accounts = normalizeAccounts(req.body?.paymentAccounts, methods);
 
-    const created = service.create({
-      userId: String(userId),
+    const termsAcceptedValue =
+      req.body?.termsAccepted === undefined ? undefined : Boolean(req.body?.termsAccepted);
+
+    const created = await service.create({
+      userId: userIdStr,
       ci,
       location,
       categories,
       paymentMethods: methods,
       paymentAccounts: accounts,
-      termsAccepted: Boolean(req.body?.termsAccepted),
+      termsAccepted: termsAcceptedValue,
+      name: typeof req.body?.name === "string" ? req.body.name.trim() || undefined : undefined,
+      city: typeof req.body?.city === "string" ? req.body.city.trim() || undefined : undefined,
+      photoUrl:
+        typeof req.body?.photoUrl === "string" ? req.body.photoUrl.trim() || undefined : undefined,
+      whatsapp:
+        typeof req.body?.whatsapp === "string" ? req.body.whatsapp.trim() || undefined : undefined,
+      bio: typeof req.body?.bio === "string" ? req.body.bio.trim() || undefined : undefined,
+      fixerId: existingFixer?.id,
     });
 
-    res.status(201).json({ success: true, data: created });
+    res.status(existingFixer ? 200 : 201).json({ success: true, data: created });
   } catch (err: any) {
     res.status(400).json({ success: false, message: String(err.message || "Error") });
   }
 };
 
-export const updateIdentity = (req: Request, res: Response) => {
+export const updateIdentity = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
     const ci = normalizeCI(req.body?.ci);
-    if (!service.isCIUnique(ci, id)) {
+    if (!(await service.isCIUnique(ci, id))) {
       return res.status(400).json({ success: false, message: "Este C.I. ya esta registrado" });
     }
 
-    const updated = service.update(id, { ci });
+    const updated = await service.update(id, { ci });
     if (!updated) return res.status(404).json({ success: false, message: "Fixer no encontrado" });
     res.json({ success: true, data: updated });
   } catch (err: any) {
@@ -131,9 +149,9 @@ export const updateIdentity = (req: Request, res: Response) => {
   }
 };
 
-export const getFixer = (req: Request, res: Response) => {
+export const getFixer = async (req: Request, res: Response) => {
   try {
-    const fixer = service.getById(req.params.id);
+    const fixer = await service.getById(req.params.id);
     if (!fixer) return res.status(404).json({ success: false, message: "Fixer no encontrado" });
     res.json({ success: true, data: fixer });
   } catch (err: any) {
@@ -141,13 +159,13 @@ export const getFixer = (req: Request, res: Response) => {
   }
 };
 
-export const updateLocation = (req: Request, res: Response) => {
+export const updateLocation = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
     const location = normalizeLocation(req.body);
     if (!location) return res.status(400).json({ success: false, message: "Ubicacion invalida" });
 
-    const updated = service.updateLocation(id, location);
+    const updated = await service.updateLocation(id, location);
     if (!updated) return res.status(404).json({ success: false, message: "Fixer no encontrado" });
     res.json({ success: true, data: updated });
   } catch (err: any) {
@@ -155,13 +173,13 @@ export const updateLocation = (req: Request, res: Response) => {
   }
 };
 
-export const updateCategories = (req: Request, res: Response) => {
+export const updateCategories = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
     const categories = normalizeCategories(req.body?.categories);
     if (!categories) return res.status(400).json({ success: false, message: "Categorias invalidas" });
 
-    const updated = service.updateCategories(id, categories);
+    const updated = await service.updateCategories(id, categories);
     if (!updated) return res.status(404).json({ success: false, message: "Fixer no encontrado" });
     res.json({ success: true, data: updated });
   } catch (err: any) {
@@ -169,7 +187,7 @@ export const updateCategories = (req: Request, res: Response) => {
   }
 };
 
-export const updatePayments = (req: Request, res: Response) => {
+export const updatePayments = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
     const methods = normalizePaymentMethods(req.body?.methods);
@@ -177,7 +195,7 @@ export const updatePayments = (req: Request, res: Response) => {
       return res.status(400).json({ success: false, message: "Debes elegir al menos un metodo de pago" });
     }
     const accounts = normalizeAccounts(req.body?.accounts, methods);
-    const updated = service.updatePaymentInfo(id, methods, accounts);
+    const updated = await service.updatePaymentInfo(id, methods, accounts);
     if (!updated) return res.status(404).json({ success: false, message: "Fixer no encontrado" });
     res.json({ success: true, data: updated });
   } catch (err: any) {
@@ -185,13 +203,13 @@ export const updatePayments = (req: Request, res: Response) => {
   }
 };
 
-export const acceptTerms = (req: Request, res: Response) => {
+export const acceptTerms = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
     const accepted = Boolean(req.body?.accepted);
     if (!accepted) return res.status(400).json({ success: false, message: "Debe aceptar los terminos" });
 
-    const updated = service.setTermsAccepted(id, true);
+    const updated = await service.setTermsAccepted(id, true);
     if (!updated) return res.status(404).json({ success: false, message: "Fixer no encontrado" });
     res.json({ success: true, data: updated });
   } catch (err: any) {

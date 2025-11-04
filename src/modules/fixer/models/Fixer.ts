@@ -1,14 +1,93 @@
-import { Schema, model, Types } from "mongoose";
+import { Schema, model, models, Document } from "mongoose";
 
-const LocationSchema = new Schema({
-  lat: { type: Number, required: true, min: -90, max: 90 },
-  lng: { type: Number, required: true, min: -180, max: 180 },
-  address: { type: String, trim: true, maxlength: 255 }
-}, { _id: false });
+export type PaymentMethod = "card" | "qr" | "cash";
 
-const FixerSchema = new Schema({
-  userId: { type: Types.ObjectId, ref: "User", required: true },
-  location: { type: LocationSchema, required: true }
-}, { timestamps: true });
+export type Location = {
+  lat: number;
+  lng: number;
+  address?: string;
+};
 
-export default model("Fixer", FixerSchema);
+export type PaymentAccount = {
+  holder: string;
+  accountNumber: string;
+};
+
+const LocationSchema = new Schema<Location>(
+  {
+    lat: { type: Number, required: true, min: -90, max: 90 },
+    lng: { type: Number, required: true, min: -180, max: 180 },
+    address: { type: String, trim: true, maxlength: 255 },
+  },
+  { _id: false }
+);
+
+const PaymentAccountSchema = new Schema<PaymentAccount>(
+  {
+    holder: { type: String, trim: true, maxlength: 120 },
+    accountNumber: { type: String, trim: true, maxlength: 40 },
+  },
+  { _id: false }
+);
+
+export interface FixerDoc extends Document {
+  fixerId: string;
+  userId: string;
+  ci: string;
+  name?: string;
+  city?: string;
+  photoUrl?: string;
+  whatsapp?: string;
+  bio?: string;
+  location?: Location;
+  categories: string[];
+  paymentMethods: PaymentMethod[];
+  paymentAccounts: Partial<Record<PaymentMethod, PaymentAccount>>;
+  termsAccepted: boolean;
+  jobsCount: number;
+  ratingAvg: number;
+  ratingCount: number;
+  memberSince?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const FixerSchema = new Schema<FixerDoc>(
+  {
+    fixerId: { type: String, required: true, unique: true, index: true },
+    userId: { type: String, required: true, index: true },
+    ci: { type: String, required: true, unique: true },
+    name: { type: String, trim: true, maxlength: 120 },
+    city: { type: String, trim: true, maxlength: 120 },
+    photoUrl: { type: String, trim: true },
+    whatsapp: { type: String, trim: true, maxlength: 32 },
+    bio: { type: String, trim: true, maxlength: 600 },
+    location: { type: LocationSchema, required: false },
+    categories: { type: [String], default: [] },
+    paymentMethods: {
+      type: [String],
+      enum: ["card", "qr", "cash"],
+      default: [],
+    },
+    paymentAccounts: {
+      type: Map,
+      of: PaymentAccountSchema,
+      default: {},
+    },
+    termsAccepted: { type: Boolean, default: false },
+    jobsCount: { type: Number, default: 0, min: 0 },
+    ratingAvg: { type: Number, default: 0, min: 0, max: 5 },
+    ratingCount: { type: Number, default: 0, min: 0 },
+    memberSince: { type: Date },
+  },
+  {
+    timestamps: true,
+    collection: "fixers",
+  }
+);
+
+FixerSchema.set("toJSON", { virtuals: true, versionKey: false });
+FixerSchema.set("toObject", { virtuals: true, versionKey: false });
+
+export const FixerModel = models.Fixer ?? model<FixerDoc>("Fixer", FixerSchema);
+

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import mongoose from 'mongoose';
 import { OfferModel } from '../models/Offer';
-import { seedOffers } from '../scripts/seed';
+import { seedAll } from '../scripts/seed';
 
 const router = Router();
 
@@ -69,7 +69,7 @@ router.get('/', async (req, res) => {
 
 router.get('/seed', async (_req, res) => {
   try {
-    const out = await seedOffers();
+    const out = await seedAll();
     res.json(out);
   } catch (e) {
     console.error(e);
