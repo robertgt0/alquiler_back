@@ -2,12 +2,87 @@ import { Request, Response } from 'express';
 import teamsysService from '../services/teamsys.service';
 import { ApiResponse} from '../types/index';
 import Usuario, { UserDocument } from '../models/teamsys';
-import { SessionService } from '../services/session.service';
 import { handleError } from '../errors/errorHandler';
-import { AuthService } from '../services/auth.service';
+import { authController } from './auth.controller';
 
-const sessionService = new SessionService();
-const authService = new AuthService();
+/* Endpoint de debug para Google Auth */
+export const debugGoogleAuth = async (req: Request, res: Response): Promise<void> => {
+  try {
+    console.log('🧪 ========= DEBUG ENDPOINT CALLED =========');
+    console.log('📝 Request body:', req.body);
+    console.log('🔑 Environment variables check:');
+    console.log('   GOOGLE_CLIENT_ID:', process.env.GOOGLE_CLIENT_ID ? '✅ SET' : '❌ MISSING');
+    console.log('   GOOGLE_CLIENT_SECRET:', process.env.GOOGLE_CLIENT_SECRET ? '✅ SET' : '❌ MISSING');
+    console.log('   GOOGLE_REDIRECT_URL:', process.env.GOOGLE_REDIRECT_URL);
+    console.log('   JWT_SECRET:', process.env.JWT_SECRET ? '✅ SET' : '❌ MISSING');
+    
+    res.json({
+      success: true,
+      message: 'Debug endpoint working',
+      env: {
+        clientId: !!process.env.GOOGLE_CLIENT_ID,
+        clientSecret: !!process.env.GOOGLE_CLIENT_SECRET,
+        redirectUrl: process.env.GOOGLE_REDIRECT_URL,
+        jwtSecret: !!process.env.JWT_SECRET
+      },
+      receivedBody: req.body,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('❌ Debug endpoint error:', error);
+    res.status(500).json({ 
+      success: false,
+      error: 'Debug failed',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+};
+
+/* Endpoint de test simple */
+export const testGoogleAuth = async (req: Request, res: Response): Promise<void> => {
+  try {
+    console.log('🧪 ========= TEST ENDPOINT CALLED =========');
+    const { code } = req.body;
+    
+    console.log('📥 Test - Código recibido:', code ? `${code.substring(0, 30)}...` : 'NO CODE');
+    
+    // Simular una respuesta exitosa para testing
+    res.json({
+      success: true,
+      message: 'Test endpoint working - Code received successfully',
+      receivedCode: code ? 'VALID' : 'MISSING',
+      codeLength: code ? code.length : 0,
+      testData: {
+        user: {
+          nombre: 'Test User',
+          correo: 'test@example.com',
+          fotoPerfil: 'https://example.com/photo.jpg',
+          terminosYCondiciones: true
+        },
+        accessToken: 'test_access_token',
+        refreshToken: 'test_refresh_token'
+      }
+    });
+  } catch (error) {
+    console.error('❌ Test endpoint error:', error);
+    res.status(500).json({ 
+      success: false,
+      error: 'Test failed',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+};
+
+/* Endpoint de callback de Google */
+export const googleCallback = async (req: Request, res: Response): Promise<void> => {
+  try {
+    console.log('🔄 Iniciando callback de Google desde controller...');
+    await authController.googleCallback(req, res);
+  } catch (error) {
+    console.error('❌ Error en googleCallback controller:', error);
+    handleError(error, res);
+  }
+};
 
 /*obtener todos los registros de usuario */
 export const getAll = async (req: Request, res: Response): Promise<void> => {
@@ -62,32 +137,15 @@ export const getById = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-/*crear nuevo usr 
-  que verifique si un usr con el mismo 
-*/
+/*crear nuevo usr */
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
-    const user = await teamsysService.create(req.body);
-
-    if (!user) {
-      throw new Error("Usuario no encontrado");
-    }
-
-    const userAgent = req.headers['user-agent'] || 'Unknown';
-    const ip = (req.ip || req.socket.remoteAddress || 'Unknown').replace('::ffff:', '');
-    const { accessToken, refreshToken } = authService.generateTokens(user);
-    const result = await sessionService.create(user.id, userAgent, ip, accessToken, refreshToken);
-
-    const response: ApiResponse<{accessToken: string, refreshToken: string, user: UserDocument}> = {
+    const data = await teamsysService.create(req.body);
+    const response: ApiResponse<UserDocument | null> = {
       success: true,
-      message: 'Registro creado exitosamente',
-      data: {
-        accessToken: accessToken,
-        refreshToken: refreshToken,
-        user: user,
-      },
+      data,
+      message: 'Registro creado exitosamente'
     };
-
     res.status(201).json(response);
   } catch (error) {
     handleError(error, res);
@@ -137,14 +195,11 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
 };
 
 /**
- * tarea: endpoint de autenticacion
  * Registrar un nuevo usuario (versión autenticación)
- * Este endpoint se usa para crear usuarios con validación previa
  */
 export const registerUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const data = req.body;
-
     const nuevoUsuario = await teamsysService.create(data);
     res.status(201).json({
       success: true,
@@ -158,7 +213,6 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
 
 /**
  * Iniciar sesión de un usuario existente
- * Verifica correo y contraseña
  */
 export const loginUser = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -182,20 +236,10 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // registarr en sessions
-    const userAgent = req.headers['user-agent'] || 'Unknown';
-    const ip = (req.ip || req.socket.remoteAddress || 'Unknown').replace('::ffff:', '');
-    const { accessToken, refreshToken } = authService.generateTokens(usuario);
-    await sessionService.create(usuario.id, userAgent, ip, accessToken, refreshToken);
-
     res.json({
       success: true,
       message: 'Inicio de sesión exitoso',
-      data: {
-        accessToken,
-        refreshToken,
-        usuaer: usuario,
-      }
+      data: usuario,
     });
   } catch (error) {
     handleError(error, res);

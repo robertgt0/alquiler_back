@@ -5,65 +5,114 @@ import { validarPassword } from '../utils/validaciones';
 export class UsuarioService {
   /**
    * Registrar un nuevo usuario en la base de datos
-   * @param data - Datos básicos del usuario (DTO)
-   * @returns Usuario creado
    */
   async registrarUsuario(data: CrearUsuarioDto ): Promise<UserDocument | null > {
-    // Validación de contraseña
-    if (data.password!=null) {
-    if (!validarPassword(data.password)) {
-      throw new Error('La contraseña no cumple con los requisitos mínimos');
-    }
-    }
+    try {
+      console.log('👤 Registrando nuevo usuario:', data.correo);
+      
+      // Validación de contraseña
+      if (data.password != null) {
+        if (!validarPassword(data.password)) {
+          throw new Error('La contraseña no cumple con los requisitos mínimos');
+        }
+      }
 
-    // Verificar si el correo ya está registrado
-    const existe = await Usuario.findOne({ correo: data.correo });
-    if (existe) {
-      throw new Error('El correo electrónico ya está registrado');
-    }
+      // Verificar si el correo ya está registrado
+      console.log('🔍 Verificando si el correo existe:', data.correo);
+      const existe = await Usuario.findOne({ correo: data.correo });
+      if (existe) {
+        console.log('❌ Correo ya registrado:', data.correo);
+        throw new Error('El correo electrónico ya está registrado');
+      }
 
-    // Crear y guardar el nuevo usuario
-    const nuevoUsuario = new Usuario(data);
-    return await nuevoUsuario.save();
+      // Crear y guardar el nuevo usuario
+      console.log('💾 Creando nuevo usuario en BD...');
+      const nuevoUsuario = new Usuario(data);
+      const resultado = await nuevoUsuario.save();
+      
+      console.log('✅ Usuario registrado exitosamente:', resultado.correo);
+      return resultado;
+    } catch (error) {
+      console.error('❌ Error en registrarUsuario:');
+      console.error('📝 Error:', error);
+      throw error;
+    }
   }
 
   /**
    * Verificar si un correo ya existe en la base de datos
-   * @param correo - Correo electrónico a verificar
-   * @returns true si existe, false si no
    */
   async verificarCorreo(correo: string): Promise<boolean> {
-    const usuario = await Usuario.findOne({ correo: correo });
-    return usuario!=null;
+    try {
+      console.log('🔍 Verificando correo en BD:', correo);
+      const usuario = await Usuario.findOne({ correo: correo });
+      const existe = usuario !== null;
+      console.log('📊 Resultado verificación:', existe ? 'EXISTE' : 'NO EXISTE');
+      return existe;
+    } catch (error) {
+      console.error('❌ ERROR en verificarCorreo:');
+      console.error('📝 Error:', error);
+      throw error;
+    }
   }
 
   /**
-   * Impedir que el usuario acceda al sistema si la contraseña es incorrecta.
- * Verifica que el correo y la contraseña coincidan con un usuario registrado
- * @param correo - Correo electrónico del usuario que intenta iniciar sesión
- * @param password - Contraseña a verificiar, comparar e impedir si no es el caso
- * @returns User si las contraseñas coinciden, null si no
- */
-async autenticarUsuario(correoE: string, password: string): Promise<UserDocument | null> {
-  const usuario = await Usuario.findOne({ correo: correoE });
-  if (!usuario) return null;
-  if (usuario.password !== password) return null;
-  return usuario;
-}
-
+   * Autenticar usuario
+   */
+  async autenticarUsuario(correoE: string, password: string): Promise<UserDocument | null> {
+    try {
+      console.log('🔐 Autenticando usuario:', correoE);
+      const usuario = await Usuario.findOne({ correo: correoE });
+      
+      if (!usuario) {
+        console.log('❌ Usuario no encontrado');
+        return null;
+      }
+      
+      if (usuario.password !== password) {
+        console.log('❌ Contraseña incorrecta');
+        return null;
+      }
+      
+      console.log('✅ Autenticación exitosa');
+      return usuario;
+    } catch (error) {
+      console.error('❌ Error en autenticarUsuario:');
+      console.error('📝 Error:', error);
+      throw error;
+    }
+  }
 
   /**
    * Obtener todos los usuarios
    */
   async getAll(): Promise<UserDocument[]> {
-    return await Usuario.find();
+    try {
+      console.log('📋 Obteniendo todos los usuarios...');
+      const usuarios = await Usuario.find();
+      console.log('✅ Usuarios obtenidos:', usuarios.length);
+      return usuarios;
+    } catch (error) {
+      console.error('❌ Error en getAll:');
+      console.error('📝 Error:', error);
+      throw error;
+    }
   }
 
   /**
    * Obtener un usuario por ID
    */
   async getById(id: string): Promise<UserDocument | null> {
-    return await Usuario.findById(id);
+    try {
+      console.log('🔍 Buscando usuario por ID:', id);
+      const usuario = await Usuario.findById(id);
+      console.log('📊 Resultado:', usuario ? 'ENCONTRADO' : 'NO ENCONTRADO');
+      return usuario;
+    } catch (error) {
+      console.error('❌ Error en getById:');
+      console.error('📝 Error:', error);
+      throw error;
+    }
   }
 
   /**
@@ -77,17 +126,33 @@ async autenticarUsuario(correoE: string, password: string): Promise<UserDocument
    * Actualizar un usuario existente
    */
   async update(id: string, data: Partial<CrearUsuarioDto>): Promise<UserDocument | null> {
-    return await Usuario.findByIdAndUpdate(id, data, { new: true });
+    try {
+      console.log('✏️ Actualizando usuario:', id);
+      const usuario = await Usuario.findByIdAndUpdate(id, data, { new: true });
+      console.log('✅ Usuario actualizado:', usuario ? 'EXITOSO' : 'NO ENCONTRADO');
+      return usuario;
+    } catch (error) {
+      console.error('❌ Error en update:');
+      console.error('📝 Error:', error);
+      throw error;
+    }
   }
 
   /**
    * Eliminar un usuario por ID
    */
   async delete(id: string): Promise<UserDocument | null> {
-    return await Usuario.findByIdAndDelete(id);
+    try {
+      console.log('🗑️ Eliminando usuario:', id);
+      const usuario = await Usuario.findByIdAndDelete(id);
+      console.log('✅ Usuario eliminado:', usuario ? 'EXITOSO' : 'NO ENCONTRADO');
+      return usuario;
+    } catch (error) {
+      console.error('❌ Error en delete:');
+      console.error('📝 Error:', error);
+      throw error;
+    }
   }
-
-
 }
 
 export default new UsuarioService();

@@ -1,5 +1,4 @@
 import { Document } from 'mongoose';
-// Define aquí los tipos/interfaces específicos de este módulo
 
 export interface TeamsysEntity {
   _id?: string;
@@ -17,7 +16,50 @@ export interface ApiResponse<T> {
   count?: number;
 }
 
-// types/index.ts
+// Tipos para autenticación con Google
+export interface GoogleTokenResponse {
+  access_token: string;
+  expires_in: number;
+  refresh_token?: string;
+  scope: string;
+  token_type: string;
+  id_token?: string;
+}
+
+export interface GoogleUserProfile {
+  id: string;
+  email: string;
+  verified_email: boolean;
+  name: string;
+  given_name: string;
+  family_name: string;
+  picture: string;
+  locale: string;
+}
+
+export interface TokenResponse {
+  accessToken: string;
+  refreshToken: string;
+  user: {
+    nombre: string;
+    correo: string;
+    fotoPerfil?: string;
+    terminosYCondiciones: boolean;
+  };
+  expiresAt: Date;
+}
+
+export interface JWTPayload {
+  userId: string;
+  email: string;
+}
+
+export interface AuthTokens {
+  accessToken: string;
+  refreshToken: string;
+}
+
+// Tipos existentes
 export interface UsuarioAttrs {
   nombre: string;
   apellido?: string | null;
@@ -34,8 +76,6 @@ export interface UsuarioAttrs {
   updatedAt?: Date;
 }
 
-
-// Agrega más tipos según necesites
 export interface OtraInterface {
   // ...
 }
@@ -57,12 +97,11 @@ export interface UsuarioDocument extends Document {
   updatedAt?: Date;
 }
 
-
 export interface CrearUsuarioDto {
   nombre: string;
   correo: string;
   telefono?: string;
   password?: string;
-  fotoPerfil?:any;
+  fotoPerfil?: any;
   terminosYCondiciones: boolean;
 }

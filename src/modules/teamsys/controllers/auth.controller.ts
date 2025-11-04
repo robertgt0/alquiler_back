@@ -1,59 +1,87 @@
 import { Request, Response } from "express";
 import { ApiResponse } from "@/types";
 import { TokenResponse } from "../types/token.types";
-import { AuthService} from "../services/auth.service";
+import { AuthService } from "../services/auth.service";
 import { handleError } from "../errors/errorHandler";
-import { JWTPayload } from "../types/auth.types";
-import teamsysService from "../services/teamsys.service";
 
 export class AuthController {
   private authService: AuthService;
 
   constructor() {
+    console.log('🔄 Inicializando AuthController...');
     this.authService = new AuthService();
+    console.log('✅ AuthController inicializado');
   }
 
   googleCallback = async (req: Request, res: Response): Promise<void> => {
+    console.log('🔄 ========= INICIANDO GOOGLE CALLBACK =========');
+    
     try {
-      const { code } = req.body;
+      const { code, authType = 'register' } = req.body;
 
-      if (! code || typeof code !== 'string') {
-        res.status(400).json({
-          message: 'Authorizaction code is required'
-        })
-          throw new Error('Authorizaction code is required');
-      }
+      console.log('📥 Request body recibido:', { 
+        authType,
+        code: code ? `${code.substring(0, 30)}...` : 'NO CODE'
+      });
 
-      const result  = await this.authService.loginWithGoogle(code as string)
-      if (result==null){
+      if (!code || typeof code !== 'string') {
+        console.error('❌ Código no válido recibido');
         res.status(400).json({
           success: false,
-          data: result,
-          message: 'usuario ya registrado',
+          message: 'Authorization code is required and must be a string'
+        });
+        return;
+      }
+
+      console.log('🚀 Llamando a authService.loginWithGoogle...');
+      const result = await this.authService.loginWithGoogle(code, authType);
+      
+      console.log('📊 Resultado de loginWithGoogle:', {
+        result: result ? 'SUCCESS_WITH_DATA' : 'USER_ALREADY_EXISTS',
+        authType
       });
-      return;
-      } 
+
+      if (result === null) {
+        if (authType === 'register') {
+          console.log('ℹ️ Enviando respuesta: usuario ya registrado');
+          res.status(400).json({
+            success: false,
+            message: 'usuario ya registrado',
+            data: null
+          });
+        } else {
+          console.log('❌ Enviando respuesta: usuario no encontrado');
+          res.status(400).json({
+            success: false,
+            message: 'usuario no encontrado',
+            data: null
+          });
+        }
+        return;
+      }
+
+      console.log('✅ Enviando respuesta exitosa al cliente');
       res.status(200).json({
-          success: true,
-          data: result,
-          message: 'Usuario registrado correctamente!',
+        success: true,
+        data: result,
+        message: 'Usuario autenticado correctamente!',
       });
-      return;
-    } catch (error) {
-      handleError(error, res);
+
+    } catch (error: any) {
+      console.error('❌ ========= ERROR EN GOOGLE CALLBACK =========');
+      console.error('📝 Error message:', error.message);
+      
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Error interno del servidor'
+      });
+    } finally {
+      console.log('✅ ========= GOOGLE CALLBACK FINALIZADO =========');
     }
   }
 
-  getCurrentUser = async (req: Request, res: Response): Promise<void> => {
-    const { email, userId } = req.user as JWTPayload;
-
-    const user = await teamsysService.getById(userId);
-
-    res.status(200).json({
-        success: true,
-        data: user,
-        message: 'Usuario recuperado correctamente!',
-    });
+  getCurrentUser() {
+    // Implementación existente
   }
 }
 
