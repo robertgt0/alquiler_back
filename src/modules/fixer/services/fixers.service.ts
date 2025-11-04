@@ -8,6 +8,8 @@ import {
 } from "../models/Fixer";
 import { UserModel } from "../../../models/User";
 import type { UserDoc } from "../../../models/User";
+import categoriesService from "../../categories/services/categories.service";
+import type { Category } from "../../categories/types";
 
 export type FixerRecord = {
   id: string;
@@ -29,6 +31,14 @@ export type FixerRecord = {
   ratingAvg?: number;
   ratingCount?: number;
   memberSince?: string;
+};
+
+export type FixerWithCategories = FixerRecord & { categoriesInfo: Category[] };
+
+export type FixersByCategoryResult = {
+  category: Category;
+  total: number;
+  fixers: FixerWithCategories[];
 };
 
 export type CreateFixerDTO = {
@@ -308,6 +318,102 @@ class FixersService {
     return false;
   }
 
+  async listByCategories(search?: string) {
+    const trimmed = search?.trim();
+    const filter: FilterQuery<FixerDoc> = {};
+
+    if (trimmed) {
+      const escaped = trimmed.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const regex = new RegExp(escaped, "i");
+      filter.$or = [{ name: regex }, { city: regex }, { bio: regex }];
+    }
+
+    const docs = await FixerModel.find(filter);
+    if (!docs.length) return [];
+
+    const records = await Promise.all(docs.map(async (doc) => attachUserData(toRecord(doc))));
+    const valid = records.filter((rec): rec is FixerRecord => Boolean(rec && rec.categories && rec.categories.length));
+    if (!valid.length) return [];
+
+    const categoryIds = new Set<string>();
+    valid.forEach((rec) => {
+      (rec.categories ?? []).forEach((id) => {
+        if (id) categoryIds.add(id);
+      });
+    });
+
+    if (!categoryIds.size) return [];
+
+    const categories = await categoriesService.getByIds(Array.from(categoryIds));
+    if (!categories.length) return [];
+
+    const categoryById = new Map<string, Category>();
+    const categoryMap = new Map<string, Category>();
+    categories.forEach((cat) => {
+      categoryById.set(cat.id, cat);
+      [cat.id, cat.slug, cat.name, cat.name.toLowerCase()].forEach((key) => {
+        if (typeof key === "string" && key.trim()) {
+          categoryMap.set(key, cat);
+        }
+      });
+    });
+    if (!categoryMap.size || !categoryById.size) return [];
+
+    const grouped = new Map<string, FixerWithCategories[]>();
+
+    valid.forEach((rec) => {
+      const categoriesInfo = (rec.categories ?? [])
+        .map((raw) => {
+          const candidate = typeof raw === "string" ? raw.trim() : "";
+          if (!candidate) return undefined;
+          return categoryMap.get(candidate) ?? categoryMap.get(candidate.toLowerCase());
+        })
+        .filter((cat): cat is Category => Boolean(cat));
+
+      if (!categoriesInfo.length) return;
+
+      const fixerWithCategories: FixerWithCategories = {
+        ...rec,
+        categoriesInfo,
+      };
+
+      (rec.categories ?? []).forEach((raw) => {
+        const candidate = typeof raw === "string" ? raw.trim() : "";
+        const key = candidate ? candidate : "";
+        const effectiveKey = key ? key : "";
+        const category =
+          key && (categoryMap.get(key) ?? categoryMap.get(key.toLowerCase()));
+        if (!category) return;
+        const mapKey = category.id;
+        if (!grouped.has(mapKey)) grouped.set(mapKey, []);
+        grouped.get(mapKey)!.push(fixerWithCategories);
+      });
+    });
+
+    const result = Array.from(grouped.entries())
+      .map(([catId, fixers]) => {
+        const category = categoryById.get(catId);
+        if (!category) return null;
+
+        const uniqueFixers = Array.from(new Map(fixers.map((fixer) => [fixer.id, fixer])).values());
+        uniqueFixers.sort((a, b) => {
+          const ratingDiff = (b.ratingAvg ?? 0) - (a.ratingAvg ?? 0);
+          if (ratingDiff !== 0) return ratingDiff;
+          return (a.name ?? "").localeCompare(b.name ?? "");
+        });
+
+        return {
+          category,
+          total: uniqueFixers.length,
+          fixers: uniqueFixers,
+        } as FixersByCategoryResult;
+      })
+      .filter((item): item is FixersByCategoryResult => item !== null)
+      .sort((a, b) => a.category.name.localeCompare(b.category.name));
+
+    return result;
+  }
+
   async updateLocation(id: string, location: Location) {
     return this.update(id, { location });
   }
@@ -333,3 +439,4 @@ class FixersService {
 }
 
 export default new FixersService();
+

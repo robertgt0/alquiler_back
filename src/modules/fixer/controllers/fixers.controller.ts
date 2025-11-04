@@ -159,6 +159,16 @@ export const getFixer = async (req: Request, res: Response) => {
   }
 };
 
+export const listByCategory = async (req: Request, res: Response) => {
+  try {
+    const search = typeof req.query.search === "string" ? req.query.search : undefined;
+    const data = await service.listByCategories(search);
+    res.json({ success: true, data });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: String(err?.message || "Error") });
+  }
+};
+
 export const updateLocation = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;

@@ -1,4 +1,5 @@
 ﻿import { randomUUID } from "crypto";
+import { Types } from "mongoose";
 import { Category } from "../types";
 import { CategoryModel, CategoryDoc } from "../models/Category";
 
@@ -47,25 +48,35 @@ function toDTO(doc: CategoryDoc): Category {
   };
 }
 
+type DuplicateCheckDoc = {
+  slug?: string;
+  _id: Types.ObjectId | string;
+};
+
 async function cleanupDuplicates() {
-  const docs = await CategoryModel.find().lean<CategoryDoc[]>();
+  const docs = await CategoryModel.find().select("slug").lean<DuplicateCheckDoc[]>();
   const seen = new Map<string, string>();
   const remove: string[] = [];
 
   docs.forEach((doc) => {
     const slug = doc.slug;
     if (!slug) return;
+    const docId = typeof doc._id === "string" ? doc._id : doc._id.toString();
     const prev = seen.get(slug);
     if (prev) {
-      remove.push(doc._id.toString());
+      remove.push(docId);
     } else {
-      seen.set(slug, doc._id.toString());
+      seen.set(slug, docId);
     }
   });
 
   if (remove.length) {
     await CategoryModel.deleteMany({ _id: { $in: remove } });
   }
+}
+
+function escapeRegex(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 async function seedDefaults() {
@@ -137,8 +148,46 @@ class CategoriesService {
   async getByIds(ids: string[]): Promise<Category[]> {
     await this.ensureReady();
     if (!ids?.length) return [];
-    const docs = await CategoryModel.find({ id: { $in: ids } }).lean<CategoryDoc[]>();
-    return docs.map(toDTO);
+
+    const unique = Array.from(new Set(ids.filter(Boolean)));
+    if (!unique.length) return [];
+
+    const objectIds = unique
+      .filter((value) => Types.ObjectId.isValid(value))
+      .map((value) => new Types.ObjectId(value));
+
+    const lower = Array.from(
+      new Set(
+        unique
+          .map((value) => value.toLowerCase?.())
+          .filter((value): value is string => typeof value === "string" && value.length > 0)
+      )
+    );
+
+    const nameMatchers = unique.map((value) => new RegExp(`^${escapeRegex(value)}$`, "i"));
+
+    const orFilters: Record<string, unknown>[] = [
+      { id: { $in: unique } },
+      { slug: { $in: lower } },
+      { name: { $in: nameMatchers } },
+    ];
+
+    if (objectIds.length) {
+      orFilters.push({ _id: { $in: objectIds } });
+    }
+
+    const docs = await CategoryModel.find({ $or: orFilters }).lean<CategoryDoc[]>();
+    if (!docs.length) return [];
+
+    const seen = new Map<string, Category>();
+    docs.forEach((doc) => {
+      const dto = toDTO(doc);
+      if (!seen.has(dto.id)) {
+        seen.set(dto.id, dto);
+      }
+    });
+
+    return Array.from(seen.values());
   }
 }
 
