@@ -1,75 +1,144 @@
+﻿import { randomUUID } from "crypto";
 import { Category } from "../types";
-import { randomUUID } from "crypto";
+import { CategoryModel, CategoryDoc } from "../models/Category";
 
 const seedNames = [
-  "Plomería","Electricista","Carpintería","Pintura","Arreglo de electrodomésticos",
-  "Climatización","Jardinería","Limpieza","Trabajo de techos","Trabajo de pisos",
-  "Embalosado","Paneles de yeso","Aislamiento","Arreglo de ventanas","Arreglo de puertas",
-  "Reparación de cercas","Mantenimiento de piscinas","Control de plagas","Limpieza de canaletas","Levantador de basura"
+  "Plomeria",
+  "Electricista",
+  "Carpinteria",
+  "Pintura",
+  "Arreglo de electrodomesticos",
+  "Climatizacion",
+  "Jardineria",
+  "Limpieza",
+  "Trabajo de techos",
+  "Trabajo de pisos",
+  "Instalacion de paneles",
+  "Aislamiento",
+  "Arreglo de ventanas",
+  "Arreglo de puertas",
+  "Reparacion de cercas",
+  "Mantenimiento de piscinas",
+  "Control de plagas",
+  "Limpieza de canaletas",
+  "Levantador de basura",
 ];
 
-const store = new Map<string, Category>();
+const FORBIDDEN = ["xxx", "spam", "invalido", "prueba", "test"];
+const MIN = 3;
+const MAX = 40;
 
-function slugify(s: string) {
-  return s
+function slugify(value: string) {
+  return value
     .toLowerCase()
-    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
     .replace(/[^a-z0-9\s-]/g, "")
     .trim()
     .replace(/\s+/g, "-");
 }
 
-const FORBIDDEN = ["xxx","spam","invalido","prueba","test"];
-const MIN = 3;
-const MAX = 40;
+function toDTO(doc: CategoryDoc): Category {
+  return {
+    id: doc.id,
+    name: doc.name,
+    slug: doc.slug,
+    createdAt: doc.createdAt instanceof Date ? doc.createdAt.toISOString() : String(doc.createdAt),
+  };
+}
+
+async function cleanupDuplicates() {
+  const docs = await CategoryModel.find().lean<CategoryDoc[]>();
+  const seen = new Map<string, string>();
+  const remove: string[] = [];
+
+  docs.forEach((doc) => {
+    const slug = doc.slug;
+    if (!slug) return;
+    const prev = seen.get(slug);
+    if (prev) {
+      remove.push(doc._id.toString());
+    } else {
+      seen.set(slug, doc._id.toString());
+    }
+  });
+
+  if (remove.length) {
+    await CategoryModel.deleteMany({ _id: { $in: remove } });
+  }
+}
+
+async function seedDefaults() {
+  await cleanupDuplicates();
+
+  for (const name of seedNames) {
+    const slug = slugify(name);
+    await CategoryModel.updateOne(
+      { slug },
+      {
+        $setOnInsert: {
+          id: randomUUID(),
+          name,
+          slug,
+        },
+      },
+      { upsert: true }
+    ).catch(() => undefined);
+  }
+}
 
 class CategoriesService {
+  private ready: Promise<void>;
+
   constructor() {
-    if (store.size === 0) {
-      seedNames.forEach(n => {
-        const cat: Category = {
-          id: randomUUID(),
-          name: n,
-          slug: slugify(n),
-          createdAt: new Date().toISOString()
-        };
-        store.set(cat.id, cat);
-      });
-    }
+    this.ready = seedDefaults();
   }
 
-  list() {
-    return Array.from(store.values()).sort((a,b)=> a.name.localeCompare(b.name));
+  private async ensureReady() {
+    await this.ready;
   }
 
-  validateName(name: string) {
+  private validateName(name: string) {
     const trimmed = (name ?? "").trim();
-    if (!trimmed) throw new Error("El campo no puede estar vacío");
-    if (trimmed.length < MIN) throw new Error(`Mínimo ${MIN} caracteres`);
-    if (trimmed.length > MAX) throw new Error(`Máximo ${MAX} caracteres`);
-    if (!/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9\s.-]+$/.test(trimmed))
-      throw new Error("Solo letras, números, espacios, punto y guión");
-    const bad = FORBIDDEN.find(w => trimmed.toLowerCase().includes(w));
-    if (bad) throw new Error("Contiene palabras inválidas");
-    const exists = this.list().find(c => c.slug === slugify(trimmed));
-    if (exists) throw new Error("El tipo de trabajo ya existe");
+    if (!trimmed) throw new Error("El campo no puede estar vacio");
+    if (trimmed.length < MIN) throw new Error(`Minimo ${MIN} caracteres`);
+    if (trimmed.length > MAX) throw new Error(`Maximo ${MAX} caracteres`);
+    if (!/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9\s.\-]+$/.test(trimmed)) {
+      throw new Error("Solo letras, numeros, espacios, punto y guion");
+    }
+    const bad = FORBIDDEN.find((word) => trimmed.toLowerCase().includes(word));
+    if (bad) throw new Error("Contiene palabras invalidas");
     return trimmed;
   }
 
-  create(name: string) {
-    const valid = this.validateName(name);
-    const cat: Category = {
-      id: randomUUID(),
-      name: valid,
-      slug: slugify(valid),
-      createdAt: new Date().toISOString()
-    };
-    store.set(cat.id, cat);
-    return cat;
+  async list(): Promise<Category[]> {
+    await this.ensureReady();
+    const docs = await CategoryModel.find().sort({ name: 1 }).lean<CategoryDoc[]>();
+    return docs.map(toDTO);
   }
 
-  getByIds(ids: string[]) {
-    return ids.map(id => store.get(id)).filter(Boolean) as Category[];
+  async create(name: string): Promise<Category> {
+    await this.ensureReady();
+    const valid = this.validateName(name);
+    const slug = slugify(valid);
+
+    const exists = await CategoryModel.findOne({ slug }).lean();
+    if (exists) throw new Error("El tipo de trabajo ya existe");
+
+    const doc = await CategoryModel.create({
+      id: randomUUID(),
+      name: valid,
+      slug,
+    });
+
+    return toDTO(doc);
+  }
+
+  async getByIds(ids: string[]): Promise<Category[]> {
+    await this.ensureReady();
+    if (!ids?.length) return [];
+    const docs = await CategoryModel.find({ id: { $in: ids } }).lean<CategoryDoc[]>();
+    return docs.map(toDTO);
   }
 }
 

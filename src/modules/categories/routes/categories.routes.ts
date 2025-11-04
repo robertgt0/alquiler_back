@@ -1,21 +1,27 @@
-import { Router } from "express";
+﻿import { Router } from "express";
 import service from "../services/categories.service";
 
 const router = Router();
 
-router.get("/", (_req, res) => {
-  res.json({ success: true, data: service.list() });
+router.get("/", async (_req, res) => {
+  try {
+    const list = await service.list();
+    res.json({ success: true, data: list });
+  } catch (error) {
+    console.error("Error al listar categorias", error);
+    res.status(500).json({ success: false, message: "No se pudieron obtener las categorias" });
+  }
 });
 
-router.post("/", (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const { name } = req.body || {};
-    const created = service.create(name);
-    res.status(201).json({ success: true, data: created, message: "Su tipo de trabajo fue registrado con éxito" });
+    const created = await service.create(name);
+    res.status(201).json({ success: true, data: created, message: "Su tipo de trabajo fue registrado con exito" });
   } catch (err: any) {
     const msg = String(err?.message || "Error");
-    const code = /existe|inválidas?|vacío|Mínimo|Máximo|Solo/.test(msg) ? 400 : 500;
-    res.status(code).json({ success: false, message: msg });
+    const isClientError = /existe|invalidas?|vacio|Minimo|Maximo|Solo|palabras/i.test(msg);
+    res.status(isClientError ? 400 : 500).json({ success: false, message: msg });
   }
 });
 
