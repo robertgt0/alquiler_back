@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
 import teamsysService from '../services/teamsys.service';
 import { ApiResponse} from '../types/index';
-import Usuario, { UserDocument } from '../models/teamsys';
+import Usuario, { UserDocument,UserAuthDocument } from '../models/teamsys';
 import { handleError } from '../errors/errorHandler';
+import { validarPassword } from '../utils/validaciones';
 
 /*obtener todos los registros de usuario */
 export const getAll = async (req: Request, res: Response): Promise<void> => {
@@ -166,6 +167,200 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
       message: 'Inicio de sesión exitoso',
       data: usuario,
     });
+  } catch (error) {
+    handleError(error, res);
+  }
+};
+
+export const actualizarAutentificacion = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const user=await teamsysService.getById(req.params.id);
+    const auth=await teamsysService.getUserAuthByUserId(req.params.id);
+    if(user==null || auth ==null)throw new Error("Usuario no existente");
+    const providers :string[]=auth.authProvider as string[];
+    const accion = String(req.body.accion ?? '').toLowerCase();
+    const provider = String(req.body.provider ?? '').toLowerCase();
+    const password: string | undefined = req.body.password;
+    const email:string | undefined=req.body.email;
+    
+    if (!['agregar', 'eliminar'].includes(accion)) {
+      res.status(400).json({ success: false, message: 'Acción inválida. Usa "agregar" o "eliminar".' });
+      return;
+    }
+
+    if(accion==='agregar'){
+      if(providers.includes(provider)){
+        res.status(409).json({ success: false, message: `Este método ya está habilitado: ${provider}` });
+        return;
+        
+      }
+        if (provider === 'local') {
+        if (!password) {
+          res.status(400).json({ success: false, message: 'Debe proporcionar una contraseña para habilitar "local".' });
+          return;
+        }
+        if (!validarPassword(password)) {
+          res.status(400).json({ success: false, message: 'La contraseña no cumple con los requisitos mínimos.' });
+          return;
+        }
+      }
+      if(provider=='google'){
+        if(!(user.correo===email)){
+            res.status(404).json({ success: false, message: `el correo : ${email} no coincide` });
+            return;
+        }
+        user.authProvider=provider;}
+      providers.push(provider);
+      if(provider=='google')user.authProvider=provider;
+      auth.authProvider=providers;
+      
+    }
+    if(accion==='eliminar'){
+      if (!providers.includes(provider)) {
+        res.status(404).json({ success: false, message: `Este método no está habilitado: ${provider}` });
+        return;
+      }
+      if (providers.length <= 1) {
+        res.status(409).json({ success: false, message: 'No puedes eliminar tu único método de autenticación.' });
+        return;
+      }
+
+      // Si eliminamos LOCAL, removemos password
+      if (provider === 'local') {
+        user.password = undefined;
+      }
+      if(provider=='google')user.authProvider='local';
+      // Eliminar provider
+      auth.authProvider = providers.filter(p => p !== provider);
+    }
+
+    const data = await teamsysService.update(req.params.id, user);
+    const authData=await teamsysService.updateUserAuthProviders(req.params.id,auth.authProvider)
+    if (!data || !authData) {
+      res.status(404).json({
+        success: false,
+        message: 'Registro no encontrado',
+      });
+      return;
+    }
+    const response: ApiResponse<UserDocument> = {
+      success: true,
+      data,
+      message: 'Registro actualizado exitosamente'
+    };
+    res.json(response);
+  } catch (error) {
+    handleError(error, res);
+  }
+};
+type GeoPoint = { type: 'Point'; coordinates: [number, number] };
+
+function isGeoPoint(value: unknown): value is GeoPoint {
+  if (!value || typeof value !== 'object') return false;
+  const obj = value as Record<string, unknown>;
+  return (
+    obj.type === 'Point' &&
+    Array.isArray(obj.coordinates) &&
+    obj.coordinates.length === 2 &&
+    typeof obj.coordinates[0] === 'number' &&
+    typeof obj.coordinates[1] === 'number'
+  );
+}
+export const updateMapa = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const auth = await teamsysService.getUserAuthByUserId(req.params.id);
+    const ubicacion = req.body.ubicacion as unknown;
+
+    if (!auth) {
+      res.status(404).json({ success: false, message: 'Registro no encontrado' });
+      return;
+    }
+
+    if (!isGeoPoint(ubicacion)) {
+      res.status(400).json({
+        success: false,
+        message: 'La ubicación debe tener el formato { type: "Point", coordinates: [longitud, latitud] }',
+      });
+      return;
+    }
+
+
+    if (auth.mapaModificacion > 0) {
+      const authActualizado = await teamsysService.decrementMapaModificacion(req.params.id);
+      // Si por alguna razón no encontró el doc al decrementar:
+      const data=await teamsysService.updateUbicacionUser(req.params.id,ubicacion);
+      if (!authActualizado || !data) {
+        res.status(404).json({ success: false, message: 'Registro de autenticación no encontrado para actualizar' });
+        return;
+      }
+
+      const response: ApiResponse<UserDocument> = {
+        success: true,
+        data: data,
+        message: 'Registro actualizado exitosamente',
+      };
+      res.json(response);
+      return;
+    }
+
+    // Límite alcanzado: no se decremente
+    const response: ApiResponse<UserAuthDocument | null> = {
+      success: false,
+      data: null,
+      message: 'Alcanzó el límite de actualizaciones',
+    };
+    res.status(400).json(response);
+  } catch (error) {
+    handleError(error, res);
+  }
+};
+export const updateTelefono=async (req: Request, res: Response): Promise<void> => {
+  try {
+    const telefono:string=req.body.telefono;
+    const telefonoValido = /^[1-9][0-9]{7}$/;
+
+    if (!telefono || typeof telefono !== 'string'||!telefonoValido.test(telefono)) {
+      res.status(404).json({
+        success: false,
+        message: 'Numero de telefono no valido',
+      });
+      return;
+    }
+    const data =await teamsysService.updateTelefonoUser(req.params.id,telefono);
+    if(!data){
+      res.status(404).json({
+        success: false,
+        message: 'Usuario no encontrado',
+      });
+      return;
+    }
+    const response: ApiResponse<UserDocument> = {
+      success: true,
+      data,
+      message: 'Registro actualizado exitosamente'
+    };
+    res.json(response);
+  } catch (error) {
+    handleError(error, res);
+  }
+};
+
+export const getAuthById= async (req: Request, res: Response): Promise<void> => {
+  try {
+    const data = await teamsysService.getUserAuthByUserId(req.params.id);
+    if (data==null) {
+      res.status(404).json({
+        success: false,
+        message: 'Registro no encontrado',
+      });
+      return;
+    }
+    const response: ApiResponse<UserAuthDocument | null> = {
+      success: true,
+      data,
+      message: 'Proveedores de auntenticacion'
+    };
+    res.json(response);
   } catch (error) {
     handleError(error, res);
   }

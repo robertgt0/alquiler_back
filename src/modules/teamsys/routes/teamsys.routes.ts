@@ -5,12 +5,16 @@ import {
   create,
   update,
   remove,
-  existsByEmail
+  existsByEmail,
+  actualizarAutentificacion,
+  updateMapa,
+  updateTelefono,
+  getAuthById
 } from '../controllers/teamsys.controller';
 import { validateData } from '../middlewares/validate.middleware';
 import { authController } from '../controllers/auth.controller';
 import { registerUser, loginUser } from '../controllers/teamsys.controller';
-import { UsuarioService } from '../services/teamsys.service';
+//import { UsuarioService } from '../services/teamsys.service';
 
 
 const router = Router();
@@ -33,6 +37,10 @@ router.get('/exists', existsByEmail);
 /**
  * Auth routes
  */
+router.post('auth-Method/:id',actualizarAutentificacion);
+router.get('auth-Method/:id',getAuthById)
+router.post('usuario/telefono/:id',updateTelefono);
+router.post('usuario/ubicacion/:id',updateMapa);
 router.post("/google/callback", authController.googleCallback);
 router.get("/me", authController.getCurrentUser);
 

@@ -57,12 +57,12 @@ export interface UsuarioDocument extends Document {
   updatedAt?: Date;
 }
 
-
 export interface CrearUsuarioDto {
   nombre: string;
   correo: string;
   telefono?: string;
   password?: string;
-  fotoPerfil?:any;
+  fotoPerfil?:string;
+  authProvider?: string;
   terminosYCondiciones: boolean;
 }

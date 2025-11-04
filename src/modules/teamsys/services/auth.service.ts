@@ -65,14 +65,17 @@ return data; // ahora sí es GoogleUserProfile
 
     async findOrCreateUser(profile: GoogleUserProfile): Promise<CrearUsuarioDto | null> {
         let user = await teamsysService.verificarCorreo(profile.email);
-        console.log(user)
-        if (!user) {
-            return  {
+        //console.log(user)
+        
+        if (user!=null) {
+            
+            return {
                 nombre: profile.name,
                 correo: profile.email,
                 fotoPerfil: profile.picture,
-                terminosYCondiciones: true,
-            }
+                authProvider:user.authProvider,
+                terminosYCondiciones: true,}
+
         }
 
         return null;
@@ -114,20 +117,11 @@ return data; // ahora sí es GoogleUserProfile
         if (userDoc==null)return null;
 
         const tokens = this.generateTokens(userDoc as UsuarioDocument); 
-        const userForClient= {
-    nombre: userDoc.nombre,
-    correo: userDoc.correo,
-    fotoPerfil:userDoc.fotoPerfil,
-    terminosYCondiciones: userDoc.terminosYCondiciones,
-    //apellido: userDoc.apellido,
-    //telefono: userDoc.telefono,
-    // si quieres la foto de Google, pásala desde el service como campo aparte:
-    // fotoPerfil: profile.picture,
-    };
+        
         return {
             accessToken: tokens.accessToken,
             refreshToken: tokens.refreshToken,
-            user: userForClient ,
+            user: userDoc ,
             expiresAt: new Date(),
         }
     }
