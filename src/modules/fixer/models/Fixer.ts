@@ -13,6 +13,11 @@ export type PaymentAccount = {
   accountNumber: string;
 };
 
+export type FixerSkill = {
+  categoryId: string;
+  customDescription?: string;
+};
+
 const LocationSchema = new Schema<Location>(
   {
     lat: { type: Number, required: true, min: -90, max: 90 },
@@ -30,6 +35,14 @@ const PaymentAccountSchema = new Schema<PaymentAccount>(
   { _id: false }
 );
 
+const FixerSkillSchema = new Schema<FixerSkill>(
+  {
+    categoryId: { type: String, required: true, trim: true },
+    customDescription: { type: String, trim: true, maxlength: 800 },
+  },
+  { _id: false }
+);
+
 export interface FixerDoc extends Document {
   fixerId: string;
   userId: string;
@@ -41,6 +54,7 @@ export interface FixerDoc extends Document {
   bio?: string;
   location?: Location;
   categories: string[];
+  skills: FixerSkill[];
   paymentMethods: PaymentMethod[];
   paymentAccounts: Partial<Record<PaymentMethod, PaymentAccount>>;
   termsAccepted: boolean;
@@ -69,6 +83,7 @@ const FixerSchema = new Schema<FixerDoc>(
       enum: ["card", "qr", "cash"],
       default: [],
     },
+    skills: { type: [FixerSkillSchema], default: [] },
     paymentAccounts: {
       type: Map,
       of: PaymentAccountSchema,

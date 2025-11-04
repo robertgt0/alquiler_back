@@ -15,12 +15,12 @@ router.get("/", async (_req, res) => {
 
 router.post("/", async (req, res) => {
   try {
-    const { name } = req.body || {};
-    const created = await service.create(name);
+    const { name, description } = req.body || {};
+    const created = await service.create(name, description);
     res.status(201).json({ success: true, data: created, message: "Su tipo de trabajo fue registrado con exito" });
   } catch (err: any) {
     const msg = String(err?.message || "Error");
-    const isClientError = /existe|invalidas?|vacio|Minimo|Maximo|Solo|palabras/i.test(msg);
+    const isClientError = /existe|invalidas?|vacio|Minimo|Maximo|Solo|palabras|descripcion/i.test(msg);
     res.status(isClientError ? 400 : 500).json({ success: false, message: msg });
   }
 });

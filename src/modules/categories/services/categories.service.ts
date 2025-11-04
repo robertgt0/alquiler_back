@@ -28,6 +28,8 @@ const seedNames = [
 const FORBIDDEN = ["xxx", "spam", "invalido", "prueba", "test"];
 const MIN = 3;
 const MAX = 40;
+const DESC_MIN = 20;
+const DESC_MAX = 800;
 
 function slugify(value: string) {
   return value
@@ -44,6 +46,7 @@ function toDTO(doc: CategoryDoc): Category {
     id: doc.id,
     name: doc.name,
     slug: doc.slug,
+    description: typeof doc.description === "string" ? doc.description : "",
     createdAt: doc.createdAt instanceof Date ? doc.createdAt.toISOString() : String(doc.createdAt),
   };
 }
@@ -91,6 +94,7 @@ async function seedDefaults() {
           id: randomUUID(),
           name,
           slug,
+          description: "",
         },
       },
       { upsert: true }
@@ -122,16 +126,25 @@ class CategoriesService {
     return trimmed;
   }
 
+  private validateDescription(description: string) {
+    const trimmed = (description ?? "").trim();
+    if (!trimmed) throw new Error("Debes ingresar una descripcion general");
+    if (trimmed.length < DESC_MIN) throw new Error(`Minimo ${DESC_MIN} caracteres`);
+    if (trimmed.length > DESC_MAX) throw new Error(`Maximo ${DESC_MAX} caracteres`);
+    return trimmed;
+  }
+
   async list(): Promise<Category[]> {
     await this.ensureReady();
     const docs = await CategoryModel.find().sort({ name: 1 }).lean<CategoryDoc[]>();
     return docs.map(toDTO);
   }
 
-  async create(name: string): Promise<Category> {
+  async create(name: string, description: string): Promise<Category> {
     await this.ensureReady();
     const valid = this.validateName(name);
     const slug = slugify(valid);
+    const general = this.validateDescription(description);
 
     const exists = await CategoryModel.findOne({ slug }).lean();
     if (exists) throw new Error("El tipo de trabajo ya existe");
@@ -140,6 +153,7 @@ class CategoriesService {
       id: randomUUID(),
       name: valid,
       slug,
+      description: general,
     });
 
     return toDTO(doc);

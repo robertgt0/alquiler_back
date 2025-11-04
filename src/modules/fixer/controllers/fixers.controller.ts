@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import service from "../services/fixers.service";
+import type { FixerSkillInput } from "../services/fixers.service";
 import type { PaymentAccount, PaymentMethod } from "../models/Fixer";
 
 const ALLOWED_PAYMENTS: PaymentMethod[] = ["card", "qr", "cash"];
@@ -43,6 +44,39 @@ function normalizeCategories(raw: any): string[] | undefined {
     .filter(Boolean);
   if (!categories.length) throw new Error("Debes indicar al menos una categoria");
   return categories;
+}
+
+function normalizeSkills(raw: any): FixerSkillInput[] | undefined {
+  if (raw === undefined) return undefined;
+  if (!Array.isArray(raw)) throw new Error("Las habilidades deben ser un arreglo");
+  return raw
+    .map((item) => {
+      if (!item) return null;
+      const categoryId = String(item.categoryId ?? item.id ?? "").trim();
+      if (!categoryId) return null;
+      const custom =
+        item.customDescription === undefined || item.customDescription === null
+          ? undefined
+          : String(item.customDescription).trim();
+      return custom ? { categoryId, customDescription: custom } : { categoryId };
+    })
+    .filter((value): value is FixerSkillInput => value !== null);
+}
+
+function mergeCategoryIds(
+  categories: string[] | undefined,
+  skills: FixerSkillInput[] | undefined
+): string[] {
+  const set = new Set<string>();
+  (categories ?? []).forEach((value) => {
+    const trimmed = typeof value === "string" ? value.trim() : "";
+    if (trimmed) set.add(trimmed);
+  });
+  (skills ?? []).forEach((skill) => {
+    const trimmed = typeof skill.categoryId === "string" ? skill.categoryId.trim() : "";
+    if (trimmed) set.add(trimmed);
+  });
+  return Array.from(set);
 }
 
 function normalizePaymentMethods(raw: any): PaymentMethod[] {
@@ -103,6 +137,7 @@ export const createFixer = async (req: Request, res: Response) => {
 
     const location = normalizeLocation(req.body?.location);
     const categories = normalizeCategories(req.body?.categories);
+    const skills = normalizeSkills(req.body?.skills);
     const methods = normalizePaymentMethods(req.body?.paymentMethods);
     const accounts = normalizeAccounts(req.body?.paymentAccounts, methods);
 
@@ -114,6 +149,7 @@ export const createFixer = async (req: Request, res: Response) => {
       ci,
       location,
       categories,
+      skills,
       paymentMethods: methods,
       paymentAccounts: accounts,
       termsAccepted: termsAcceptedValue,
@@ -187,9 +223,14 @@ export const updateCategories = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
     const categories = normalizeCategories(req.body?.categories);
-    if (!categories) return res.status(400).json({ success: false, message: "Categorias invalidas" });
+    const skills = normalizeSkills(req.body?.skills);
+    const merged = mergeCategoryIds(categories, skills);
+    if (!merged.length) return res.status(400).json({ success: false, message: "Debes indicar al menos una categoria" });
 
-    const updated = await service.updateCategories(id, categories);
+    const updated =
+      skills !== undefined
+        ? await service.updateSkills(id, merged, skills)
+        : await service.updateCategories(id, merged);
     if (!updated) return res.status(404).json({ success: false, message: "Fixer no encontrado" });
     res.json({ success: true, data: updated });
   } catch (err: any) {

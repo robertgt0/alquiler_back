@@ -5,11 +5,27 @@ import {
   PaymentAccount,
   PaymentMethod,
   Location,
+  FixerSkill,
 } from "../models/Fixer";
 import { UserModel } from "../../../models/User";
 import type { UserDoc } from "../../../models/User";
 import categoriesService from "../../categories/services/categories.service";
 import type { Category } from "../../categories/types";
+
+export type FixerSkillInput = {
+  categoryId: string;
+  customDescription?: string;
+};
+
+export type FixerSkillView = {
+  category: Category;
+  description: string;
+  customDescription?: string;
+  source: "personal" | "general";
+};
+
+const CUSTOM_DESC_MIN = 10;
+const CUSTOM_DESC_MAX = 800;
 
 export type FixerRecord = {
   id: string;
@@ -17,6 +33,7 @@ export type FixerRecord = {
   ci?: string;
   location?: Location;
   categories?: string[];
+  skills?: FixerSkill[];
   paymentMethods?: PaymentMethod[];
   paymentAccounts?: Partial<Record<PaymentMethod, PaymentAccount>>;
   termsAccepted?: boolean;
@@ -31,9 +48,14 @@ export type FixerRecord = {
   ratingAvg?: number;
   ratingCount?: number;
   memberSince?: string;
+  categoriesInfo?: Category[];
+  skillsInfo?: FixerSkillView[];
 };
 
-export type FixerWithCategories = FixerRecord & { categoriesInfo: Category[] };
+export type FixerWithCategories = FixerRecord & {
+  categoriesInfo: Category[];
+  skillsInfo?: FixerSkillView[];
+};
 
 export type FixersByCategoryResult = {
   category: Category;
@@ -46,6 +68,7 @@ export type CreateFixerDTO = {
   ci: string;
   location?: Location;
   categories?: string[];
+  skills?: FixerSkillInput[];
   paymentMethods?: PaymentMethod[];
   paymentAccounts?: Partial<Record<PaymentMethod, PaymentAccount>>;
   termsAccepted?: boolean;
@@ -69,12 +92,36 @@ function toRecord(doc: FixerDoc | null): FixerRecord | null {
     paymentAccounts?: Record<PaymentMethod, PaymentAccount>;
   };
 
+  const skillsRaw = Array.isArray((plain as any).skills) ? (plain as any).skills : [];
+  const skills: FixerSkill[] = skillsRaw
+    .map((item: any) => {
+      const categoryId = typeof item?.categoryId === "string" ? item.categoryId.trim() : "";
+      if (!categoryId) return null;
+      const custom = typeof item?.customDescription === "string" ? item.customDescription.trim() : "";
+      const skill: FixerSkill = { categoryId };
+      if (custom) skill.customDescription = custom;
+      return skill;
+    })
+    .filter((value: FixerSkill | null): value is FixerSkill => value !== null);
+
+  const categorySet = new Set<string>();
+  if (Array.isArray((plain as any).categories)) {
+    (plain as any).categories.forEach((value: any) => {
+      const str = typeof value === "string" ? value.trim() : "";
+      if (str) categorySet.add(str);
+    });
+  }
+  skills.forEach((skill) => {
+    if (skill.categoryId) categorySet.add(skill.categoryId);
+  });
+
   return {
     id: plain.fixerId,
     userId: plain.userId,
     ci: plain.ci,
     location: plain.location,
-    categories: plain.categories,
+    categories: Array.from(categorySet),
+    skills,
     paymentMethods: plain.paymentMethods,
     paymentAccounts: plain.paymentAccounts ?? {},
     termsAccepted: plain.termsAccepted,
@@ -191,6 +238,176 @@ async function attachUserData(record: FixerRecord | null): Promise<FixerRecord |
 }
 
 class FixersService {
+  private sanitizeCategoryIds(ids?: string[] | null): string[] {
+    if (!ids || !ids.length) return [];
+    const set = new Set<string>();
+    for (const value of ids) {
+      const trimmed = typeof value === "string" ? value.trim() : "";
+      if (trimmed) set.add(trimmed);
+    }
+    return Array.from(set);
+  }
+
+  private sanitizeSkillsInput(list?: FixerSkillInput[]): FixerSkill[] {
+    if (!Array.isArray(list) || !list.length) return [];
+    const seen = new Map<string, FixerSkill>();
+
+    list.forEach((item) => {
+      if (!item) return;
+      const categoryId = typeof item.categoryId === "string" ? item.categoryId.trim() : "";
+      if (!categoryId) return;
+
+      const rawCustom =
+        item.customDescription === undefined || item.customDescription === null
+          ? undefined
+          : String(item.customDescription).trim();
+      let custom: string | undefined;
+      if (rawCustom) {
+        if (rawCustom.length < CUSTOM_DESC_MIN) {
+          throw new Error(`La descripcion personalizada debe tener al menos ${CUSTOM_DESC_MIN} caracteres`);
+        }
+        if (rawCustom.length > CUSTOM_DESC_MAX) {
+          throw new Error(`La descripcion personalizada no puede superar ${CUSTOM_DESC_MAX} caracteres`);
+        }
+        custom = rawCustom;
+      }
+
+      const existing = seen.get(categoryId);
+      if (existing) {
+        if (custom) {
+          existing.customDescription = custom;
+        } else {
+          delete existing.customDescription;
+        }
+        return;
+      }
+
+      const entry: FixerSkill = { categoryId };
+      if (custom) entry.customDescription = custom;
+      seen.set(categoryId, entry);
+    });
+
+    return Array.from(seen.values());
+  }
+
+  private collectCategoryIds(record: FixerRecord | null): string[] {
+    if (!record) return [];
+    const combined: string[] = [];
+    if (Array.isArray(record.categories)) combined.push(...record.categories);
+    if (Array.isArray(record.skills)) {
+      record.skills.forEach((skill) => {
+        if (skill?.categoryId) combined.push(skill.categoryId);
+      });
+    }
+    return this.sanitizeCategoryIds(combined);
+  }
+
+  private resolveCategory(
+    value: string | undefined,
+    byId: Map<string, Category>,
+    byLookup: Map<string, Category>
+  ): Category | undefined {
+    const raw = typeof value === "string" ? value.trim() : "";
+    if (!raw) return undefined;
+    return byId.get(raw) ?? byLookup.get(raw.toLowerCase());
+  }
+
+  private buildSkillData(
+    record: FixerRecord,
+    byId: Map<string, Category>,
+    byLookup: Map<string, Category>
+  ) {
+    const categoriesInfo: Category[] = [];
+    const skillsInfo: FixerSkillView[] = [];
+    const seenCategories = new Set<string>();
+    const skillMap = new Map<string, FixerSkillView>();
+
+    const addCategory = (cat?: Category) => {
+      if (!cat) return;
+      if (seenCategories.has(cat.id)) return;
+      seenCategories.add(cat.id);
+      categoriesInfo.push(cat);
+    };
+
+    (record.skills ?? []).forEach((skill) => {
+      const cat = this.resolveCategory(skill?.categoryId, byId, byLookup);
+      if (!cat) return;
+      addCategory(cat);
+      const custom = typeof skill?.customDescription === "string" ? skill.customDescription.trim() : "";
+      const view: FixerSkillView = {
+        category: cat,
+        customDescription: custom ? custom : undefined,
+        description: custom ? custom : cat.description ?? "",
+        source: custom ? "personal" : "general",
+      };
+      skillsInfo.push(view);
+      skillMap.set(cat.id, view);
+    });
+
+    const sanitizedCategories = this.sanitizeCategoryIds(record.categories);
+    sanitizedCategories.forEach((value) => {
+      const cat = this.resolveCategory(value, byId, byLookup);
+      if (!cat) return;
+      addCategory(cat);
+      if (!skillMap.has(cat.id)) {
+        const view: FixerSkillView = {
+          category: cat,
+          description: cat.description ?? "",
+          source: "general",
+        };
+        skillsInfo.push(view);
+        skillMap.set(cat.id, view);
+      }
+    });
+
+    categoriesInfo.sort((a, b) => a.name.localeCompare(b.name));
+    skillsInfo.sort((a, b) => a.category.name.localeCompare(b.category.name));
+
+    const normalizedCategories = this.sanitizeCategoryIds([
+      ...sanitizedCategories,
+      ...skillsInfo.map((item) => item.category.id),
+    ]);
+
+    return { categoriesInfo, skillsInfo, categories: normalizedCategories };
+  }
+
+  private async hydrateSingle(record: FixerRecord | null): Promise<FixerRecord | null> {
+    if (!record) return null;
+    const categoryIds = this.collectCategoryIds(record);
+    if (!categoryIds.length) {
+      return { ...record, categories: [], categoriesInfo: [], skillsInfo: [] };
+    }
+
+    const categories = await categoriesService.getByIds(categoryIds);
+    if (!categories.length) {
+      return { ...record, categories: categoryIds, categoriesInfo: [], skillsInfo: [] };
+    }
+
+    const byId = new Map<string, Category>();
+    const byLookup = new Map<string, Category>();
+    categories.forEach((cat) => {
+      byId.set(cat.id, cat);
+      [cat.id, cat.slug, cat.name].forEach((key) => {
+        if (typeof key === "string" && key.trim()) {
+          byLookup.set(key.trim().toLowerCase(), cat);
+        }
+      });
+    });
+
+    const { categoriesInfo, skillsInfo, categories: normalizedCategories } = this.buildSkillData(
+      record,
+      byId,
+      byLookup
+    );
+
+    return {
+      ...record,
+      categories: normalizedCategories,
+      categoriesInfo,
+      skillsInfo,
+    };
+  }
+
   async create(data: CreateFixerDTO) {
     if (!Types.ObjectId.isValid(data.userId)) {
       throw new Error("userId invalido: se espera ObjectId de Mongo");
@@ -204,11 +421,28 @@ class FixersService {
     const userObjectId = new Types.ObjectId(data.userId);
     const userIdStr = userObjectId.toString();
 
+    const skillsProvided = data.skills !== undefined;
+    const sanitizedSkills = skillsProvided ? this.sanitizeSkillsInput(data.skills) : undefined;
+    const categoriesProvided = data.categories !== undefined;
+    const sanitizedCategories = categoriesProvided ? this.sanitizeCategoryIds(data.categories) : undefined;
+    const mergedCategories =
+      categoriesProvided || skillsProvided
+        ? this.sanitizeCategoryIds([
+            ...(sanitizedCategories ?? []),
+            ...((sanitizedSkills ?? []).map((skill) => skill.categoryId)),
+          ])
+        : undefined;
+
     const existingByUser = await FixerModel.findOne({ userId: userIdStr });
     if (existingByUser) {
       existingByUser.ci = data.ci;
       if (data.location !== undefined) existingByUser.location = data.location;
-      if (data.categories !== undefined) existingByUser.categories = data.categories;
+      if (categoriesProvided || skillsProvided) {
+        existingByUser.categories = mergedCategories ?? [];
+      }
+      if (skillsProvided) {
+        existingByUser.skills = sanitizedSkills ?? [];
+      }
       if (data.paymentMethods !== undefined) existingByUser.paymentMethods = data.paymentMethods;
       if (data.paymentAccounts !== undefined) existingByUser.paymentAccounts = data.paymentAccounts ?? {};
       if (data.termsAccepted !== undefined) existingByUser.termsAccepted = Boolean(data.termsAccepted);
@@ -219,7 +453,7 @@ class FixersService {
       if (!existingByUser.whatsapp) existingByUser.whatsapp = extractPhone(user) ?? existingByUser.whatsapp;
       if (!existingByUser.bio) existingByUser.bio = extractBio(user) ?? existingByUser.bio;
       await existingByUser.save();
-      return attachUserData(toRecord(existingByUser));
+      return this.hydrateSingle(await attachUserData(toRecord(existingByUser)));
     }
 
     const now = new Date();
@@ -230,7 +464,8 @@ class FixersService {
       userId: userIdStr,
       ci: data.ci,
       location: data.location,
-      categories: data.categories ?? [],
+      categories: mergedCategories ?? [],
+      skills: sanitizedSkills ?? [],
       paymentMethods: data.paymentMethods ?? [],
       paymentAccounts: data.paymentAccounts ?? {},
       termsAccepted: Boolean(data.termsAccepted ?? false),
@@ -250,16 +485,32 @@ class FixersService {
       { $set: { rol: "fixer" } }
     ).catch(() => undefined);
 
-    return attachUserData(toRecord(doc));
+    return this.hydrateSingle(await attachUserData(toRecord(doc)));
   }
 
   async update(id: string, data: UpdateFixerDTO) {
     const update: Record<string, unknown> = {};
 
+    const skillsProvided = data.skills !== undefined;
+    const sanitizedSkills = skillsProvided ? this.sanitizeSkillsInput(data.skills) : undefined;
+    const categoriesProvided = data.categories !== undefined;
+    const sanitizedCategories = categoriesProvided ? this.sanitizeCategoryIds(data.categories) : undefined;
+
+    if (skillsProvided) {
+      update.skills = sanitizedSkills ?? [];
+    }
+
+    if (categoriesProvided || skillsProvided) {
+      const merged = this.sanitizeCategoryIds([
+        ...(sanitizedCategories ?? []),
+        ...((sanitizedSkills ?? []).map((skill) => skill.categoryId)),
+      ]);
+      update.categories = merged;
+    }
+
     if (data.userId !== undefined) update.userId = data.userId;
     if (data.ci !== undefined) update.ci = data.ci;
     if (data.location !== undefined) update.location = data.location;
-    if (data.categories !== undefined) update.categories = data.categories;
     if (data.paymentMethods !== undefined) update.paymentMethods = data.paymentMethods;
     if (data.paymentAccounts !== undefined) update.paymentAccounts = data.paymentAccounts;
     if (data.termsAccepted !== undefined) update.termsAccepted = Boolean(data.termsAccepted);
@@ -275,7 +526,7 @@ class FixersService {
 
     if (Object.keys(update).length === 0) {
       const existing = await FixerModel.findOne(buildIdQuery(id));
-      return toRecord(existing);
+      return this.hydrateSingle(await attachUserData(toRecord(existing)));
     }
 
     const doc = await FixerModel.findOneAndUpdate(
@@ -288,22 +539,22 @@ class FixersService {
       }
     );
 
-    return attachUserData(toRecord(doc));
+    return this.hydrateSingle(await attachUserData(toRecord(doc)));
   }
 
   async getById(id: string) {
     const doc = await FixerModel.findOne(buildIdQuery(id));
-    return attachUserData(toRecord(doc));
+    return this.hydrateSingle(await attachUserData(toRecord(doc)));
   }
 
   async getByUserId(userId: string) {
     const doc = await FixerModel.findOne({ userId });
-    return attachUserData(toRecord(doc));
+    return this.hydrateSingle(await attachUserData(toRecord(doc)));
   }
 
   async findByCI(ci: string) {
     const doc = await FixerModel.findOne({ ci });
-    return attachUserData(toRecord(doc));
+    return this.hydrateSingle(await attachUserData(toRecord(doc)));
   }
 
   async isCIUnique(ci: string, excludeId?: string) {
@@ -331,13 +582,23 @@ class FixersService {
     const docs = await FixerModel.find(filter);
     if (!docs.length) return [];
 
-    const records = await Promise.all(docs.map(async (doc) => attachUserData(toRecord(doc))));
-    const valid = records.filter((rec): rec is FixerRecord => Boolean(rec && rec.categories && rec.categories.length));
+    const normalizedRecords = await Promise.all<(FixerRecord & { categories: string[] }) | null>(
+      docs.map(async (doc) => {
+        const record = await attachUserData(toRecord(doc));
+        if (!record) return null;
+        const categories = this.collectCategoryIds(record);
+        return { ...(record as FixerRecord), categories } as FixerRecord & { categories: string[] };
+      })
+    );
+
+    const valid = normalizedRecords.filter(
+      (rec): rec is FixerRecord & { categories: string[] } => Boolean(rec && rec.categories.length)
+    );
     if (!valid.length) return [];
 
     const categoryIds = new Set<string>();
     valid.forEach((rec) => {
-      (rec.categories ?? []).forEach((id) => {
+      this.collectCategoryIds(rec).forEach((id) => {
         if (id) categoryIds.add(id);
       });
     });
@@ -348,41 +609,37 @@ class FixersService {
     if (!categories.length) return [];
 
     const categoryById = new Map<string, Category>();
-    const categoryMap = new Map<string, Category>();
+    const categoryLookup = new Map<string, Category>();
     categories.forEach((cat) => {
       categoryById.set(cat.id, cat);
-      [cat.id, cat.slug, cat.name, cat.name.toLowerCase()].forEach((key) => {
+      [cat.id, cat.slug, cat.name].forEach((key) => {
         if (typeof key === "string" && key.trim()) {
-          categoryMap.set(key, cat);
+          categoryLookup.set(key.trim().toLowerCase(), cat);
         }
       });
     });
-    if (!categoryMap.size || !categoryById.size) return [];
+    if (!categoryLookup.size || !categoryById.size) return [];
 
     const grouped = new Map<string, FixerWithCategories[]>();
 
     valid.forEach((rec) => {
-      const categoriesInfo = (rec.categories ?? [])
-        .map((raw) => {
-          const candidate = typeof raw === "string" ? raw.trim() : "";
-          if (!candidate) return undefined;
-          return categoryMap.get(candidate) ?? categoryMap.get(candidate.toLowerCase());
-        })
-        .filter((cat): cat is Category => Boolean(cat));
+      const { categoriesInfo, skillsInfo, categories: normalized } = this.buildSkillData(
+        rec,
+        categoryById,
+        categoryLookup
+      );
 
       if (!categoriesInfo.length) return;
 
       const fixerWithCategories: FixerWithCategories = {
         ...rec,
+        categories: normalized,
         categoriesInfo,
+        skillsInfo,
       };
 
-      (rec.categories ?? []).forEach((raw) => {
-        const candidate = typeof raw === "string" ? raw.trim() : "";
-        const key = candidate ? candidate : "";
-        const effectiveKey = key ? key : "";
-        const category =
-          key && (categoryMap.get(key) ?? categoryMap.get(key.toLowerCase()));
+      normalized.forEach((value) => {
+        const category = this.resolveCategory(value, categoryById, categoryLookup);
         if (!category) return;
         const mapKey = category.id;
         if (!grouped.has(mapKey)) grouped.set(mapKey, []);
@@ -420,6 +677,10 @@ class FixersService {
 
   async updateCategories(id: string, categories: string[]) {
     return this.update(id, { categories });
+  }
+
+  async updateSkills(id: string, categories: string[], skills: FixerSkillInput[]) {
+    return this.update(id, { categories, skills });
   }
 
   async updatePaymentInfo(
