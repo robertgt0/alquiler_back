@@ -10,6 +10,7 @@ type JwtPayload = jwt.JwtPayload;
 type AppJWTPayload = JwtPayload & { userId: string; email: string };
 import mongoose from "mongoose";
 import { UserDocument } from "../models/teamsys";
+import { MagicLink } from '../models/magic-link.model'; 
 
 export class AuthService  {
     
@@ -147,4 +148,81 @@ return data; // ahora sí es GoogleUserProfile
             }
         }
     }
+    async generateMagicLinkToken(email: string): Promise<string> {
+  // Verificar si el correo existe en la BD
+  const userExists = await teamsysService.verificarCorreo(email);
+  
+  if (!userExists) {
+    console.log("correo no esta en la BD");
+    throw new Error('Correo no registrado');
+  }
+
+  // Obtener el usuario completo usando teamsysService
+  const user = await teamsysService.getUserByEmail(email);
+  if (!user) {
+    throw new Error('Usuario no encontrado');
+  }
+
+  // Generar token único
+  const token = jwt.sign(
+    { 
+      email: email, 
+      userId: (user._id as mongoose.Types.ObjectId).toString(),
+      type: 'magic_link' 
+    },
+    this.jwtSecret,
+    { expiresIn: '5m' }
+  );
+
+  // Guardar token en BD
+  const magicLinkDoc = new MagicLink({
+    token: token,
+    email: email,
+    userId: (user._id as mongoose.Types.ObjectId).toString(),
+    expiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 minutos
+    used: false
+  });
+
+  await magicLinkDoc.save();
+
+  return token;
+}
+
+//h4 magic link
+/**
+ * Verificar token de magic link
+ */
+async verifyMagicLinkToken(token: string): Promise<JWTPayload> {
+  try {
+    // Verificar en BD primero
+    const magicLink = await MagicLink.findOne({ 
+      token: token,
+      used: false,
+      expiresAt: { $gt: new Date() }
+    });
+
+    if (!magicLink) {
+      throw new Error('Token inválido o expirado');
+    }
+
+    // Verificar JWT
+    const payload = this.verifyAccessToken(token) as JWTPayload;
+
+    // Marcar como usado
+    magicLink.used = true;
+    await magicLink.save();
+
+    return payload;
+  } catch (error) {
+    throw new Error('Token de magic link inválido');
+  }
+}
+
+/**
+ * Obtener usuario por email
+ */
+async getUserByEmail(email: string): Promise<import("../models/teamsys").UserDocument | null> {
+  const Usuario = require('../models/teamsys').default;
+  return await Usuario.findOne({ correo: email });
+}
 }

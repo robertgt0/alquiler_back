@@ -44,7 +44,7 @@ export class SessionController {
 	 * Eliminar una sesion especifica
 	 * DELETE /api/sessions/:sessionId
 	 */
-	deleteSession = async (req:Request, res:Response): Promise<void> => {
+	deleteSession = async (req: Request, res: Response): Promise<void> => {
 		try {
 			const { sessionId } = req.params;
 			const { userId } = req.user as JWTPayload;
@@ -55,33 +55,34 @@ export class SessionController {
 				success: true,
 				message: 'Sesión eliminada exitosamente'
 			});
-	} catch (error) {
-		const errorMessage = error instanceof Error ? error.message: 'Error desconocido'; 
-		
-		res.status(400).json({
-			success: false,
-			message: 'Error al eliminar session',
-			error: errorMessage
-		});
+		} catch (error) {
+			const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+
+			res.status(400).json({
+				success: false,
+				message: 'Error al eliminar session',
+				error: errorMessage
+			});
+		}
 	}
-}
-  /**
-	* Eliminar todas las sesiones excepto la actual
-  * DELETE /api/sessions/user/:userId/all-except-current
-  */
-	deleteAllSessionsExceptCurrent = async (req:Request, res:Response): Promise<void> => {
+	/**
+	  * Eliminar todas las sesiones excepto la actual
+	* DELETE /api/sessions/user/:userId/all-except-current
+	*/
+	deleteAllSessionsExceptCurrent = async (req: Request, res: Response): Promise<void> => {
 		try {
 			const { email, userId } = req.user as JWTPayload;
 
 			const authHeader = req.headers.authorization as string;
 			if (!authHeader || !authHeader.startsWith('Bearer ')) {
-					res.status(401).json({
-							success: false,
-							'message': 'Unauthorized'
-					});
+				res.status(401).json({
+					success: false,
+					'message': 'Unauthorized'
+				});
+				return;
 			}
 
-      const token = authHeader.split(' ')[1];
+			const token = authHeader.split(' ')[1];
 
 			const session = await this.sessionService.getSessionsByToken(token);
 			await this.sessionService.deleteAllSessionsExceptCurrent(userId, session._id.toString());
@@ -90,16 +91,16 @@ export class SessionController {
 				success: true,
 				message: 'Sesiónes eliminadas exitosamente',
 			});
-	} catch (error) {
-		const errorMessage = error instanceof Error ? error.message: 'Error desconocido'; 
+		} catch (error) {
+			const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
 
-		res.status(400).json({
-			success: false,
-			message: 'Error al eliminar sessiones',
-			error: errorMessage
-		});
-	}
-};
+			res.status(400).json({
+				success: false,
+				message: 'Error al eliminar sessiones',
+				error: errorMessage
+			});
+		}
+	};
 
 }
 

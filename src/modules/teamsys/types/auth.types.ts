@@ -29,3 +29,13 @@ export interface GoogleUserProfile {
     picture: string;
     locale?: string;
 }
+
+/**h4 magiclink */
+export interface MagicLinkToken {
+  token: string;
+  email: string;
+  userId: string;
+  expiresAt: Date;
+  used: boolean;
+  createdAt: Date;
+}

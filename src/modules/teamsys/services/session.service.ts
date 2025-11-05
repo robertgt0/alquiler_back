@@ -5,7 +5,7 @@ import { DeviceParser } from "../utils/deviceParser.util";
 import User from "../models/teamsys";
 
 export class SessionService {
-	
+
 	/**
 	 * Obtener la session por token 
 	 */
@@ -15,7 +15,7 @@ export class SessionService {
 			isActive: true,
 		});
 
-		if (! session) {
+		if (!session) {
 			throw new Error('Session no encontrada');
 		}
 
@@ -100,8 +100,11 @@ export class SessionService {
 	}
 
 	/**
- 	* Eliminar todas las sesiones de un usuario 
- 	*/
+	  * Eliminar todas las sesiones de un usuario 
+	* @param userId - ID del usuario
+	* @param currentSessionId - ID de la sesión a excluir (opcional). Si no se proporciona, se eliminan TODAS las sesiones
+	* */
+ 	
 	async deleteAllSessionsExceptCurrent(userId: string, currentSessionId: string): Promise<number> {
 		if ((!mongoose.Types.ObjectId.isValid(userId))) {
 			throw new Error('ID de usuario invalido');
@@ -127,5 +130,36 @@ export class SessionService {
 		});
 
 		return result.modifiedCount
+	}
+	/**
+    * Eliminar sesiones de usuario Miguel H3 "cambiar contraseña"
+    * @param userId - ID del usuario
+    * @param currentSessionId - ID de la sesión a excluir (opcional). Si no se proporciona, se eliminan TODAS las sesiones
+    */
+	async deleteAllSessionsExceptCurrentM(userId: string, currentSessionId?: string): Promise<number> {
+		if ((!mongoose.Types.ObjectId.isValid(userId))) {
+			throw new Error('ID de usuario invalido');
+		}
+
+		// Construir filtro dinámicamente
+		const filter: any = {
+			userId: new mongoose.Types.ObjectId(userId),
+			isActive: true,
+		};
+
+		// Solo excluir sesión actual si se proporciona y es válida
+		if (currentSessionId && mongoose.Types.ObjectId.isValid(currentSessionId)) {
+			filter._id = { $ne: new mongoose.Types.ObjectId(currentSessionId) };
+		}
+		// Si currentSessionId es null, undefined, o string vacío, se eliminan TODAS
+
+		const result = await Session.updateMany(
+			filter,
+			{
+				$set: { isActive: false }
+			}
+		);
+
+		return result.modifiedCount;
 	}
 }
