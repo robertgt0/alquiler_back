@@ -7,6 +7,8 @@ import {
   remove,
   existsByEmail,
   actualizarAutentificacion,
+  agregarAutentificacion,
+  eliminarAutentificacion,
   updateMapa,
   updateTelefono,
   getAuthById
@@ -37,8 +39,9 @@ router.get('/exists', existsByEmail);
 /**
  * Auth routes
  */
-router.post('/auth-Method/:id',actualizarAutentificacion);
-router.get('/auth-Method/:id',getAuthById)
+router.post('/auth-Method/:id',agregarAutentificacion);
+router.delete('/auth-Method/:id',eliminarAutentificacion);
+router.get('/auth-Method/:id',getAuthById);
 router.post('/usuario/telefono/:id',updateTelefono);
 router.post('/usuario/ubicacion/:id',updateMapa);
 router.post("/google/callback", authController.googleCallback);

@@ -365,3 +365,108 @@ export const getAuthById= async (req: Request, res: Response): Promise<void> => 
     handleError(error, res);
   }
 };
+
+export const agregarAutentificacion = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const user=await teamsysService.getById(req.params.id);
+    const auth=await teamsysService.getUserAuthByUserId(req.params.id);
+    if(user==null || auth ==null)throw new Error("Usuario no existente");
+    const providers :string[]=auth.authProvider as string[];
+    const provider = String(req.body.provider ?? '').toLowerCase();
+    const password: string | undefined = req.body.password;
+    const email:string | undefined=req.body.email;
+    
+      if(providers.includes(provider)){
+        res.status(409).json({ success: false, message: `Este método ya está habilitado: ${provider}` });
+        return;
+        
+      }
+        if (provider === 'local') {
+        if (!password) {
+          res.status(400).json({ success: false, message: 'Debe proporcionar una contraseña para habilitar "local".' });
+          return;
+        }
+        if (!validarPassword(password)) {
+          res.status(400).json({ success: false, message: 'La contraseña no cumple con los requisitos mínimos.' });
+          return;
+        }
+      }
+      if(provider=='google'){
+        if(!(user.correo===email)){
+            res.status(404).json({ success: false, message: `el correo : ${email} no coincide` });
+            return;
+        }
+        user.authProvider=provider;
+      }
+      providers.push(provider);
+      if(provider=='google')user.authProvider=provider;
+      auth.authProvider=providers;
+      
+    
+
+    const data = await teamsysService.update(req.params.id, user);
+    const authData=await teamsysService.updateUserAuthProviders(req.params.id,auth.authProvider)
+    if (!data || !authData) {
+      res.status(404).json({
+        success: false,
+        message: 'Registro no encontrado',
+      });
+      return;
+    }
+    const response: ApiResponse<UserDocument> = {
+      success: true,
+      data,
+      message: 'Registro actualizado exitosamente'
+    };
+    res.json(response);
+  } catch (error) {
+    handleError(error, res);
+  }
+};
+
+export const eliminarAutentificacion = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const user=await teamsysService.getById(req.params.id);
+    const auth=await teamsysService.getUserAuthByUserId(req.params.id);
+    if(user==null || auth ==null)throw new Error("Usuario no existente");
+    const providers :string[]=auth.authProvider as string[];
+    const provider = String(req.body.provider ?? '').toLowerCase();
+    const password: string | undefined = req.body.password;
+    const email:string | undefined=req.body.email;
+
+      if (!providers.includes(provider)) {
+        res.status(404).json({ success: false, message: `Este método no está habilitado: ${provider}` });
+        return;
+      }
+      if (providers.length <= 1) {
+        res.status(409).json({ success: false, message: 'No puedes eliminar tu único método de autenticación.' });
+        return;
+      }
+
+      // Si eliminamos LOCAL, removemos password
+      if (provider === 'local') {
+        user.password = undefined;
+      }
+      if(provider=='google')user.authProvider='local';
+      // Eliminar provider
+      auth.authProvider = providers.filter(p => p !== provider);
+
+    const data = await teamsysService.update(req.params.id, user);
+    const authData=await teamsysService.updateUserAuthProviders(req.params.id,auth.authProvider)
+    if (!data || !authData) {
+      res.status(404).json({
+        success: false,
+        message: 'Registro no encontrado',
+      });
+      return;
+    }
+    const response: ApiResponse<UserDocument> = {
+      success: true,
+      data,
+      message: 'Registro actualizado exitosamente'
+    };
+    res.json(response);
+  } catch (error) {
+    handleError(error, res);
+  }
+};
