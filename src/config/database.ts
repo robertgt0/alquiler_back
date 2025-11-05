@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-function getMongoUri() {
+function getMongoUri(): string {
   return process.env.MONGODB_URI ?? process.env.MONGO_URI ?? '';
 }
 
@@ -30,6 +30,11 @@ export async function connectDB(strict: boolean = true): Promise<void> {
   }
 }
 
-export default function connectDBOptional(): Promise<void> {
+export function connectDBOptional(): Promise<void> {
   return connectDB(false);
 }
+
+export default function connectDBStrict(): Promise<void> {
+  return connectDB(true);
+}
+

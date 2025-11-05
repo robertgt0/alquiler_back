@@ -1,17 +1,47 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
+    /* === Salida y estructura === */
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "sourceMap": true,
+    "declaration": false,
+    "removeComments": true,
+
+    /* === Módulos y compatibilidad === */
+    "target": "ES2022",
     "module": "commonjs",
     "moduleResolution": "node",
-    "outDir": "dist",
-    "rootDir": "src",
+    "lib": ["ES2022", "DOM"],
+
+    /* === Comportamiento del compilador === */
     "strict": true,
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,
-    "sourceMap": false
+    "skipLibCheck": true,
+
+    /* === Imports === */
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+
+    /* === Alias === */
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["*"],
+      "@config/*": ["config/*"],
+      "@modules/*": ["modules/*"],
+      "@controllers/*": ["modules/*/controllers/*"],
+      "@services/*": ["modules/*/services/*"],
+      "@models/*": ["models/*", "modules/*/models/*"],
+      "@utils/*": ["utils/*"]
+    },
+
+    /* === Opciones adicionales === */
+    "allowImportingTsExtensions": true,
+    "noUncheckedIndexedAccess": false,
+    "incremental": true
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }
