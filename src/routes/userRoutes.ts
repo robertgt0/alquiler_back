@@ -1,12 +1,26 @@
-import { Router } from "express";
-import devCodeRoutes from "../modules/DevCode";
-import ejemploRoutes from "../modules/nombre_grupo_ejemplo";
+import express from 'express';
+import teamsysRoutes from '../modules/teamsys/routes/teamsys.routes';
+
+const router = express.Router();
+router.use('/teamsys', teamsysRoutes); // ruta de crear usr /api/teamsys
+
+
+/*
+import {
+  getUsers,
+  getUserById,
+  createUser,
+  updateUser,
+  deleteUser,
+} from '../controllers/userController';
+ 
 
 const router = Router();
 
-router.use("/devcode", devCodeRoutes);
-router.use("/grupo-ejemplo", ejemploRoutes);
-
-
-
+router.get('/', getUsers);
+router.get('/:id', getUserById);
+router.post('/', createUser);
+router.put('/:id', updateUser);
+router.delete('/:id', deleteUser);
+*/
 export default router;
