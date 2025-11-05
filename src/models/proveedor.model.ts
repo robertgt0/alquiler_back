@@ -23,6 +23,7 @@ export interface IProveedor extends Document {
   telefono?: string;
   password: string; // se guarda hasheada
   servicios: IServicio[];
+  horarioLaboral?: IHorarioLaboral;
   disponibilidad: IDisponibilidad;
   ubicacion?: {
     lat: number;
@@ -31,6 +32,45 @@ export interface IProveedor extends Document {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface RangoHorario {
+  inicio: string;  // formato "HH:mm"
+  fin: string;     // formato "HH:mm"
+}
+
+export interface IDiaLaboral {
+  dia: number;     // [1,2,3,4,5,6,7] -> Lun a Dom
+  activo: boolean;
+  rangos: RangoHorario[];
+}
+
+export interface IHorarioLaboral {
+  modo: 'diaria' | 'semanal';
+  dias: IDiaLaboral[];
+  updatedAt?: Date;
+}
+
+const RangoHorarioSchema = new Schema<RangoHorario>({
+  inicio: { type: String, required: true },
+  fin: { type: String, required: true }
+}, { _id: false });
+
+const DiaLaboralSchema = new Schema<IDiaLaboral>({
+  dia: { type: Number, required: true },
+  activo: { type: Boolean, default: false },
+  rangos: [RangoHorarioSchema]
+}, { _id: false });
+
+const HorarioLaboralSchema = new Schema<IHorarioLaboral>({
+  modo: { 
+    type: String, 
+    enum: ['diaria', 'semanal'], 
+    required: true 
+  },
+  dias: [DiaLaboralSchema],
+  updatedAt: { type: Date, default: Date.now }
+}, { _id: false });
+
 
 const ServicioSchema = new Schema<IServicio>({
   nombre: { type: String, required: true },
@@ -55,6 +95,7 @@ const ProveedorSchema = new Schema<IProveedor>(
     telefono: { type: String },
     password: { type: String, required: true },
     servicios: [ServicioSchema],
+    horarioLaboral: { type: HorarioLaboralSchema },
     disponibilidad: { type: DisponibilidadSchema, required: true },
     ubicacion: {
       lat: { type: Number },
