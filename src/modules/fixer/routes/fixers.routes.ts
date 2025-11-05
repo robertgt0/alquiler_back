@@ -1,5 +1,17 @@
 import { Router, Request, Response } from "express";
-import { createFixer, getFixer, updateIdentity, checkCI, updateLocation, updatePayments, acceptTerms, updateCategories } from "../controllers/fixers.controller";
+import { 
+  createFixer, 
+  getFixer, 
+  updateIdentity, 
+  checkCI, 
+  updateLocation, 
+  updatePayments, 
+  acceptTerms, 
+  updateCategories,
+  updateFixerJobs,    // ⬇️ NUEVO
+  addFixerJob,        // ⬇️ NUEVO
+  getFixerJobDescription  // ⬇️ NUEVO
+} from "../controllers/fixers.controller";
 
 const router = Router();
 
@@ -16,11 +28,14 @@ router.get("/", (_req: Request, res: Response) => {
       "PUT /:id/payments",
       "PUT /:id/terms",
       "GET /:id",
+      "PUT /:id/jobs",           // ⬇️ NUEVO
+      "POST /:id/jobs",          // ⬇️ NUEVO
+      "GET /:id/jobs/:jobId",    // ⬇️ NUEVO
     ],
   });
 });
 
-// Handlers (ya asegurados como funciones)
+// Rutas existentes
 router.get("/check-ci", checkCI);
 router.post("/", createFixer);
 router.put("/:id/identity", updateIdentity);
@@ -29,5 +44,10 @@ router.put("/:id/categories", updateCategories);
 router.put("/:id/payments", updatePayments);
 router.put("/:id/terms", acceptTerms);
 router.get("/:id", getFixer);
+
+// ⬇️⬇️⬇️ NUEVAS RUTAS PARA FIXERJOBS ⬇️⬇️⬇️
+router.put("/:id/jobs", updateFixerJobs);           // Actualizar todos los trabajos
+router.post("/:id/jobs", addFixerJob);              // Agregar/actualizar un trabajo
+router.get("/:id/jobs/:jobId", getFixerJobDescription);  // Obtener descripción
 
 export default router;

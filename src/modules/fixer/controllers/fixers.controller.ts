@@ -198,3 +198,123 @@ export const acceptTerms = (req: Request, res: Response) => {
     res.status(400).json({ success: false, message: String(err.message || "Error") });
   }
 };
+
+// ⬇️⬇️⬇️ NUEVOS CONTROLADORES PARA FIXERJOBS ⬇️⬇️⬇️
+
+import { FixerJob } from "../services/fixers.service";
+
+function normalizeFixerJob(raw: any): FixerJob {
+  if (!raw) throw new Error("Datos del trabajo invalidos");
+  
+  const jobId = String(raw.jobId || "").trim();
+  const jobName = String(raw.jobName || "").trim();
+  const generalDescription = String(raw.generalDescription || "").trim();
+  
+  if (!jobId) throw new Error("jobId es requerido");
+  if (!jobName) throw new Error("jobName es requerido");
+  if (!generalDescription) throw new Error("generalDescription es requerida");
+  
+  const job: FixerJob = {
+    jobId,
+    jobName,
+    generalDescription,
+  };
+  
+  // customDescription es opcional
+  if (raw.customDescription) {
+    const customDesc = String(raw.customDescription).trim();
+    if (customDesc.length > 500) {
+      throw new Error("customDescription no puede exceder 500 caracteres");
+    }
+    job.customDescription = customDesc;
+  }
+  
+  return job;
+}
+
+function normalizeFixerJobs(raw: any): FixerJob[] {
+  if (!Array.isArray(raw)) throw new Error("fixerJobs debe ser un arreglo");
+  return raw.map(normalizeFixerJob);
+}
+
+// PUT /:id/jobs - Actualizar todos los trabajos del fixer
+export const updateFixerJobs = (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    const fixerJobs = normalizeFixerJobs(req.body?.fixerJobs);
+    
+    if (!fixerJobs.length) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Debes proporcionar al menos un trabajo" 
+      });
+    }
+    
+    const updated = service.updateFixerJobs(id, fixerJobs);
+    if (!updated) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Fixer no encontrado" 
+      });
+    }
+    
+    res.json({ success: true, data: updated });
+  } catch (err: any) {
+    res.status(400).json({ 
+      success: false, 
+      message: String(err.message || "Error") 
+    });
+  }
+};
+
+// POST /:id/jobs - Agregar/actualizar un solo trabajo
+export const addFixerJob = (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    const job = normalizeFixerJob(req.body);
+    
+    const updated = service.addFixerJob(id, job);
+    if (!updated) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Fixer no encontrado" 
+      });
+    }
+    
+    res.json({ 
+      success: true, 
+      data: updated,
+      message: "Trabajo agregado/actualizado exitosamente"
+    });
+  } catch (err: any) {
+    res.status(400).json({ 
+      success: false, 
+      message: String(err.message || "Error") 
+    });
+  }
+};
+
+// GET /:id/jobs/:jobId - Obtener descripción de un trabajo específico
+export const getFixerJobDescription = (req: Request, res: Response) => {
+  try {
+    const { id, jobId } = req.params;
+    
+    const description = service.getFixerJobDescription(id, jobId);
+    if (description === null) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Trabajo no encontrado para este fixer" 
+      });
+    }
+    
+    res.json({ 
+      success: true, 
+      data: { jobId, description } 
+    });
+  } catch (err: any) {
+    res.status(400).json({ 
+      success: false, 
+      message: String(err.message || "Error") 
+    });
+  }
+};
