@@ -5,7 +5,7 @@ import { JWTPayload } from "../types/auth.types";
 declare global {
     namespace Express {
         interface Request {
-            user?: JWTPayload
+            authuser?: JWTPayload
             token?: string;
         }
     }
@@ -27,7 +27,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
         const authService = new AuthService();
         const payload = authService.verifyAccessToken(token);
 
-        req.user = payload;
+        req.authuser = payload;
         req.token = token;
         next();
     } catch (error) {

@@ -45,7 +45,7 @@ export class AuthController {
   }
 
   getCurrentUser = async (req: Request, res: Response): Promise<void> => {
-    const { email, userId } = req.user as JWTPayload;
+    const { email, userId } = req.authuser as JWTPayload;
 
     const user = await teamsysService.getById(userId);
 

@@ -47,7 +47,7 @@ export class SessionController {
 	deleteSession = async (req:Request, res:Response): Promise<void> => {
 		try {
 			const { sessionId } = req.params;
-			const { userId } = req.user as JWTPayload;
+			const { userId } = req.authuser as JWTPayload;
 
 			await this.sessionService.deleteSession(sessionId, userId);
 
@@ -71,7 +71,7 @@ export class SessionController {
   */
 	deleteAllSessionsExceptCurrent = async (req:Request, res:Response): Promise<void> => {
 		try {
-			const { email, userId } = req.user as JWTPayload;
+			const { email, userId } = req.authuser as JWTPayload;
 
 			const authHeader = req.headers.authorization as string;
 			if (!authHeader || !authHeader.startsWith('Bearer ')) {
