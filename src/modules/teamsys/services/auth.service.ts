@@ -1,6 +1,6 @@
 import axios from "axios";
 import * as jwt from 'jsonwebtoken';
-import { CrearUsuarioDto } from "../types";
+import { UsuarioDocument, CrearUsuarioDto } from "../types";
 import { AuthTokens, GoogleTokenResponse, GoogleUserProfile, JWTPayload } from "../types/auth.types";
 import { TokenResponse } from "../types/token.types";
 import teamsysService from '../services/teamsys.service';
@@ -95,9 +95,11 @@ return data; // ahora sí es GoogleUserProfile
     return this.signToken(payload, this.jwtRefreshSecret, this.refreshTokenExpiry);
   }
 
-    generateTokens(user: UserDocument): AuthTokens {
+    generateTokens(user: UsuarioDocument | UserDocument): AuthTokens {
+        console.log({user});
         const payload: JWTPayload = {
-            userId: (user._id as mongoose.Types.ObjectId).toString(),
+            // userId: (user._id as mongoose.Types.ObjectId).toString(),
+            userId: String((user as any)?._id),
             email: user.correo, 
         }
 
@@ -115,36 +117,31 @@ return data; // ahora sí es GoogleUserProfile
         }
     }
 
-    async loginWithGoogle(code: string): Promise<{user: any}> {
+    async loginWithGoogle(code: string): Promise<TokenResponse | null> {
         const googleTokens = await this.exchangeCodeForTokens(code);
 
         const profile = await this.getGoogleUserProfile(googleTokens.access_token);
 
         const userDoc = await this.findOrCreateUser(profile);
-        if (userDoc==null) return {user: null};
+        if (userDoc==null) return null;
 
-        // const tokens = this.generateTokens(userDoc); 
-        // const userForClient= {
-        //     nombre: userDoc.nombre,
-        //     correo: userDoc.correo,
-        //     fotoPerfil:userDoc.fotoPerfil,
-        //     terminosYCondiciones: userDoc.terminosYCondiciones,
+        const tokens = this.generateTokens(userDoc as UsuarioDocument); 
+        const userForClient= {
+            nombre: userDoc.nombre,
+            correo: userDoc.correo,
+            fotoPerfil:userDoc.fotoPerfil,
+            terminosYCondiciones: userDoc.terminosYCondiciones,
         //     apellido: userDoc.apellido,
         //     telefono: userDoc.telefono,
         //     si quieres la foto de Google, pásala desde el service como campo aparte:
         //     fotoPerfil: profile.picture,
-        // };
+        };
 
         return {
-            // accessToken: tokens.accessToken,
-            // refreshToken: tokens.refreshToken,
-            user: {
-                nombre: profile.given_name,
-                correo: profile.email,
-                fotoPerfil: profile.picture,
-                telefono: '121515454545'
-                // terminosYCondiciones: true
-            }
+            accessToken: tokens.accessToken,
+            refreshToken: tokens.refreshToken,
+            user: userForClient,
+            expiresAt: new Date(),
         }
     }
 }
