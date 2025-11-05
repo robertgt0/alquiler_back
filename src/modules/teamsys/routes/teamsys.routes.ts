@@ -37,10 +37,10 @@ router.get('/exists', existsByEmail);
 /**
  * Auth routes
  */
-router.post('auth-Method/:id',actualizarAutentificacion);
-router.get('auth-Method/:id',getAuthById)
-router.post('usuario/telefono/:id',updateTelefono);
-router.post('usuario/ubicacion/:id',updateMapa);
+router.post('/auth-Method/:id',actualizarAutentificacion);
+router.get('/auth-Method/:id',getAuthById)
+router.post('/usuario/telefono/:id',updateTelefono);
+router.post('/usuario/ubicacion/:id',updateMapa);
 router.post("/google/callback", authController.googleCallback);
 router.get("/me", authController.getCurrentUser);
 
