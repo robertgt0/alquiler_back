@@ -31,14 +31,11 @@
       "@/*": ["*"],
       "@config/*": ["config/*"],
       "@modules/*": ["modules/*"],
-      "@controllers/*": ["modules/*/controllers/*"],
-      "@services/*": ["modules/*/services/*"],
-      "@models/*": ["models/*", "modules/*/models/*"],
+      "@models/*": ["models/*"],
       "@utils/*": ["utils/*"]
     },
 
     /* === Opciones adicionales === */
-    "allowImportingTsExtensions": true,
     "noUncheckedIndexedAccess": false,
     "incremental": true
   },
