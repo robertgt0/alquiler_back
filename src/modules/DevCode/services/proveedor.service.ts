@@ -1,5 +1,6 @@
-import { Proveedor, IProveedor, IHorarioLaboral, RangoHorario } from '@models/proveedor.model';
-import { Cita } from '@models/cita.model';
+import { Proveedor, IProveedor } from '../../../models/proveedor.model';
+import { Cita } from '../../../models/cita.model';
+
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 dayjs.extend(customParseFormat);

@@ -1,6 +1,6 @@
-import { Cita, ICita } from '@models/cita.model';
-import { Proveedor } from '@models/proveedor.model';
-import { Cliente } from '@models/cliente.model'; // 👈 importa el modelo si lo creaste
+import { Cita, ICita } from '../../../models/cita.model';
+import { Proveedor } from '../../../models/proveedor.model';
+import { Cliente } from '../../../models/cliente.model'; // 👈 importa el modelo si lo creaste
 
 export class CitaService {
   static async crearCita(data: Partial<ICita>) {

@@ -1,0 +1,116 @@
+{"ts":"2025-10-27T21:10:07.053Z","level":"INFO","message":"🚀 Servidor corriendo en puerto 5000"}
+{"ts":"2025-10-27T21:10:07.056Z","level":"INFO","message":"🔧 Modo: development"}
+{"ts":"2025-10-27T21:10:07.057Z","level":"INFO","message":"🌐 URL: http://localhost:5000"}
+{"ts":"2025-10-27T21:10:07.058Z","level":"INFO","message":"📦 Módulos cargados: /api/notifications, /notifications"}
+{"ts":"2025-10-27T21:10:07.059Z","level":"INFO","message":"✅ Listo para recibir peticiones!"}
+{"ts":"2025-10-27T21:10:48.088Z","level":"INFO","message":"request:start","id":"dc233da2-69bc-4e78-8db7-62988298a28e","method":"POST","url":"/api/notifications","ip":"::1"}
+{"ts":"2025-10-27T21:10:48.099Z","level":"INFO","message":"request:finish","id":"dc233da2-69bc-4e78-8db7-62988298a28e","status":401,"method":"POST","url":"/api/notifications","duration":11}
+{"ts":"2025-10-27T21:14:27.739Z","level":"INFO","message":"request:start","id":"78c3ffa8-528c-4845-807a-50cbc13471e6","method":"POST","url":"/api/notifications","ip":"::1"}
+{"ts":"2025-10-27T21:14:28.963Z","level":"INFO","message":"request:finish","id":"78c3ffa8-528c-4845-807a-50cbc13471e6","status":200,"method":"POST","url":"/api/notifications","duration":1224}
+{"ts":"2025-10-27T21:16:29.467Z","level":"INFO","message":"request:start","id":"8df35692-c0e0-4060-bc98-610f1481b610","method":"POST","url":"/api/notifications","ip":"::1"}
+{"ts":"2025-10-27T21:16:29.479Z","level":"INFO","message":"request:finish","id":"8df35692-c0e0-4060-bc98-610f1481b610","status":400,"method":"POST","url":"/api/notifications","duration":12}
+{"ts":"2025-10-27T21:16:56.694Z","level":"INFO","message":"request:start","id":"ef477e07-bc7a-4bb3-8c3e-2a629e5e0cb4","method":"POST","url":"/api/notifications","ip":"::1"}
+{"ts":"2025-10-27T21:16:57.394Z","level":"INFO","message":"request:finish","id":"ef477e07-bc7a-4bb3-8c3e-2a629e5e0cb4","status":200,"method":"POST","url":"/api/notifications","duration":700}
+{"ts":"2025-10-27T21:18:54.172Z","level":"INFO","message":"request:start","id":"c4586ca0-736d-456f-88ec-33edb63ba30b","method":"POST","url":"/api/notifications","ip":"::1"}
+{"ts":"2025-10-27T21:18:54.865Z","level":"INFO","message":"request:finish","id":"c4586ca0-736d-456f-88ec-33edb63ba30b","status":200,"method":"POST","url":"/api/notifications","duration":693}
+{"ts":"2025-10-27T21:23:25.374Z","level":"INFO","message":"🚀 Servidor corriendo en puerto 5000"}
+{"ts":"2025-10-27T21:23:25.376Z","level":"INFO","message":"🔧 Modo: development"}
+{"ts":"2025-10-27T21:23:25.377Z","level":"INFO","message":"🌐 URL: http://localhost:5000"}
+{"ts":"2025-10-27T21:23:25.378Z","level":"INFO","message":"📦 Módulos cargados: /api/notifications, /notifications"}
+{"ts":"2025-10-27T21:23:25.379Z","level":"INFO","message":"✅ Listo para recibir peticiones!"}
+{"ts":"2025-10-27T21:25:31.640Z","level":"INFO","message":"🚀 Servidor corriendo en puerto 5000"}
+{"ts":"2025-10-27T21:25:31.643Z","level":"INFO","message":"🔧 Modo: development"}
+{"ts":"2025-10-27T21:25:31.644Z","level":"INFO","message":"🌐 URL: http://localhost:5000"}
+{"ts":"2025-10-27T21:25:31.645Z","level":"INFO","message":"📦 Módulos cargados: /api/notifications, /notifications"}
+{"ts":"2025-10-27T21:25:31.646Z","level":"INFO","message":"✅ Listo para recibir peticiones!"}
+{"ts":"2025-10-27T21:25:42.021Z","level":"INFO","message":"request:start","id":"6501203d-8acd-4f6e-925f-d7aaae59cde9","method":"POST","url":"/api/notifications","ip":"::1"}
+{"ts":"2025-10-27T21:25:43.223Z","level":"INFO","message":"request:finish","id":"6501203d-8acd-4f6e-925f-d7aaae59cde9","status":200,"method":"POST","url":"/api/notifications","duration":1202}
+{"ts":"2025-10-27T22:21:37.785Z","level":"INFO","message":"🚀 Servidor corriendo en puerto 5000"}
+{"ts":"2025-10-27T22:21:37.787Z","level":"INFO","message":"🔧 Modo: development"}
+{"ts":"2025-10-27T22:21:37.789Z","level":"INFO","message":"🌐 URL: http://localhost:5000"}
+{"ts":"2025-10-27T22:21:37.789Z","level":"INFO","message":"📦 Módulos cargados: /api/notifications, /notifications"}
+{"ts":"2025-10-27T22:21:37.790Z","level":"INFO","message":"✅ Listo para recibir peticiones!"}
+{"ts":"2025-10-27T22:22:05.098Z","level":"INFO","message":"request:start","id":"2d712478-74b5-4731-b32e-541e7eddbc89","method":"POST","url":"/api/notifications","ip":"::1"}
+{"ts":"2025-10-27T22:22:06.314Z","level":"INFO","message":"request:finish","id":"2d712478-74b5-4731-b32e-541e7eddbc89","status":200,"method":"POST","url":"/api/notifications","duration":1217}
+{"ts":"2025-10-28T06:07:13.692Z","level":"INFO","message":"🚀 Servidor corriendo en puerto 5000"}
+{"ts":"2025-10-28T06:07:13.695Z","level":"INFO","message":"🔧 Modo: development"}
+{"ts":"2025-10-28T06:07:13.696Z","level":"INFO","message":"🌐 URL: http://localhost:5000"}
+{"ts":"2025-10-28T06:07:13.697Z","level":"INFO","message":"📦 Módulos activos: Gmail & WhatsApp"}
+{"ts":"2025-10-28T06:07:13.698Z","level":"INFO","message":"✅ Listo para recibir peticiones!"}
+{"ts":"2025-10-28T06:09:31.239Z","level":"INFO","message":"🚀 Servidor corriendo en puerto 5000"}
+{"ts":"2025-10-28T06:09:31.241Z","level":"INFO","message":"🔧 Modo: development"}
+{"ts":"2025-10-28T06:09:31.243Z","level":"INFO","message":"🌐 URL: http://localhost:5000"}
+{"ts":"2025-10-28T06:09:31.244Z","level":"INFO","message":"📦 Módulos activos: /gmail-notifications, /api/gmail-notifications, /whatsapp-notifications, /api/whatsapp-notifications"}
+{"ts":"2025-10-28T06:09:31.245Z","level":"INFO","message":"✅ Listo para recibir peticiones!"}
+{"ts":"2025-10-28T06:10:16.735Z","level":"INFO","message":"🚀 Servidor corriendo en puerto 5000"}
+{"ts":"2025-10-28T06:10:16.737Z","level":"INFO","message":"🔧 Modo: development"}
+{"ts":"2025-10-28T06:10:16.738Z","level":"INFO","message":"🌐 URL: http://localhost:5000"}
+{"ts":"2025-10-28T06:10:16.739Z","level":"INFO","message":"📦 Módulos activos: \n/gmail-notifications, \n/api/gmail-notifications, \n/whatsapp-notifications, \n/api/whatsapp-notifications"}
+{"ts":"2025-10-28T06:10:16.740Z","level":"INFO","message":"✅ Listo para recibir peticiones!"}
+{"ts":"2025-10-28T06:11:35.819Z","level":"INFO","message":"request:start","id":"3cabe451-b0e0-4b71-94c8-90e9e4e7ac75","method":"POST","url":"/api/whatsapp-notifications","ip":"::1"}
+{"ts":"2025-10-28T06:11:37.070Z","level":"INFO","message":"request:finish","id":"3cabe451-b0e0-4b71-94c8-90e9e4e7ac75","status":200,"method":"POST","url":"/api/whatsapp-notifications","duration":1251}
+{"ts":"2025-10-28T06:12:43.623Z","level":"INFO","message":"request:start","id":"111bc7ae-21fb-40d2-9aca-8c2222f9965d","method":"POST","url":"/api/whatsapp-notifications","ip":"::1"}
+{"ts":"2025-10-28T06:12:44.943Z","level":"INFO","message":"request:finish","id":"111bc7ae-21fb-40d2-9aca-8c2222f9965d","status":200,"method":"POST","url":"/api/whatsapp-notifications","duration":1320}
+{"ts":"2025-10-28T06:17:33.726Z","level":"INFO","message":"🚀 Servidor corriendo en puerto 5000"}
+{"ts":"2025-10-28T06:17:33.728Z","level":"INFO","message":"🔧 Modo: development"}
+{"ts":"2025-10-28T06:17:33.729Z","level":"INFO","message":"🌐 URL: http://localhost:5000"}
+{"ts":"2025-10-28T06:17:33.730Z","level":"INFO","message":"📦 Módulos activos: \n/gmail-notifications, \n/api/gmail-notifications, \n/whatsapp-notifications, \n/api/whatsapp-notifications"}
+{"ts":"2025-10-28T06:17:33.731Z","level":"INFO","message":"✅ Listo para recibir peticiones!"}
+{"ts":"2025-10-28T06:17:40.691Z","level":"INFO","message":"request:start","id":"0109c69f-6827-4a35-8ce1-d28b50816df8","method":"POST","url":"/api/whatsapp-notifications","ip":"::1"}
+{"ts":"2025-10-28T06:17:42.030Z","level":"INFO","message":"request:finish","id":"0109c69f-6827-4a35-8ce1-d28b50816df8","status":200,"method":"POST","url":"/api/whatsapp-notifications","duration":1339}
+{"ts":"2025-10-28T06:19:50.187Z","level":"INFO","message":"🚀 Servidor corriendo en puerto 5000"}
+{"ts":"2025-10-28T06:19:50.189Z","level":"INFO","message":"🔧 Modo: development"}
+{"ts":"2025-10-28T06:19:50.191Z","level":"INFO","message":"🌐 URL: http://localhost:5000"}
+{"ts":"2025-10-28T06:19:50.192Z","level":"INFO","message":"📦 Módulos activos: \n/gmail-notifications, \n/api/gmail-notifications, \n/whatsapp-notifications, \n/api/whatsapp-notifications"}
+{"ts":"2025-10-28T06:19:50.192Z","level":"INFO","message":"✅ Listo para recibir peticiones!"}
+{"ts":"2025-10-28T06:25:16.499Z","level":"INFO","message":"request:start","id":"429ee5de-fdab-4d57-b384-12f7aad86080","method":"POST","url":"/api/whatsapp-notifications","ip":"::1"}
+{"ts":"2025-10-28T06:25:17.998Z","level":"INFO","message":"request:finish","id":"429ee5de-fdab-4d57-b384-12f7aad86080","status":200,"method":"POST","url":"/api/whatsapp-notifications","duration":1499}
+{"ts":"2025-10-28T06:27:05.564Z","level":"INFO","message":"🚀 Servidor corriendo en puerto 5000"}
+{"ts":"2025-10-28T06:27:05.566Z","level":"INFO","message":"🔧 Modo: development"}
+{"ts":"2025-10-28T06:27:05.567Z","level":"INFO","message":"🌐 URL: http://localhost:5000"}
+{"ts":"2025-10-28T06:27:05.568Z","level":"INFO","message":"📦 Módulos activos: \n/gmail-notifications, \n/api/gmail-notifications, \n/whatsapp-notifications, \n/api/whatsapp-notifications"}
+{"ts":"2025-10-28T06:27:05.569Z","level":"INFO","message":"✅ Listo para recibir peticiones!"}
+{"ts":"2025-10-28T06:27:19.221Z","level":"INFO","message":"🚀 Servidor corriendo en puerto 5000"}
+{"ts":"2025-10-28T06:27:19.223Z","level":"INFO","message":"🔧 Modo: development"}
+{"ts":"2025-10-28T06:27:19.224Z","level":"INFO","message":"🌐 URL: http://localhost:5000"}
+{"ts":"2025-10-28T06:27:19.225Z","level":"INFO","message":"📦 Módulos activos: \n/gmail-notifications, \n/api/gmail-notifications, \n/whatsapp-notifications, \n/api/whatsapp-notifications"}
+{"ts":"2025-10-28T06:27:19.225Z","level":"INFO","message":"✅ Listo para recibir peticiones!"}
+{"ts":"2025-10-28T06:28:32.942Z","level":"INFO","message":"🚀 Servidor corriendo en puerto 5000"}
+{"ts":"2025-10-28T06:28:32.944Z","level":"INFO","message":"🔧 Modo: development"}
+{"ts":"2025-10-28T06:28:32.945Z","level":"INFO","message":"🌐 URL: http://localhost:5000"}
+{"ts":"2025-10-28T06:28:32.946Z","level":"INFO","message":"📦 Módulos activos: \n/gmail-notifications, \n/api/gmail-notifications, \n/whatsapp-notifications, \n/api/whatsapp-notifications"}
+{"ts":"2025-10-28T06:28:32.947Z","level":"INFO","message":"✅ Listo para recibir peticiones!"}
+{"ts":"2025-10-28T06:28:39.668Z","level":"INFO","message":"request:start","id":"c7f1ce16-b3c9-4d50-9d70-8caa3f345010","method":"POST","url":"/api/whatsapp-notifications","ip":"::1"}
+{"ts":"2025-10-28T06:28:41.252Z","level":"INFO","message":"request:finish","id":"c7f1ce16-b3c9-4d50-9d70-8caa3f345010","status":200,"method":"POST","url":"/api/whatsapp-notifications","duration":1585}
+{"ts":"2025-10-28T06:30:37.237Z","level":"INFO","message":"🚀 Servidor corriendo en puerto 5000"}
+{"ts":"2025-10-28T06:30:37.240Z","level":"INFO","message":"🔧 Modo: development"}
+{"ts":"2025-10-28T06:30:37.242Z","level":"INFO","message":"🌐 URL: http://localhost:5000"}
+{"ts":"2025-10-28T06:30:37.244Z","level":"INFO","message":"📦 Módulos activos: \n/gmail-notifications, \n/api/gmail-notifications, \n/whatsapp-notifications, \n/api/whatsapp-notifications"}
+{"ts":"2025-10-28T06:30:37.245Z","level":"INFO","message":"✅ Listo para recibir peticiones!"}
+{"ts":"2025-10-28T06:30:49.406Z","level":"INFO","message":"🚀 Servidor corriendo en puerto 5000"}
+{"ts":"2025-10-28T06:30:49.408Z","level":"INFO","message":"🔧 Modo: development"}
+{"ts":"2025-10-28T06:30:49.409Z","level":"INFO","message":"🌐 URL: http://localhost:5000"}
+{"ts":"2025-10-28T06:30:49.410Z","level":"INFO","message":"📦 Módulos activos: \n/gmail-notifications, \n/api/gmail-notifications, \n/whatsapp-notifications, \n/api/whatsapp-notifications"}
+{"ts":"2025-10-28T06:30:49.411Z","level":"INFO","message":"✅ Listo para recibir peticiones!"}
+{"ts":"2025-10-28T06:31:31.651Z","level":"INFO","message":"request:start","id":"f50238e2-113d-41a9-b632-83c5dec62f7a","method":"POST","url":"/api/whatsapp-notifications","ip":"::1"}
+{"ts":"2025-10-28T06:31:33.180Z","level":"INFO","message":"request:finish","id":"f50238e2-113d-41a9-b632-83c5dec62f7a","status":200,"method":"POST","url":"/api/whatsapp-notifications","duration":1530}
+{"ts":"2025-10-28T06:31:48.201Z","level":"INFO","message":"request:start","id":"60292b66-89ff-4ffc-ab48-6d63eebfbed5","method":"POST","url":"/api/gmail-notifications","ip":"::1"}
+{"ts":"2025-10-28T06:31:49.577Z","level":"INFO","message":"request:finish","id":"60292b66-89ff-4ffc-ab48-6d63eebfbed5","status":200,"method":"POST","url":"/api/gmail-notifications","duration":1376}
+{"ts":"2025-10-28T06:37:09.780Z","level":"INFO","message":"request:start","id":"47bcfa5d-9b36-4b12-a8b5-53cce07ef6cf","method":"POST","url":"/api/whatsapp-notifications","ip":"::1"}
+{"ts":"2025-10-28T06:37:11.623Z","level":"INFO","message":"request:finish","id":"47bcfa5d-9b36-4b12-a8b5-53cce07ef6cf","status":200,"method":"POST","url":"/api/whatsapp-notifications","duration":1843}
+{"ts":"2025-10-28T06:39:24.275Z","level":"INFO","message":"request:start","id":"f6b8c802-74da-49ba-a0d4-1f4ac830d431","method":"POST","url":"/api/whatsapp-notifications","ip":"::1"}
+{"ts":"2025-10-28T06:39:25.772Z","level":"INFO","message":"request:finish","id":"f6b8c802-74da-49ba-a0d4-1f4ac830d431","status":200,"method":"POST","url":"/api/whatsapp-notifications","duration":1497}
+{"ts":"2025-10-29T02:13:38.938Z","level":"INFO","message":"🚀 Servidor corriendo en puerto 5000"}
+{"ts":"2025-10-29T02:13:38.938Z","level":"INFO","message":"🔧 Modo: undefined"}
+{"ts":"2025-10-29T02:13:38.938Z","level":"INFO","message":"🌐 URL: http://localhost:5000"}
+{"ts":"2025-10-29T02:13:38.939Z","level":"INFO","message":"📦 Módulos activos: \n/gmail-notifications, \n/api/gmail-notifications, \n/whatsapp-notifications, \n/api/whatsapp-notifications"}
+{"ts":"2025-10-29T02:13:38.939Z","level":"INFO","message":"✅ Listo para recibir peticiones!"}
+{"ts":"2025-10-29T02:44:29.513Z","level":"INFO","message":"request:start","id":"5958f936-a72d-4aea-9ad5-851c92020962","method":"GET","url":"/api/notifications/gmail","ip":"::ffff:127.0.0.1"}
+{"ts":"2025-10-29T02:44:29.514Z","level":"ERROR","message":"Ruta no encontrada: /api/notifications/gmail","code":"NOT_FOUND","status":404,"endpoint":"/api/notifications/gmail","method":"GET","ip":"::ffff:127.0.0.1","requestId":"5958f936-a72d-4aea-9ad5-851c92020962","userAgent":"insomnia/11.6.2"}
+{"ts":"2025-10-29T02:44:29.518Z","level":"INFO","message":"request:finish","id":"5958f936-a72d-4aea-9ad5-851c92020962","status":404,"method":"GET","url":"/api/notifications/gmail","duration":5}
+{"ts":"2025-10-29T02:44:47.035Z","level":"INFO","message":"request:start","id":"59bbda33-83d0-4140-bb6b-635d3584ff3d","method":"POST","url":"/api/notifications/gmail","ip":"::ffff:127.0.0.1"}
+{"ts":"2025-10-29T02:44:47.036Z","level":"ERROR","message":"Ruta no encontrada: /api/notifications/gmail","code":"NOT_FOUND","status":404,"endpoint":"/api/notifications/gmail","method":"POST","ip":"::ffff:127.0.0.1","requestId":"59bbda33-83d0-4140-bb6b-635d3584ff3d","userAgent":"insomnia/11.6.2"}
+{"ts":"2025-10-29T02:44:47.037Z","level":"INFO","message":"request:finish","id":"59bbda33-83d0-4140-bb6b-635d3584ff3d","status":404,"method":"POST","url":"/api/notifications/gmail","duration":2}
+{"ts":"2025-10-29T02:47:08.755Z","level":"INFO","message":"request:start","id":"21cd8925-a078-465c-9cae-09c154f64877","method":"POST","url":"/api/notifications/gmail","ip":"::ffff:127.0.0.1"}
+{"ts":"2025-10-29T02:47:08.755Z","level":"ERROR","message":"Ruta no encontrada: /api/notifications/gmail","code":"NOT_FOUND","status":404,"endpoint":"/api/notifications/gmail","method":"POST","ip":"::ffff:127.0.0.1","requestId":"21cd8925-a078-465c-9cae-09c154f64877","userAgent":"insomnia/11.6.2"}
+{"ts":"2025-10-29T02:47:08.756Z","level":"INFO","message":"request:finish","id":"21cd8925-a078-465c-9cae-09c154f64877","status":404,"method":"POST","url":"/api/notifications/gmail","duration":1}

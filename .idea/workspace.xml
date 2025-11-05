@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="ccb29092-aeb2-45ef-90c8-599ee07314e7" name="Changes" comment="ignore" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="TypeScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="dev/recode-Cristhian_Calizaya_Mamani" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="UPDATE_TYPE" value="REBASE" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;M1guel4ng&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/robertgt0/alquiler_back.git&quot;,
+    &quot;accountId&quot;: &quot;81f5b9c5-76a5-422f-a8cf-ffa3da6f4e2b&quot;
+  }
+}</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 6
+}</component>
+  <component name="ProjectId" id="33wEilaIyjUq9PmGfTJW6NOVwuC" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Node.js.index.ts.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "#37 on dev/recode-MiguelAngelAlmanzaSilvestre",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "D:/ProyectosUMSS/Servineo_IS/Servineo_back/alquiler_back",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "to.speed.mode.migration.done": "true",
+    "ts.external.directory.path": "D:\\ProyectosUMSS\\Servineo_IS\\Servineo_back\\alquiler_back\\node_modules\\typescript\\lib",
+    "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mongo"
+    ]
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\ProyectosUMSS\Servineo_IS\Servineo_back\alquiler_back" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\ProyectosUMSS\Servineo_IS\Servineo_back\alquiler_back" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-WS-252.26830.93" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="ccb29092-aeb2-45ef-90c8-599ee07314e7" name="Changes" comment="" />
+      <created>1760219865225</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1760219865225</updated>
+      <workItem from="1760219867246" duration="6933000" />
+      <workItem from="1760902982516" duration="13662000" />
+      <workItem from="1760972500366" duration="147000" />
+    </task>
+    <task id="LOCAL-00001" summary="prueba">
+      <option name="closed" value="true" />
+      <created>1760903139143</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1760903139143</updated>
+    </task>
+    <task id="LOCAL-00002" summary="T9 propia (aun falta complementar con antigua tarea)">
+      <option name="closed" value="true" />
+      <created>1760919503719</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1760919503719</updated>
+    </task>
+    <task id="LOCAL-00003" summary="ignore">
+      <option name="closed" value="true" />
+      <created>1761003691279</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1761003691279</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="prueba" />
+    <MESSAGE value="T9 propia (aun falta complementar con antigua tarea)" />
+    <MESSAGE value="ignore" />
+    <option name="LAST_COMMIT_MESSAGE" value="ignore" />
+  </component>
+</project>
