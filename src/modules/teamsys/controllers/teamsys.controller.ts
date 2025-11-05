@@ -5,9 +5,11 @@ import Usuario, { UserDocument } from '../models/teamsys';
 import { SessionService } from '../services/session.service';
 import { handleError } from '../errors/errorHandler';
 import { AuthService } from '../services/auth.service';
+import { TwoFactorService } from '../services/twofactor.service';
 
 const sessionService = new SessionService();
 const authService = new AuthService();
+const twoFactorService = new TwoFactorService();
 
 /*obtener todos los registros de usuario */
 export const getAll = async (req: Request, res: Response): Promise<void> => {
@@ -159,10 +161,11 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
 /**
  * Iniciar sesión de un usuario existente
  * Verifica correo y contraseña
+ * Si 2FA esta habilitado: requiere el token
  */
 export const loginUser = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { correoElectronico, password } = req.body;
+    const { correoElectronico, password, twoFactorToken } = req.body;
 
     if (!correoElectronico || !password) {
       res.status(400).json({
@@ -182,6 +185,26 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    if (usuario.twoFactorEnabled) {
+      if (! twoFactorToken) {
+        res.json({
+          success: true,
+          message: 'Two-factor authentication required',
+          data: {
+            requiresTwoFactor: true,
+          }
+        });
+
+        return;
+      }
+
+      if (! usuario.twoFactorSecret) {
+        throw new Error("Two-factor secret not found");
+      }
+
+      twoFactorService.verifyToken(usuario.twoFactorSecret, twoFactorToken);
+    }
+
     // registarr en sessions
     const userAgent = req.headers['user-agent'] || 'Unknown';
     const ip = (req.ip || req.socket.remoteAddress || 'Unknown').replace('::ffff:', '');
@@ -194,7 +217,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
       data: {
         accessToken,
         refreshToken,
-        usuaer: usuario,
+        user: usuario,
       }
     });
   } catch (error) {

@@ -66,3 +66,6 @@ export interface CrearUsuarioDto {
   fotoPerfil?:any;
   terminosYCondiciones: boolean;
 }
+
+export type { TwoFactorSetupResponse, TwoFactorVerifyRequest } from './twofactor.types'
+export type { LoginRequest, LoginResponse } from './login.types'

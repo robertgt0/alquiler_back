@@ -47,7 +47,7 @@ export class SessionController {
 	deleteSession = async (req:Request, res:Response): Promise<void> => {
 		try {
 			const { sessionId } = req.params;
-			const { userId } = req.user as JWTPayload;
+			const { userId } = req.authuser as JWTPayload;
 
 			await this.sessionService.deleteSession(sessionId, userId);
 
@@ -67,11 +67,11 @@ export class SessionController {
 }
   /**
 	* Eliminar todas las sesiones excepto la actual
-  * DELETE /api/sessions/user/:userId/all-except-current
+  * DELETE /api/sessions/user/all-except-current
   */
 	deleteAllSessionsExceptCurrent = async (req:Request, res:Response): Promise<void> => {
 		try {
-			const { email, userId } = req.user as JWTPayload;
+			const { email, userId } = req.authuser as JWTPayload;
 
 			const authHeader = req.headers.authorization as string;
 			if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -81,7 +81,7 @@ export class SessionController {
 					});
 			}
 
-      const token = authHeader.split(' ')[1];
+      		const token = authHeader.split(' ')[1];
 
 			const session = await this.sessionService.getSessionsByToken(token);
 			await this.sessionService.deleteAllSessionsExceptCurrent(userId, session._id.toString());

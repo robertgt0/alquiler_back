@@ -12,6 +12,7 @@ import { authController } from '../controllers/auth.controller';
 import { registerUser, loginUser } from '../controllers/teamsys.controller';
 import { sessionController } from '../controllers/session.controller';
 import { authMiddleware } from '../middlewares/auth.middleware';
+import { twofactorController } from '../controllers/twofactor.controller';
 
 const router = Router();
 
@@ -44,5 +45,11 @@ router.get("/me", authMiddleware, authController.getCurrentUser);
 router.get("/sessions/user/:userId", authMiddleware, sessionController.getSessionsByUserId);
 router.delete("/sessions/:sessionId/", authMiddleware, sessionController.deleteSession);
 router.delete("/sessions/user/all-except-current", authMiddleware, sessionController.deleteAllSessionsExceptCurrent);
+
+router.post("/2fa/setup", authMiddleware, twofactorController.setupTwoFactor);
+router.post("/2fa/verify", authMiddleware, twofactorController.verifyAndEnable);
+router.post("/2fa/disable", authMiddleware, twofactorController.disableTwoFactor);
+router.post("/2fa/verify-login", twofactorController.verifyLoginToken);
+router.get("/2fa/status", authMiddleware, twofactorController.getTwoFactorStatus);
 
 export default router;

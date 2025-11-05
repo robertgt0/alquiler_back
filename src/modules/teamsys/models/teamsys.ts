@@ -1,4 +1,5 @@
 import { Schema, model, InferSchemaType, HydratedDocument } from 'mongoose';
+import { IUser } from '../interfaces/user.interface';
 
 export interface Usuario1 {
   _id?:string | null;
@@ -23,13 +24,11 @@ export interface Usuario1 {
 
   rol: 'requester' | 'provider' | 'admin';
 }
-const userSchema = new Schema(
+const userSchema = new Schema<IUser>(
   {
-    nombre: { type: String,
-      required: [true, 'El nombre es requerido'], trim: true },
+    nombre: { type: String, required: [true, 'El nombre es requerido'], trim: true },
     apellido: { type: String, trim: true },
     telefono: { type: String, trim: true },
-
     correo: {
       type: String,
       required: [true, 'El correo electrónico es requerido'],
@@ -83,6 +82,19 @@ const userSchema = new Schema(
       default: 'requester', // todos los nuevos usuarios serán requester
       required: true,
     },
+
+    // === Two factor ===
+    twoFactorSecret: {
+      type: String,
+    },
+    twoFactorEnabled: {
+      type: Boolean,
+      default: false,
+    },
+    twoFactorBackupCodes: {
+      type: [String],
+      default: [],
+    }
   },
   { timestamps: true }
 );
