@@ -1,25 +1,15 @@
 
 import { Router } from 'express';
-// Importamos las dos funciones del controlador
-import { 
-  handleGetBilleteraByUsuario, 
-  handleGetBilleteraTmolina 
-} from '../controllers/wallet.controller';
+
+//  IMPORTAMOS EL CONTROLADOR
+import * as billeteraController from '../controllers/wallet.controller';
 
 const router = Router();
 
-// --- RUTA DE PRUEBA "HARCODED" ---
-// Antes era: /billetera-tmolina
-// Ahora es: /tmolina-test
-// URL completa: /api/bitcrew/billetera/tmolina-test
-router.get('/tmolina-test', handleGetBilleteraTmolina);
-
-
-// --- RUTA DINÁMICA (La que ya tenías) ---
-// Antes era: /billetera/:usuario
-// Ahora es: /:usuario
-// URL completa: /api/bitcrew/billetera/tmolina
-router.get('/:usuario', handleGetBilleteraByUsuario);
-
+// Ruta dinámica para obtener billetera por nombre de usuario
+router.get(
+  '/:usuario', 
+  billeteraController.handleGetBilleteraByUsuario
+);
 
 export default router;
