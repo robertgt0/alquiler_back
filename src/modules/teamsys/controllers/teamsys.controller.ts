@@ -431,8 +431,6 @@ export const eliminarAutentificacion = async (req: Request, res: Response): Prom
     if(user==null || auth ==null)throw new Error("Usuario no existente");
     const providers :string[]=auth.authProvider as string[];
     const provider = String(req.body.provider ?? '').toLowerCase();
-    const password: string | undefined = req.body.password;
-    const email:string | undefined=req.body.email;
 
       if (!providers.includes(provider)) {
         res.status(404).json({ success: false, message: `Este método no está habilitado: ${provider}` });
