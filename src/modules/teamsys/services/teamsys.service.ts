@@ -1,6 +1,8 @@
-import Usuario, { UserDocument } from '../models/teamsys';
+import { UsuarioDocument } from '@/models/User';
+import Usuario, { UserDocument,UserAuth,UserAuthModel,UserAuthDocument} from '../models/teamsys';
 import { CrearUsuarioDto} from '../types/index';
 import { validarPassword } from '../utils/validaciones';
+import { Types } from 'mongoose';
 
 export class UsuarioService {
   /**
@@ -9,32 +11,45 @@ export class UsuarioService {
    * @returns Usuario creado
    */
   async registrarUsuario(data: CrearUsuarioDto ): Promise<UserDocument | null > {
-    // Validación de contraseña
-    if (data.password!=null) {
-    if (!validarPassword(data.password)) {
-      throw new Error('La contraseña no cumple con los requisitos mínimos');
-    }
-    }
-
     // Verificar si el correo ya está registrado
     const existe = await Usuario.findOne({ correo: data.correo });
     if (existe) {
       throw new Error('El correo electrónico ya está registrado');
     }
-
+    if (data.password!=null) {
+    if (!validarPassword(data.password)) {
+      throw new Error('La contraseña no cumple con los requisitos mínimos');
+    }
+    }
+    const userData = {
+      ...data,
+      authProvider: data.password ? 'local' : 'google'
+    };
     // Crear y guardar el nuevo usuario
-    const nuevoUsuario = new Usuario(data);
-    return await nuevoUsuario.save();
-  }
+    const nuevoUsuario = new Usuario(userData);
+    const usuarioCreado=await nuevoUsuario.save();
+    try {
 
+    await UserAuthModel.create({
+      userId: usuarioCreado._id,
+      authProvider: [usuarioCreado.authProvider],
+      // mapaModificacion usa el default=3 del schema
+    });
+  } catch (err) {
+    // Rollback manual para no dejar usuario sin su user_auth
+    await Usuario.findByIdAndDelete(usuarioCreado._id).catch(() => {});
+    throw new Error('No se pudo crear el user_auth para el nuevo usuario');
+  }
+    return usuarioCreado;
+  }
   /**
    * Verificar si un correo ya existe en la base de datos
    * @param correo - Correo electrónico a verificar
    * @returns true si existe, false si no
    */
-  async verificarCorreo(correo: string): Promise<boolean> {
+  async verificarCorreo(correo: string): Promise<UserDocument | null> {
     const usuario = await Usuario.findOne({ correo: correo });
-    return usuario!=null;
+    return usuario;
   }
 
   /**
@@ -76,8 +91,8 @@ async autenticarUsuario(correoE: string, password: string): Promise<UserDocument
   /**
    * Actualizar un usuario existente
    */
-  async update(id: string, data: Partial<CrearUsuarioDto>): Promise<UserDocument | null> {
-    return await Usuario.findByIdAndUpdate(id, data, { new: true });
+  async update(id: string, data: Partial<CrearUsuarioDto | UserDocument>): Promise<UserDocument | null> {
+    return await Usuario.findByIdAndUpdate(id, data);
   }
 
   /**
@@ -87,6 +102,68 @@ async autenticarUsuario(correoE: string, password: string): Promise<UserDocument
     return await Usuario.findByIdAndDelete(id);
   }
 
+  async getUserAuthByUserId(userId: string | Types.ObjectId): Promise<UserAuthDocument | null> {
+    // Convertimos a ObjectId si llega como string
+    const objectId =
+      typeof userId === 'string' ? new Types.ObjectId(userId) : userId;
+
+    const userAuth = await UserAuthModel.findOne({ userId: objectId });
+    return userAuth;
+  }
+  /**
+   * Actualiza el campo authProvider en la colección user_auth
+   * @param userId - ID del usuario
+   * @param newProviders - Nuevo array de métodos de autenticación
+   * @returns Documento actualizado o null
+   */
+  async updateUserAuthProviders(
+    userId: string | Types.ObjectId,
+    newProviders: string[]
+  ): Promise<UserAuth | null> {
+    const objectId =
+      typeof userId === 'string' ? new Types.ObjectId(userId) : userId;
+
+    const updatedUserAuth = await UserAuthModel.findOneAndUpdate(
+      { userId: objectId },
+      { authProvider: newProviders },
+      { new: true }
+    );
+
+    return updatedUserAuth;
+  }
+
+  async updateUbicacionUser(userId:string,ubicacion: {
+    type: 'Point';
+    coordinates: number[]; // [lng, lat]
+  } ):Promise<UserDocument | null>{
+    const objectId =
+      typeof userId === 'string' ? new Types.ObjectId(userId) : userId;
+
+    return await Usuario.findOneAndUpdate({_id:objectId},{ubicacion:ubicacion },{new:true})
+  }
+
+  async updateTelefonoUser(userId:string,telefono:string ):Promise<UserDocument | null>{
+    const objectId =
+      typeof userId === 'string' ? new Types.ObjectId(userId) : userId;
+
+    return await Usuario.findOneAndUpdate({_id:objectId},{telefono:telefono },{new:true})
+  }
+
+  async decrementMapaModificacion(
+  userId: string | Types.ObjectId
+): Promise<UserAuth | null> {
+  const objectId =
+    typeof userId === 'string' ? new Types.ObjectId(userId) : userId;
+
+  // 🔽 Resta 1 al campo mapaModificacion
+  const updatedUserAuth = await UserAuthModel.findOneAndUpdate(
+    { userId: objectId },
+    { $inc: { mapaModificacion: -1 } },
+    { new: true }
+  );
+
+  return updatedUserAuth;
+}
 
 }
 

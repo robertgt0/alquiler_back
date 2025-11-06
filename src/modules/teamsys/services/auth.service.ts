@@ -68,14 +68,17 @@ return data; // ahora sí es GoogleUserProfile
 
     async findOrCreateUser(profile: GoogleUserProfile): Promise<CrearUsuarioDto | null> {
         let user = await teamsysService.verificarCorreo(profile.email);
-        console.log(user)
-        if (!user) {
-            return  {
+        //console.log(user)
+        
+        if (user!=null) {
+            
+            return {
                 nombre: profile.name,
                 correo: profile.email,
                 fotoPerfil: profile.picture,
-                terminosYCondiciones: true,
-            }
+                authProvider:user.authProvider,
+                terminosYCondiciones: true,}
+
         }
 
         return null;

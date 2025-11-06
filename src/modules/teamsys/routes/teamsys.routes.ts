@@ -5,11 +5,19 @@ import {
   create,
   update,
   remove,
-  existsByEmail
+  existsByEmail,
+  actualizarAutentificacion,
+  agregarAutentificacion,
+  eliminarAutentificacion,
+  updateMapa,
+  updateTelefono,
+  getAuthById
 } from '../controllers/teamsys.controller';
 import { validateData } from '../middlewares/validate.middleware';
 import { authController } from '../controllers/auth.controller';
 import { registerUser, loginUser } from '../controllers/teamsys.controller';
+//import { UsuarioService } from '../services/teamsys.service';
+
 import { sessionController } from '../controllers/session.controller';
 import { authMiddleware } from '../middlewares/auth.middleware';
 
@@ -34,6 +42,11 @@ router.get('/exists', existsByEmail);
 /**
  * Auth routes
  */
+router.post('/auth-Method/:id',agregarAutentificacion);
+router.delete('/auth-Method/:id',eliminarAutentificacion);
+router.get('/auth-Method/:id',getAuthById);
+router.post('/usuario/telefono/:id',updateTelefono);
+router.post('/usuario/ubicacion/:id',updateMapa);
 router.post("/google/callback", authController.googleCallback);
 router.get("/me", authMiddleware, authController.getCurrentUser);
 

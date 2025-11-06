@@ -23,6 +23,10 @@ export interface Usuario1 {
 
   rol: 'requester' | 'provider' | 'admin';
 }
+
+  const PROVIDERS = ['local', 'google'] as const;
+  type Provider = typeof PROVIDERS[number];
+
 const userSchema = new Schema(
   {
     nombre: { type: String,
@@ -94,3 +98,31 @@ userSchema.index({ correo: 1 }, { unique: true });
 export type User = InferSchemaType<typeof userSchema>;
 export type UserDocument = HydratedDocument<User>;
 export default model<User>('User', userSchema, 'users');
+
+
+// Documento principal: un registro por usuario
+const userAuthSchema = new Schema(
+  {
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+      unique: true, // un documento por usuario
+    },
+
+    authProvider: {
+      type: [String],
+      required: true
+    },
+    mapaModificacion:{
+      type:Number,
+      default:3,
+      required:true
+    }
+  },
+  { timestamps: true }
+);
+
+export type UserAuth = InferSchemaType<typeof userAuthSchema>;
+export type UserAuthDocument = HydratedDocument<UserAuth>;
+export const UserAuthModel = model<UserAuth>('UserAuth', userAuthSchema, 'user_auth');

@@ -12,6 +12,15 @@ export const handleError = (error: any, res: Response): void => {
     return;
   }
 
+  if (error.name === 'UpdateAutenticationError'){
+    res.status(400).json({
+      success: false,
+      message: 'error en metodos de autenticacion',
+      errors: error.errors,
+    });
+    return;
+  }
+
   if (error.name === 'CastError') {
     res.status(400).json({
       success: false,
