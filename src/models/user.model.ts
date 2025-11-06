@@ -27,13 +27,4 @@ const userSchema = new Schema<IUser>(
   { timestamps: true }
 );
 
-export const comparePassword = async function (
-  this: IUser,
-  candidatePassword: string
-): Promise<boolean> {
-  return candidatePassword === this.contraseña;
-};
-
-userSchema.methods.comparePassword = comparePassword;
-
 export const User = model<IUser>("User", userSchema);
