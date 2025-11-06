@@ -21,7 +21,7 @@ export interface Usuario1 {
   authProvider: 'local' | 'google';
   googleId?: string | null;
 
-  rol: 'requester' | 'provider' | 'admin';
+  rol: 'requester' | 'provider' | 'admin' | 'fixer';
 }
 
   const PROVIDERS = ['local', 'google'] as const;
