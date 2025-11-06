@@ -1,3 +1,4 @@
+import { JWTPayload } from '../types/auth.types';
 import { Request, Response } from 'express';
 import teamsysService from '../services/teamsys.service';
 import { ApiResponse} from '../types/index';
@@ -6,8 +7,15 @@ import { SessionService } from '../services/session.service';
 import { handleError } from '../errors/errorHandler';
 import { validarPassword } from '../utils/validaciones';
 import { AuthService } from '../services/auth.service';
-import { JWTPayload } from '../types/auth.types';
+//import { JWTPayload } from '../types/auth.types';
 import mongoose from 'mongoose';
+
+// Extender el tipo Request para este archivo
+declare module 'express' {
+  interface Request {
+    user?: JWTPayload;
+  }
+}
 
 const sessionService = new SessionService();
 const authService = new AuthService();
@@ -505,10 +513,22 @@ export const eliminarAutentificacion = async (req: Request, res: Response): Prom
 // En controllers/teamsys.controller.ts - Agregar este export
 export const cambiarContraseña = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { userId,email } = req.body as JWTPayload;
-    console.log('🔍 UserId correcto:', userId);
-    console.log('🔍 email:', email);
-    console.log('🔍 Es ObjectId válido?:', mongoose.Types.ObjectId.isValid(userId));
+    //const { userId} = req.user as JWTPayload;
+    //2daModif          const user = req.user as JWTPayload | undefined;
+    const user = (req as any).user as JWTPayload;
+    console.log('🔍 user en controlador:', user);
+    //if(!userId){
+    if (!user || !user.userId) {
+      res.status(401).json({
+        success: false,
+        message: 'Usuario no autenticado'
+      });    
+      return;
+    }
+    const { userId } = user;
+    console.log('✅ userId en controlador:', userId);
+    //console.log('🔍 UserId correcto:', userId);
+   // console.log('🔍 Es ObjectId válido?:', mongoose.Types.ObjectId.isValid(userId));
     const { contraseñaActual, nuevaContraseña, confirmacionContraseña } = req.body;
 
 
