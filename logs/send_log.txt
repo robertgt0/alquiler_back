@@ -80,3 +80,6 @@
 2025-11-05T22:10:08.992Z | TxID: N/A | To: N/A | Estado: ERROR | Error: NOT_FOUND: Ruta no encontrada: /api/borbotones/search
 2025-11-05T22:10:09.661Z | TxID: N/A | To: N/A | Estado: ERROR | Error: NOT_FOUND: Ruta no encontrada: /api/borbotones/search
 2025-11-05T22:10:10.718Z | TxID: N/A | To: N/A | Estado: ERROR | Error: NOT_FOUND: Ruta no encontrada: /api/borbotones/search
+2025-11-05T23:33:50.992Z | TxID: N/A | To: N/A | Estado: ERROR | Error: NOT_FOUND: Ruta no encontrada: /api/borbotones/search
+2025-11-05T23:35:01.462Z | TxID: N/A | To: N/A | Estado: ERROR | Error: NOT_FOUND: Ruta no encontrada: /api/borbotones/search
+2025-11-05T23:35:10.852Z | TxID: N/A | To: N/A | Estado: ERROR | Error: NOT_FOUND: Ruta no encontrada: /api/borbotones/search

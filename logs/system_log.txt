@@ -1788,3 +1788,75 @@
 {"ts":"2025-11-05T22:10:31.744Z","level":"INFO","message":"request:start","id":"3e4f1e9b-5c48-4606-9b61-2d197fd068c3","method":"GET","url":"/api/borbotones/search/history","ip":"::1"}
 {"ts":"2025-11-05T22:10:31.908Z","level":"INFO","message":"request:finish","id":"3e4f1e9b-5c48-4606-9b61-2d197fd068c3","status":304,"method":"GET","url":"/api/borbotones/search/history","duration":164}
 {"ts":"2025-11-05T22:10:31.913Z","level":"INFO","message":"request:finish","id":"1857ed24-3a31-493f-8223-9d6cc6415c3f","status":304,"method":"GET","url":"/api/borbotones/usuarios?limit=30","duration":324}
+{"ts":"2025-11-05T22:24:01.548Z","level":"INFO","message":"🚀 Servidor corriendo en puerto 5000"}
+{"ts":"2025-11-05T22:24:01.549Z","level":"INFO","message":"🔧 Modo: development"}
+{"ts":"2025-11-05T22:24:01.550Z","level":"INFO","message":"🌐 URL: http://localhost:5000"}
+{"ts":"2025-11-05T22:24:01.550Z","level":"INFO","message":"📦 Módulos activos: \n/gmail-notifications, \n/api/gmail-notifications, \n/whatsapp-notifications, \n/api/whatsapp-notifications"}
+{"ts":"2025-11-05T22:24:01.550Z","level":"INFO","message":"✅ Listo para recibir peticiones!"}
+{"ts":"2025-11-05T22:24:04.594Z","level":"INFO","message":"request:start","id":"a2185514-8ef1-4771-bd0c-e7c7be04e42b","method":"GET","url":"/api/borbotones/search/history","ip":"::1"}
+{"ts":"2025-11-05T22:24:04.600Z","level":"INFO","message":"request:start","id":"4067db2b-5f90-4c33-9a8a-dffe817f4ebb","method":"GET","url":"/api/borbotones/filtros/departamentos","ip":"::1"}
+{"ts":"2025-11-05T22:24:04.605Z","level":"INFO","message":"request:finish","id":"4067db2b-5f90-4c33-9a8a-dffe817f4ebb","status":304,"method":"GET","url":"/api/borbotones/filtros/departamentos","duration":5}
+{"ts":"2025-11-05T22:24:04.607Z","level":"INFO","message":"request:start","id":"c60189d3-3c4c-41d5-9d79-95d04dd8ccc0","method":"GET","url":"/api/borbotones/filtros/especialidades","ip":"::1"}
+{"ts":"2025-11-05T22:24:04.610Z","level":"INFO","message":"request:start","id":"bd408392-5d14-42d1-99a1-64f280b127f2","method":"GET","url":"/api/borbotones/usuarios?limit=30","ip":"::1"}
+{"ts":"2025-11-05T22:24:04.816Z","level":"INFO","message":"request:finish","id":"a2185514-8ef1-4771-bd0c-e7c7be04e42b","status":200,"method":"GET","url":"/api/borbotones/search/history","duration":222}
+{"ts":"2025-11-05T22:24:04.817Z","level":"INFO","message":"request:start","id":"b5579d5a-4597-43ef-b518-2a7ee72de411","method":"DELETE","url":"/api/borbotones/search/history","ip":"::1"}
+{"ts":"2025-11-05T22:24:04.828Z","level":"INFO","message":"request:finish","id":"c60189d3-3c4c-41d5-9d79-95d04dd8ccc0","status":304,"method":"GET","url":"/api/borbotones/filtros/especialidades","duration":221}
+{"ts":"2025-11-05T22:24:05.013Z","level":"INFO","message":"request:finish","id":"bd408392-5d14-42d1-99a1-64f280b127f2","status":304,"method":"GET","url":"/api/borbotones/usuarios?limit=30","duration":403}
+{"ts":"2025-11-05T22:24:05.159Z","level":"INFO","message":"request:finish","id":"b5579d5a-4597-43ef-b518-2a7ee72de411","status":200,"method":"DELETE","url":"/api/borbotones/search/history","duration":342}
+{"ts":"2025-11-05T22:26:48.353Z","level":"INFO","message":"request:start","id":"44428dec-efd3-43f4-bee8-52dfc8103faf","method":"GET","url":"/api/borbotones/search/history","ip":"::1"}
+{"ts":"2025-11-05T22:26:48.356Z","level":"INFO","message":"request:start","id":"219b5162-34c3-49dc-bc87-c209d48a87d7","method":"GET","url":"/api/borbotones/filtros/departamentos","ip":"::1"}
+{"ts":"2025-11-05T22:26:48.358Z","level":"INFO","message":"request:finish","id":"219b5162-34c3-49dc-bc87-c209d48a87d7","status":304,"method":"GET","url":"/api/borbotones/filtros/departamentos","duration":2}
+{"ts":"2025-11-05T22:26:48.359Z","level":"INFO","message":"request:start","id":"20abe4ee-ba5c-4f76-a89f-bb9d0c8f2ff4","method":"GET","url":"/api/borbotones/filtros/especialidades","ip":"::1"}
+{"ts":"2025-11-05T22:26:48.361Z","level":"INFO","message":"request:start","id":"a4822754-9220-425e-9c16-dda193578bff","method":"GET","url":"/api/borbotones/usuarios?limit=30","ip":"::1"}
+{"ts":"2025-11-05T22:26:48.515Z","level":"INFO","message":"request:finish","id":"44428dec-efd3-43f4-bee8-52dfc8103faf","status":200,"method":"GET","url":"/api/borbotones/search/history","duration":162}
+{"ts":"2025-11-05T22:26:48.516Z","level":"INFO","message":"request:start","id":"5be1bd60-290f-4dcf-8503-940e137d42d7","method":"DELETE","url":"/api/borbotones/search/history","ip":"::1"}
+{"ts":"2025-11-05T22:26:48.521Z","level":"INFO","message":"request:finish","id":"20abe4ee-ba5c-4f76-a89f-bb9d0c8f2ff4","status":304,"method":"GET","url":"/api/borbotones/filtros/especialidades","duration":162}
+{"ts":"2025-11-05T22:26:48.678Z","level":"INFO","message":"request:finish","id":"5be1bd60-290f-4dcf-8503-940e137d42d7","status":200,"method":"DELETE","url":"/api/borbotones/search/history","duration":162}
+{"ts":"2025-11-05T22:26:48.688Z","level":"INFO","message":"request:finish","id":"a4822754-9220-425e-9c16-dda193578bff","status":304,"method":"GET","url":"/api/borbotones/usuarios?limit=30","duration":327}
+{"ts":"2025-11-05T23:33:27.862Z","level":"INFO","message":"request:start","id":"7150923c-b3a4-4c2e-9c88-d39705311c6c","method":"GET","url":"/api/borbotones/search/history","ip":"::1"}
+{"ts":"2025-11-05T23:33:27.866Z","level":"INFO","message":"request:start","id":"1498a156-d373-496b-9e7a-cc277a9abd0a","method":"GET","url":"/api/borbotones/filtros/departamentos","ip":"::1"}
+{"ts":"2025-11-05T23:33:27.868Z","level":"INFO","message":"request:finish","id":"1498a156-d373-496b-9e7a-cc277a9abd0a","status":304,"method":"GET","url":"/api/borbotones/filtros/departamentos","duration":2}
+{"ts":"2025-11-05T23:33:27.869Z","level":"INFO","message":"request:start","id":"b5034340-95c7-4d32-ba87-8dff8ff187a7","method":"GET","url":"/api/borbotones/filtros/especialidades","ip":"::1"}
+{"ts":"2025-11-05T23:33:27.872Z","level":"INFO","message":"request:start","id":"76916140-5496-44a8-aa3a-18d026cfc888","method":"GET","url":"/api/borbotones/usuarios?limit=30","ip":"::1"}
+{"ts":"2025-11-05T23:33:28.026Z","level":"INFO","message":"request:finish","id":"7150923c-b3a4-4c2e-9c88-d39705311c6c","status":200,"method":"GET","url":"/api/borbotones/search/history","duration":164}
+{"ts":"2025-11-05T23:33:28.027Z","level":"INFO","message":"request:start","id":"955d3b99-2262-4837-b649-2b5ce6345953","method":"DELETE","url":"/api/borbotones/search/history","ip":"::1"}
+{"ts":"2025-11-05T23:33:28.031Z","level":"INFO","message":"request:finish","id":"b5034340-95c7-4d32-ba87-8dff8ff187a7","status":304,"method":"GET","url":"/api/borbotones/filtros/especialidades","duration":162}
+{"ts":"2025-11-05T23:33:28.194Z","level":"INFO","message":"request:finish","id":"76916140-5496-44a8-aa3a-18d026cfc888","status":304,"method":"GET","url":"/api/borbotones/usuarios?limit=30","duration":322}
+{"ts":"2025-11-05T23:33:28.195Z","level":"INFO","message":"request:finish","id":"955d3b99-2262-4837-b649-2b5ce6345953","status":200,"method":"DELETE","url":"/api/borbotones/search/history","duration":168}
+{"ts":"2025-11-05T23:33:50.678Z","level":"INFO","message":"request:start","id":"b404c5c6-9172-48b3-92aa-59fef828e4ab","method":"GET","url":"/api/borbotones/search/autocomplete?q=fg&limit=6","ip":"::1"}
+{"ts":"2025-11-05T23:33:50.990Z","level":"INFO","message":"request:start","id":"357b8ddc-5e62-48c0-805e-bf4092b77e51","method":"POST","url":"/api/borbotones/search","ip":"::1"}
+{"ts":"2025-11-05T23:33:50.992Z","level":"ERROR","message":"Ruta no encontrada: /api/borbotones/search","code":"NOT_FOUND","status":404,"endpoint":"/api/borbotones/search","method":"POST","ip":"::1","requestId":"357b8ddc-5e62-48c0-805e-bf4092b77e51","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"}
+{"ts":"2025-11-05T23:33:50.993Z","level":"INFO","message":"request:finish","id":"357b8ddc-5e62-48c0-805e-bf4092b77e51","status":404,"method":"POST","url":"/api/borbotones/search","duration":3}
+{"ts":"2025-11-05T23:33:51.181Z","level":"INFO","message":"request:finish","id":"b404c5c6-9172-48b3-92aa-59fef828e4ab","status":200,"method":"GET","url":"/api/borbotones/search/autocomplete?q=fg&limit=6","duration":503}
+{"ts":"2025-11-05T23:33:51.956Z","level":"INFO","message":"request:start","id":"72484894-e2ff-4b7d-b398-2ce8d755ab10","method":"GET","url":"/api/borbotones/search/autocomplete?q=f&limit=6","ip":"::1"}
+{"ts":"2025-11-05T23:33:51.957Z","level":"INFO","message":"request:finish","id":"72484894-e2ff-4b7d-b398-2ce8d755ab10","status":400,"method":"GET","url":"/api/borbotones/search/autocomplete?q=f&limit=6","duration":1}
+{"ts":"2025-11-05T23:33:54.476Z","level":"INFO","message":"request:start","id":"ccab7824-6dcd-4d24-b4f8-d5dde004ba9d","method":"GET","url":"/api/borbotones/search/autocomplete?q=%C3%B1&limit=6","ip":"::1"}
+{"ts":"2025-11-05T23:33:54.502Z","level":"INFO","message":"request:finish","id":"ccab7824-6dcd-4d24-b4f8-d5dde004ba9d","status":400,"method":"GET","url":"/api/borbotones/search/autocomplete?q=%C3%B1&limit=6","duration":26}
+{"ts":"2025-11-05T23:34:27.852Z","level":"INFO","message":"request:start","id":"ec50ba86-3186-40c5-b43e-1c0e5a10c25d","method":"GET","url":"/api/borbotones/search/history","ip":"::1"}
+{"ts":"2025-11-05T23:34:28.015Z","level":"INFO","message":"request:finish","id":"ec50ba86-3186-40c5-b43e-1c0e5a10c25d","status":200,"method":"GET","url":"/api/borbotones/search/history","duration":163}
+{"ts":"2025-11-05T23:34:34.204Z","level":"INFO","message":"request:start","id":"b53cbaec-4d25-4754-83f4-44738fa3eaa8","method":"GET","url":"/api/borbotones/search/history","ip":"::1"}
+{"ts":"2025-11-05T23:34:34.206Z","level":"INFO","message":"request:start","id":"5c362dfd-6bc8-4940-9431-824f5c8f0861","method":"GET","url":"/api/borbotones/filtros/departamentos","ip":"::1"}
+{"ts":"2025-11-05T23:34:34.208Z","level":"INFO","message":"request:finish","id":"5c362dfd-6bc8-4940-9431-824f5c8f0861","status":304,"method":"GET","url":"/api/borbotones/filtros/departamentos","duration":2}
+{"ts":"2025-11-05T23:34:34.208Z","level":"INFO","message":"request:start","id":"c06c5ef4-f7a6-4ee6-adde-342e5b6f022f","method":"GET","url":"/api/borbotones/filtros/especialidades","ip":"::1"}
+{"ts":"2025-11-05T23:34:34.210Z","level":"INFO","message":"request:start","id":"7b4f43fa-9d5b-409a-a134-5d582862b98d","method":"GET","url":"/api/borbotones/usuarios?limit=30","ip":"::1"}
+{"ts":"2025-11-05T23:34:34.365Z","level":"INFO","message":"request:finish","id":"b53cbaec-4d25-4754-83f4-44738fa3eaa8","status":304,"method":"GET","url":"/api/borbotones/search/history","duration":161}
+{"ts":"2025-11-05T23:34:34.369Z","level":"INFO","message":"request:finish","id":"c06c5ef4-f7a6-4ee6-adde-342e5b6f022f","status":304,"method":"GET","url":"/api/borbotones/filtros/especialidades","duration":161}
+{"ts":"2025-11-05T23:34:34.535Z","level":"INFO","message":"request:finish","id":"7b4f43fa-9d5b-409a-a134-5d582862b98d","status":304,"method":"GET","url":"/api/borbotones/usuarios?limit=30","duration":325}
+{"ts":"2025-11-05T23:34:35.994Z","level":"INFO","message":"request:start","id":"e82afbf2-d0bd-4801-9c67-01c82c5a112f","method":"DELETE","url":"/api/borbotones/search/history","ip":"::1"}
+{"ts":"2025-11-05T23:34:36.160Z","level":"INFO","message":"request:finish","id":"e82afbf2-d0bd-4801-9c67-01c82c5a112f","status":200,"method":"DELETE","url":"/api/borbotones/search/history","duration":166}
+{"ts":"2025-11-05T23:35:01.461Z","level":"INFO","message":"request:start","id":"4ef2e274-54b3-43a6-bbfd-c645578406c1","method":"POST","url":"/api/borbotones/search","ip":"::1"}
+{"ts":"2025-11-05T23:35:01.462Z","level":"ERROR","message":"Ruta no encontrada: /api/borbotones/search","code":"NOT_FOUND","status":404,"endpoint":"/api/borbotones/search","method":"POST","ip":"::1","requestId":"4ef2e274-54b3-43a6-bbfd-c645578406c1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"}
+{"ts":"2025-11-05T23:35:01.463Z","level":"INFO","message":"request:finish","id":"4ef2e274-54b3-43a6-bbfd-c645578406c1","status":404,"method":"POST","url":"/api/borbotones/search","duration":2}
+{"ts":"2025-11-05T23:35:04.978Z","level":"INFO","message":"request:start","id":"af839946-e4f3-4438-a288-812a46f33caf","method":"GET","url":"/api/borbotones/search/autocomplete?q=sadasd&limit=6","ip":"::1"}
+{"ts":"2025-11-05T23:35:05.466Z","level":"INFO","message":"request:finish","id":"af839946-e4f3-4438-a288-812a46f33caf","status":304,"method":"GET","url":"/api/borbotones/search/autocomplete?q=sadasd&limit=6","duration":488}
+{"ts":"2025-11-05T23:35:05.467Z","level":"INFO","message":"request:start","id":"f99ee0db-5535-4581-a8b1-3092a3c6e1c9","method":"GET","url":"/api/borbotones/search/autocomplete?q=sadasd&limit=6","ip":"::1"}
+{"ts":"2025-11-05T23:35:05.952Z","level":"INFO","message":"request:finish","id":"f99ee0db-5535-4581-a8b1-3092a3c6e1c9","status":304,"method":"GET","url":"/api/borbotones/search/autocomplete?q=sadasd&limit=6","duration":485}
+{"ts":"2025-11-05T23:35:10.551Z","level":"INFO","message":"request:start","id":"f34756da-1968-4018-8028-156d17347386","method":"GET","url":"/api/borbotones/search/autocomplete?q=ghj&limit=6","ip":"::1"}
+{"ts":"2025-11-05T23:35:10.852Z","level":"INFO","message":"request:start","id":"58a574a8-7f29-4f0c-bc5b-fa959fc9a953","method":"POST","url":"/api/borbotones/search","ip":"::1"}
+{"ts":"2025-11-05T23:35:10.853Z","level":"ERROR","message":"Ruta no encontrada: /api/borbotones/search","code":"NOT_FOUND","status":404,"endpoint":"/api/borbotones/search","method":"POST","ip":"::1","requestId":"58a574a8-7f29-4f0c-bc5b-fa959fc9a953","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"}
+{"ts":"2025-11-05T23:35:10.854Z","level":"INFO","message":"request:finish","id":"58a574a8-7f29-4f0c-bc5b-fa959fc9a953","status":404,"method":"POST","url":"/api/borbotones/search","duration":2}
+{"ts":"2025-11-05T23:35:11.040Z","level":"INFO","message":"request:finish","id":"f34756da-1968-4018-8028-156d17347386","status":200,"method":"GET","url":"/api/borbotones/search/autocomplete?q=ghj&limit=6","duration":489}
+{"ts":"2025-11-05T23:35:12.151Z","level":"INFO","message":"request:start","id":"3b912a1c-52ce-45f6-8627-ef94385fe429","method":"GET","url":"/api/borbotones/search/autocomplete?q=ghjghjghj&limit=6","ip":"::1"}
+{"ts":"2025-11-05T23:35:12.641Z","level":"INFO","message":"request:finish","id":"3b912a1c-52ce-45f6-8627-ef94385fe429","status":200,"method":"GET","url":"/api/borbotones/search/autocomplete?q=ghjghjghj&limit=6","duration":490}
+{"ts":"2025-11-05T23:35:12.760Z","level":"INFO","message":"request:start","id":"3631a5e0-abdd-4624-bc04-e2e979063591","method":"GET","url":"/api/borbotones/search/autocomplete?q=ghjghjgh&limit=6","ip":"::1"}
+{"ts":"2025-11-05T23:35:13.246Z","level":"INFO","message":"request:finish","id":"3631a5e0-abdd-4624-bc04-e2e979063591","status":200,"method":"GET","url":"/api/borbotones/search/autocomplete?q=ghjghjgh&limit=6","duration":486}
