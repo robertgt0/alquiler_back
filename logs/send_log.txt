@@ -1,0 +1,4 @@
+2025-11-06T01:59:29.514Z | TxID: N/A | To: N/A | Estado: ERROR | Error: NOT_FOUND: Ruta no encontrada: /api/borbotones/search
+2025-11-06T01:59:30.462Z | TxID: N/A | To: N/A | Estado: ERROR | Error: NOT_FOUND: Ruta no encontrada: /api/borbotones/search
+2025-11-06T01:59:31.110Z | TxID: N/A | To: N/A | Estado: ERROR | Error: NOT_FOUND: Ruta no encontrada: /api/borbotones/search
+2025-11-06T01:59:32.700Z | TxID: N/A | To: N/A | Estado: ERROR | Error: NOT_FOUND: Ruta no encontrada: /api/borbotones/search
