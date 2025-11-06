@@ -24,7 +24,7 @@ router.post("/google/callback", authController.googleCallback);
 router.get("/me", authMiddleware, authController.getCurrentUser);
 //h4
 router.post('/magic-link/request', magicLinkController.requestMagicLink);
-router.get('/magic-link/verify', magicLinkController.verifyMagicLink);
+//router.get('/magic-link/verify', magicLinkController.verifyMagicLink);
 router.post('/magic-link/verify', magicLinkController.verifyMagicLink);
 
 

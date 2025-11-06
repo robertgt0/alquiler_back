@@ -11,6 +11,8 @@ type AppJWTPayload = JwtPayload & { userId: string; email: string };
 import mongoose from "mongoose";
 import { UserDocument } from "../models/teamsys";
 import { MagicLink } from '../models/magic-link.model'; 
+import teamsysService1 from './teamsys.service';
+//import teamsysService from './teamsys.service';
 
 export class AuthService  {
     

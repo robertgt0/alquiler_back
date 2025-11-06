@@ -31,19 +31,22 @@ export class MagicLinkController {
       }
 
       const token = await this.authService.generateMagicLinkToken(email);
+      // URL del frontend donde el usuario hará clic
+    //const frontendBaseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const magicLink = `http://localhost:3000/auth/magic-link?token=${token}`;
 
       // Aquí deberías integrar con tu servicio de email
       // Por ahora solo devolvemos el token para pruebas
-      const magicLink = `http://localhost:3000/api/teamsys/magic-link/verify?token=${token}`;
+      //const magicLink = `http://localhost:3000/api/teamsys/magic-link/verify?token=${token}`;
       
       console.log('🔗 Magic Link generado:', magicLink);
-      // En producción: await emailService.sendMagicLink(email, magicLink);
+      //await emailService.sendMagicLink(email, magicLink);
 
       res.status(200).json({
         success: true,
         message: 'Se ha enviado el enlace mágico a tu correo',
         // Solo para desarrollo - quitar en producción
-        magicLink: magicLink
+        magicLink: process.env.NODE_ENV === 'production' ? undefined : magicLink
       });
 
     } catch (error: any) {
@@ -61,21 +64,24 @@ export class MagicLinkController {
 
   /**
    * Verificar magic link y hacer login
-   * GET /api/magic-link/verify?token=...
-   * POST /api/magic-link/verify { "token": "..." }
+   * ........................................................GET /api/magic-link/verify?token=...
+   * POST /api/teamsys/magic-link/verify
    */
    verifyMagicLink = async (req: Request, res: Response): Promise<void> => {
   try {
+    const{token}=req.body;
+    /*
     let token: string | undefined;
-
+    
     // Buscar token en query parameters (GET) o body (POST)
     if (req.method === 'GET') {
       token = req.query.token as string;
     } else if (req.method === 'POST') {
       token = req.body.token;
     }
-
-    if (!token || typeof token !== 'string') {
+    */
+    //if (!token || typeof token !== 'string') {
+    if(!token){
       res.status(400).json({
         success: false,
         message: 'Token es requerido'

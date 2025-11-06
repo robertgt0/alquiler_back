@@ -1,5 +1,14 @@
 import mongoose, { Schema, Model } from 'mongoose';
-import { MagicLinkToken } from '../types/auth.types';
+//import { MagicLinkToken } from '../types/auth.types';
+
+export interface MagicLinkToken {
+  token: string;
+  email: string;
+  userId: string;
+  expiresAt: Date;
+  used: boolean;
+  createdAt: Date;
+}
 
 const magicLinkSchema = new Schema<MagicLinkToken>({
   token: {
