@@ -95,6 +95,7 @@ export const obtenerHistorialMovimientos = async (
 
         // 2. Contamos el total (llamando al servicio)
         transaccionService.count({ cuentaId: cuenta._id }),
+    ]);
 
     // --- Inicio de AC 6 (Mensaje si no hay transacciones) ---
     if (totalTransacciones === 0) {
@@ -109,8 +110,8 @@ export const obtenerHistorialMovimientos = async (
 
     // AC 3: Mapeamos el resultado
     const historial = transacciones.map((tx) => ({
-      id: tx._id, // Es bueno enviar el ID
-      fecha: tx.fecha,
+      cuentaId: tx.cuentaId, 
+      fecha_pago: tx.fecha_pago,
       descripcion: tx.descripcion,
       monto: tx.monto,
       tipo: tx.tipo,
