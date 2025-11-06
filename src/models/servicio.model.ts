@@ -16,6 +16,6 @@ const ServicioSchema = new Schema<IServicio>({
   precio: { type: Number, required: true },
   rating: { type: Number, required: true },
   proveedorId: { type: Schema.Types.ObjectId, ref: 'Proveedor', required: true }
-});
+}, { timestamps: true }); // ← IMPORTANTE: esto agrega createdAt y updatedAt
 
 export const Servicio = model<IServicio>('Servicio', ServicioSchema);
