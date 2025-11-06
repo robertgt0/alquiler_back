@@ -10,3 +10,4 @@ export async function connectMongo() {
   const dbName = mongoose.connection.db?.databaseName || '(desconocida)';
   console.log(`✅ Mongo conectado: ${dbName}`);
 }
+

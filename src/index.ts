@@ -1,20 +1,22 @@
 // src/index.ts
-import 'dotenv/config';
-import express from 'express';
-import cors from 'cors';
-import { connectMongo } from './config/mongoose';
-import offersRouter from './routes/offers';
-import fixerRouter from './modules/fixer';
-import categoriesRouter from './modules/categories';
+import "dotenv/config";
+import express from "express";
+import cors from "cors";
+import { connectMongo } from "./config/mongoose";
+import offersRouter from "./routes/offers";
+import fixerRouter from "./modules/fixer";
+import categoriesRouter from "./modules/categories";
+import jobsModule from "./modules/jobs/index"; // a veces ayuda al TS Server
+
 
 const app = express();
 
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ limit: '10mb', extended: true }));
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
 
 // Permite lista separada por comas en CORS_ORIGIN
-const origins = (process.env.CORS_ORIGIN ?? '')
-  .split(',')
+const origins = (process.env.CORS_ORIGIN ?? "")
+  .split(",")
   .map((s) => s.trim())
   .filter(Boolean);
 
@@ -25,29 +27,29 @@ app.use(
   })
 );
 
-app.get('/health', (_req, res) => res.json({ ok: true }));
+app.get("/health", (_req, res) => res.json({ ok: true }));
 
-app.use('/api/offers', offersRouter);
-app.use('/api/fixers', fixerRouter);
-app.use('/api/categories', categoriesRouter);
+app.use("/api/offers", offersRouter);
+app.use("/api/fixers", fixerRouter);
+app.use("/api/categories", categoriesRouter);
+app.use("/api", jobsModule); // ✅ monta HU02
 
 const PORT = Number(process.env.PORT ?? 4000);
 const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
-  console.error('? Falta MONGODB_URI en variables de entorno');
+  console.error("❓ Falta MONGODB_URI en variables de entorno");
   process.exit(1);
 }
 
 connectMongo()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`?? API listening on port ${PORT}`);
+      console.log(`✅ API listening on port ${PORT}`);
     });
   })
   .catch((e) => {
-    console.error('? Error al iniciar el servidor');
+    console.error("❌ Error al iniciar el servidor");
     console.error(e);
     process.exit(1);
   });
-
