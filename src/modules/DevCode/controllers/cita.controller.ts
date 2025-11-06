@@ -5,29 +5,32 @@ export class CitaController {
   static async crear(req: Request, res: Response) {
     try {
       const nueva = await CitaService.crearCita(req.body);
-      res.status(201).json(nueva);
+      res.status(201).json({ success: true, data: nueva });
     } catch (err: any) {
-      res.status(400).json({ error: err.message });
+      res.status(400).json({ success: false, error: err.message });
     }
   }
 
   static async listarPorProveedor(req: Request, res: Response) {
     try {
-      const citas = await CitaService.listarPorProveedor(req.params.proveedorId);
-      res.json(citas);
+      const proveedorId = req.params.proveedorId;
+      const citas = await CitaService.listarPorProveedor(proveedorId);
+      res.json({ success: true, data: citas });
     } catch (err: any) {
-      res.status(500).json({ error: err.message });
+      res.status(500).json({ success: false, error: err.message });
     }
   }
 
   static async listarPorCliente(req: Request, res: Response) {
     try {
-      const citas = await CitaService.listarPorCliente(req.params.clienteId);
-      res.json(citas);
+      const clienteId = req.params.clienteId;
+      const citas = await CitaService.listarPorCliente(clienteId);
+      res.json({ success: true, data: citas });
     } catch (err: any) {
-      res.status(500).json({ error: err.message });
+      res.status(500).json({ success: false, error: err.message });
     }
   }
+
   static async actualizar(req: Request, res: Response) {
     try {
       const { id } = req.params;
@@ -35,27 +38,26 @@ export class CitaController {
       const citaActualizada = await CitaService.actualizarCita(id, data);
 
       if (!citaActualizada) {
-        return res.status(404).json({ error: 'Cita no encontrada' });
+        return res.status(404).json({ success: false, error: 'Cita no encontrada' });
       }
 
-      res.json(citaActualizada);
+      res.json({ success: true, data: citaActualizada });
     } catch (err: any) {
-      res.status(400).json({ error: err.message });
+      res.status(400).json({ success: false, error: err.message });
     }
   }
 
-  static async eliminar(req: Request, res: Response) {
+  // ✅ Eliminar cita como proveedor
+  static async eliminarPorProveedor(req: Request, res: Response) {
     try {
-      const { id } = req.params;
-      const eliminada = await CitaService.eliminarCita(id);
+      const { id } = req.params; // id de la cita
+      const { proveedorId } = req.body; // proveedor que hace la petición
 
-      if (!eliminada) {
-        return res.status(404).json({ error: 'Cita no encontrada' });
-      }
+      await CitaService.eliminarCitaPorProveedor(id, proveedorId);
 
-      res.json({ message: 'Cita eliminada correctamente' });
+      res.json({ success: true, message: 'Cita eliminada correctamente' });
     } catch (err: any) {
-      res.status(400).json({ error: err.message });
+      res.status(400).json({ success: false, error: err.message });
     }
   }
 }
