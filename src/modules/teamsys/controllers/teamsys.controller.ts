@@ -7,7 +7,6 @@ import { handleError } from '../errors/errorHandler';
 import { validarPassword } from '../utils/validaciones';
 import { AuthService } from '../services/auth.service';
 import { JWTPayload } from '../types/auth.types';
-import { validarPassword } from '../utils/validaciones';
 import mongoose from 'mongoose';
 
 const sessionService = new SessionService();
@@ -506,7 +505,7 @@ export const eliminarAutentificacion = async (req: Request, res: Response): Prom
 // En controllers/teamsys.controller.ts - Agregar este export
 export const cambiarContraseña = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { userId,email } = req.user as JWTPayload;
+    const { userId,email } = req.body as JWTPayload;
     console.log('🔍 UserId correcto:', userId);
     console.log('🔍 email:', email);
     console.log('🔍 Es ObjectId válido?:', mongoose.Types.ObjectId.isValid(userId));

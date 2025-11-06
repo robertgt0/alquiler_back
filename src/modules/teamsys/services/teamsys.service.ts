@@ -2,6 +2,8 @@ import { UsuarioDocument } from '@/models/User';
 import Usuario, { UserDocument,UserAuth,UserAuthModel,UserAuthDocument} from '../models/teamsys';
 import { CrearUsuarioDto } from '../types/index';
 import { validarPassword } from '../utils/validaciones';
+import { Types } from 'mongoose';
+import mongoose from 'mongoose';
 
 export class UsuarioService {
   /**
@@ -9,14 +11,7 @@ export class UsuarioService {
    * @param data - Datos básicos del usuario (DTO)
    * @returns Usuario creado
    */
-  async registrarUsuario(data: CrearUsuarioDto): Promise<UserDocument | null> {
-    // Validación de contraseña
-    if (data.password != null) {
-      if (!validarPassword(data.password)) {
-        throw new Error('La contraseña no cumple con los requisitos mínimos');
-      }
-    }
-
+  async registrarUsuario(data: CrearUsuarioDto ): Promise<UserDocument | null > {
     // Verificar si el correo ya está registrado
     const existe = await Usuario.findOne({ correo: data.correo });
     if (existe) {
@@ -55,7 +50,7 @@ export class UsuarioService {
    */
   async verificarCorreo(correo: string): Promise<UserDocument | null> {
     const usuario = await Usuario.findOne({ correo: correo });
-    return usuario!=null;
+    return usuario;
   }
 
   /**
@@ -212,11 +207,12 @@ async cambiarContraseña(
 }
 
 
-}/**
+/**
  * Obtener usuario por email
  */
 async getUserByEmail(email: string): Promise<UserDocument | null> {
   return await Usuario.findOne({ correo: email });
+}
 }
 
 export default new UsuarioService();
