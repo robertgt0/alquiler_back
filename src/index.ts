@@ -6,6 +6,7 @@ import offersRouter from './routes/offers';
 import fixerModule from './modules/fixer';
 import categoriesModule from './modules/categories';
 import routesDevcode from './modules/DevCode/routes';
+import teamsysModule from './modules/teamsys';
 
 const app = express();
 
@@ -32,7 +33,7 @@ app.get('/', (_req: Request, res: Response) => {
     status: 'OK',
     version: '1.0.0',
     timestamp: new Date().toISOString(),
-    modules: ['/api/offers', '/api/fixers', '/api/categories', '/api/devcode'],
+    modules: ['/api/offers', '/api/fixers', '/api/categories', '/api/devcode', '/api/teamsys'],
   });
 });
 
@@ -44,6 +45,7 @@ app.use('/api/offers', offersRouter);
 app.use('/api/fixers', fixerModule);
 app.use('/api/categories', categoriesModule);
 app.use('/api/devcode', routesDevcode);
+app.use('/api/teamsys', teamsysModule);
 
 app.use((req: Request, res: Response) => {
   res.status(404).json({ success: false, message: 'Ruta no encontrada', path: req.path });
@@ -67,9 +69,8 @@ async function bootstrap() {
 
   app.listen(PORT, () => {
     console.log(`API listening on port ${PORT}`);
-    console.log('Endpoints disponibles: /api/offers, /api/fixers, /api/categories, /api/devcode');
+    console.log('Endpoints disponibles: /api/offers, /api/fixers, /api/categories, /api/devcode, /api/teamsys');
   });
 }
 
 bootstrap();
-
