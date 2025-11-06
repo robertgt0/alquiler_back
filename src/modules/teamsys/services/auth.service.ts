@@ -143,7 +143,7 @@ return data; // ahora sí es GoogleUserProfile
         return {
             accessToken: tokens.accessToken,
             refreshToken: tokens.refreshToken,
-            user: userForClient,
+            user: userDoc,
             expiresAt: new Date(),
         }
     }
