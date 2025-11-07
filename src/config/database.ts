@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
-// 🔹 Cargar .env antes de usar cualquier variable
 dotenv.config();
 
 const connectDB = async (): Promise<void> => {
