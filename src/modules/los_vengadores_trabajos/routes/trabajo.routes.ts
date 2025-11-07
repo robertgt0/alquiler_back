@@ -1,6 +1,6 @@
 import { Router } from "express";
 import {crearTrabajoController, obtenerTrabajosController, obtenerTrabajoPorIdController, eliminarTrabajoController,obtenerTrabajoProveedorController} from "../controllers/trabajo.controller";
-import {cancelarTrabajoProveedorController,TerminarTrabajoController,obtenerTrabajoClienteController} from "../controllers/trabajo.controller";
+import {cancelarTrabajoProveedorController,cancelarTrabajoClienteController,TerminarTrabajoController,obtenerTrabajoClienteController} from "../controllers/trabajo.controller";
 const router = Router();
 
 
@@ -10,6 +10,8 @@ router.get("/detalles/proveedor/:id", obtenerTrabajoProveedorController);
 router.get("/detalles/cliente/:id", obtenerTrabajoClienteController);
 //cancelar trabajo por el proveedor
 router.put("/cancelar/proveedor/:trabajoId", cancelarTrabajoProveedorController);
+//cancelar trabajo por el cliente
+router.put("/cancelar/cliente/:trabajoId", cancelarTrabajoClienteController);
 // Ruta para marcar un trabajo como terminado
 router.put("/terminar/:trabajoId", TerminarTrabajoController);
 
