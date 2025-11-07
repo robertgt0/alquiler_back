@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { createFixer, getFixer, updateIdentity, checkCI, updateLocation, updatePayments, acceptTerms, updateCategories, listByCategory } from "../controllers/fixers.controller";
+import { createFixer, getFixer, updateIdentity, checkCI, updateLocation, updatePayments, acceptTerms, updateCategories, listByCategory, getFixerByUser } from "../controllers/fixers.controller";
 
 const router = Router();
 
@@ -25,6 +25,7 @@ router.get("/", (_req: Request, res: Response) => {
 router.get("/check-ci", checkCI);
 router.post("/", createFixer);
 router.get("/by-category", listByCategory);
+router.get("/user/:userId", getFixerByUser);
 router.put("/:id/identity", updateIdentity);
 router.put("/:id/location", updateLocation);
 router.put("/:id/categories", updateCategories);

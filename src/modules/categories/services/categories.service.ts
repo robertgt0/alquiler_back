@@ -52,19 +52,18 @@ function toDTO(doc: CategoryDoc): Category {
 }
 
 type DuplicateCheckDoc = {
-  slug?: string;
+  slug?: string | null;
   _id: Types.ObjectId | string;
 };
 
 async function cleanupDuplicates() {
-  const docs = await CategoryModel.find().select("slug").lean<DuplicateCheckDoc[]>();
+  const docs = (await CategoryModel.find().select("slug").lean().exec()) as DuplicateCheckDoc[];
   const seen = new Map<string, string>();
   const remove: string[] = [];
 
-  docs.forEach((doc) => {
-    const slug = doc.slug;
+  docs.forEach(({ slug, _id }) => {
     if (!slug) return;
-    const docId = typeof doc._id === "string" ? doc._id : doc._id.toString();
+    const docId = typeof _id === "string" ? _id : _id.toString();
     const prev = seen.get(slug);
     if (prev) {
       remove.push(docId);

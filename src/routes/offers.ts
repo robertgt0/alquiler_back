@@ -1,9 +1,33 @@
-import { Router } from "express";
+import { Router, type Request } from "express";
 import mongoose from "mongoose";
 import { OfferModel } from "../models/Offer";
 import { seedAll } from "../scripts/seed";
 
 const router = Router();
+
+function resolveOwnerId(req: Request): string | null {
+  const header = req.get("x-owner-id");
+  const bodyValue =
+    typeof req.body?.ownerId === "string" || typeof req.body?.ownerId === "number"
+      ? String(req.body.ownerId)
+      : undefined;
+  const queryValue =
+    typeof req.query?.ownerId === "string" || typeof req.query?.ownerId === "number"
+      ? String(req.query.ownerId)
+      : undefined;
+  const raw = header ?? bodyValue ?? queryValue ?? "";
+  const trimmed = raw.trim();
+  return trimmed || null;
+}
+
+function buildIdFilter(id: string, extra?: Record<string, unknown>) {
+  const append = (criteria: Record<string, unknown>) => (extra ? { ...criteria, ...extra } : criteria);
+  const filters = [append({ id })];
+  if (mongoose.Types.ObjectId.isValid(id)) {
+    filters.push(append({ _id: new mongoose.Types.ObjectId(id) }));
+  }
+  return filters.length > 1 ? { $or: filters } : filters[0];
+}
 
 function normalize(doc: any) {
   return {
@@ -32,10 +56,15 @@ router.get("/", async (req, res) => {
     const pageSize = Math.max(1, Math.min(100, Number(req.query.pageSize ?? 10)));
     const query = String(req.query.query ?? "").trim().toLowerCase();
     const includeInactive = String(req.query.includeInactive ?? "true") !== "false";
+    const ownerIdFilter = typeof req.query.ownerId === "string" ? req.query.ownerId.trim() : "";
 
     const filter: any = { status: { $ne: "deleted" } };
     if (!includeInactive) {
       filter.$or = [{ status: "active" }, { status: { $exists: false } }];
+    }
+
+    if (ownerIdFilter) {
+      filter.ownerId = ownerIdFilter;
     }
 
     if (query) {
@@ -102,7 +131,6 @@ router.post("/", async (req, res) => {
   try {
     const {
       id,
-      ownerId,
       title,
       description,
       category,
@@ -113,6 +141,11 @@ router.post("/", async (req, res) => {
       whatsapp,
     } = req.body ?? {};
 
+    const ownerId = resolveOwnerId(req);
+    if (!ownerId) {
+      return res.status(400).json({ error: "Debes indicar el fixer propietario (ownerId)." });
+    }
+
     const now = new Date();
     const desc = (description ?? descripcion ?? "").toString();
     if (desc.length > 100) {
@@ -121,7 +154,7 @@ router.post("/", async (req, res) => {
 
     const doc = await OfferModel.create({
       id: id ?? String(now.getTime()),
-      ownerId: ownerId ?? "fixer-1",
+      ownerId,
       title: title ?? descripcion ?? "Oferta sin titulo",
       description: desc,
       category: category ?? categoria ?? "General",
@@ -141,6 +174,10 @@ router.post("/", async (req, res) => {
 router.put("/:id", async (req, res) => {
   try {
     const id = String(req.params.id);
+    const ownerId = resolveOwnerId(req);
+    if (!ownerId) {
+      return res.status(400).json({ error: "Debes identificarte como el fixer propietario para editar." });
+    }
 
     const patch: any = {};
     if (req.body.title ?? req.body.descripcion) patch.title = req.body.title ?? req.body.descripcion;
@@ -150,16 +187,16 @@ router.put("/:id", async (req, res) => {
     if (Array.isArray(req.body.images)) patch.images = req.body.images.filter((x: any) => typeof x === "string");
     if (["active", "inactive", "deleted"].includes(req.body.status)) patch.status = req.body.status;
 
-    const asObjectId =
-      mongoose.Types.ObjectId.isValid(id) ? { _id: new mongoose.Types.ObjectId(id) } : null;
+    const filter = buildIdFilter(id, { ownerId });
+    const doc = await OfferModel.findOneAndUpdate(filter, { $set: patch }, { new: true, lean: true });
 
-    const doc = await OfferModel.findOneAndUpdate(
-      asObjectId ? { $or: [{ id }, asObjectId] } : { id },
-      { $set: patch },
-      { new: true, lean: true }
-    );
-
-    if (!doc) return res.status(404).json({ error: "Oferta no encontrada" });
+    if (!doc) {
+      const exists = await OfferModel.exists(buildIdFilter(id));
+      if (exists) {
+        return res.status(403).json({ error: "No puedes editar una oferta que no te pertenece." });
+      }
+      return res.status(404).json({ error: "Oferta no encontrada" });
+    }
     res.json(normalize(doc));
   } catch (e) {
     console.error(e);
@@ -170,16 +207,21 @@ router.put("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   try {
     const id = String(req.params.id);
-    const asObjectId =
-      mongoose.Types.ObjectId.isValid(id) ? { _id: new mongoose.Types.ObjectId(id) } : null;
+    const ownerId = resolveOwnerId(req);
+    if (!ownerId) {
+      return res.status(400).json({ error: "Debes identificarte como el fixer propietario para eliminar." });
+    }
 
-    const result = await OfferModel.findOneAndUpdate(
-      asObjectId ? { $or: [{ id }, asObjectId] } : { id },
-      { $set: { status: "deleted" } },
-      { new: true, lean: true }
-    );
+    const filter = buildIdFilter(id, { ownerId });
+    const result = await OfferModel.findOneAndUpdate(filter, { $set: { status: "deleted" } }, { new: true, lean: true });
 
-    if (!result) return res.status(404).json({ error: "Oferta no encontrada" });
+    if (!result) {
+      const exists = await OfferModel.exists(buildIdFilter(id));
+      if (exists) {
+        return res.status(403).json({ error: "No puedes eliminar una oferta que no te pertenece." });
+      }
+      return res.status(404).json({ error: "Oferta no encontrada" });
+    }
     res.json({ ok: true });
   } catch (e) {
     console.error(e);

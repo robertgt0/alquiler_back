@@ -195,6 +195,16 @@ export const getFixer = async (req: Request, res: Response) => {
   }
 };
 
+export const getFixerByUser = async (req: Request, res: Response) => {
+  try {
+    const fixer = await service.getByUserId(req.params.userId);
+    if (!fixer) return res.status(404).json({ success: false, message: "Fixer no encontrado" });
+    res.json({ success: true, data: fixer });
+  } catch (err: any) {
+    res.status(400).json({ success: false, message: String(err.message || "Error") });
+  }
+};
+
 export const listByCategory = async (req: Request, res: Response) => {
   try {
     const search = typeof req.query.search === "string" ? req.query.search : undefined;
