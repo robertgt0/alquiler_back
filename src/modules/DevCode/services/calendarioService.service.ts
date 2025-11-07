@@ -1,4 +1,4 @@
-import { Calendario, ICalendario } from "@models/calendario.model";
+import { Calendario, ICalendario } from "../../../models/calendario.model";
 
 export const createCalendario = async (data: Partial<ICalendario>): Promise<ICalendario> => {
   const calendario = new Calendario(data);

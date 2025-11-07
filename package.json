@@ -8,10 +8,10 @@
   },
   "main": "dist/index.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/index.ts",
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "seed": "ts-node-dev --transpile-only src/seed/seedOffers.ts",
     "build": "rimraf dist && tsc",
-    "start": "node -r tsconfig-paths/register dist/index.js",
+    "start": "node dist/index.js",
     "start:dev": "npm run build && npm start",
     "clean": "rimraf dist"
   },
@@ -27,8 +27,7 @@
     "mogoose": "^0.0.1-security",
     "mongoose": "^8.19.1",
     "multer": "^2.0.2",
-    "jsonwebtoken": "^9.0.2",
-    "tsconfig-paths": "^4.2.0"
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
     "@types/connect": "^3.4.38",

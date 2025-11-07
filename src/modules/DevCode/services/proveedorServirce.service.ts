@@ -1,4 +1,4 @@
-import { ProveedorInfo, IProveedorInfo } from "@models/proveedorInfo.model";
+import { ProveedorInfo, IProveedorInfo } from "../../../models/proveedorInfo.model";
 
 export const createProveedor = async (data: Partial<IProveedorInfo>): Promise<IProveedorInfo> => {
   const proveedor = new ProveedorInfo(data);

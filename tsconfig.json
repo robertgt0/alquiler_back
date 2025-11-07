@@ -25,16 +25,6 @@
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
 
-    /* === Alias === */
-    "baseUrl": "./src",
-    "paths": {
-      "@/*": ["*"],
-      "@config/*": ["config/*"],
-      "@modules/*": ["modules/*"],
-      "@models/*": ["models/*"],
-      "@utils/*": ["utils/*"]
-    },
-
     /* === Opciones adicionales === */
     "noUncheckedIndexedAccess": false,
     "incremental": true

@@ -5,7 +5,7 @@ import servicioRoutes from "./servicioRoutes.routes";
 import ofertaRoutes from "./ofertaRoutes.routes";
 import notificacionRoutes from "./notificacionRoutes.routes";
 import calendarioRoutes from "./calendarioRoutes.routes";
-import clienteRoutes from "@modules/DevCode/routes/cliente.routes";
+import clienteRoutes from "./cliente.routes";
 
 
 const router = Router();

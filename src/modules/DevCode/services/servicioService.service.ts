@@ -1,4 +1,4 @@
-import { Servicio, IServicio } from "@models/servicio.model";
+import { Servicio, IServicio } from "../../../models/servicio.model";
 
 export const createServicio = async (data: Partial<IServicio>): Promise<IServicio> => {
   const servicio = new Servicio(data);

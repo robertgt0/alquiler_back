@@ -1,4 +1,4 @@
-import { Notificacion, INotificacion } from "@models/notificacion.model";
+import { Notificacion, INotificacion } from "../../../models/notificacion.model";
 
 export const createNotificacion = async (data: Partial<INotificacion>): Promise<INotificacion> => {
   const notificacion = new Notificacion(data);

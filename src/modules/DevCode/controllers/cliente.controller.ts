@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import * as clienteService from "@modules/DevCode/services/clienteServise.service";
+import * as clienteService from "../services/clienteServise.service";
 
 export const createCliente = async (req: Request, res: Response) => {
   try {

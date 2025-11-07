@@ -1,4 +1,4 @@
-import { OfertaTrabajo, IOfertaTrabajo } from "@models/ofertaTrabajo.model";
+import { OfertaTrabajo, IOfertaTrabajo } from "../../../models/ofertaTrabajo.model";
 
 export const createOferta = async (data: Partial<IOfertaTrabajo>): Promise<IOfertaTrabajo> => {
   const oferta = new OfertaTrabajo(data);
