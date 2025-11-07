@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import {crearTrabajo,obtenerTrabajos, obtenerTrabajoPorId, eliminarTrabajo} from "../services/trabajo.service";
-import { DetallesTrabajo, CancelacionTrabajoPorProveedor,TerminarTrabajo} from "../services/cancelar-trabajo.service";
+import { DetallesTrabajo, CancelacionTrabajo,TerminarTrabajo} from "../services/cancelar-trabajo.service";
 // Crear nuevo trabajo
 export const crearTrabajoController = async (req: Request, res: Response) => {
   try {
@@ -82,7 +82,7 @@ export const eliminarTrabajoController = async (req: Request, res: Response) => 
     });
   }
 };
-
+//Cancelar trabajo por parte del proveedor
 export const cancelarTrabajoProveedorController = async (req: Request, res: Response) => {
   try {
     const { trabajoId } = req.params;
@@ -92,7 +92,7 @@ export const cancelarTrabajoProveedorController = async (req: Request, res: Resp
       return res.status(400).json({ mensaje: "Debe ingresar una justificación antes de cancelar." });
     }
 
-    const trabajoCancelado = await CancelacionTrabajoPorProveedor.cancelarTrabajo(trabajoId, justificacion);
+    const trabajoCancelado = await CancelacionTrabajo.cancelarTrabajoProveedor(trabajoId, justificacion);
 
     if (!trabajoCancelado) {
       return res.status(404).json({ mensaje: "Trabajo no encontrado." });
@@ -108,6 +108,33 @@ export const cancelarTrabajoProveedorController = async (req: Request, res: Resp
     res.status(500).json({ mensaje: "Error al procesar la cancelación.", error: error.message });
   }
 };
+//Cancelar trabajo por parte del cliente
+export const cancelarTrabajoClienteController = async (req: Request, res: Response) => {
+  try {
+    const { trabajoId } = req.params;
+    const { justificacion } = req.body;
+
+    if (!justificacion || justificacion.trim() === "") {
+      return res.status(400).json({ mensaje: "Debe ingresar una justificación antes de cancelar." });
+    }
+
+    const trabajoCancelado = await CancelacionTrabajo.cancelarTrabajoCliente(trabajoId, justificacion);
+
+    if (!trabajoCancelado) {
+      return res.status(404).json({ mensaje: "Trabajo no encontrado." });
+    }
+
+    //Mensaje de confirmación al frontend
+    res.json({
+      mensaje: "Tu cancelación ha sido enviada al proveedor correctamente.",
+    });
+
+  } catch (error: any) {
+    console.error("Error al cancelar trabajo:", error);
+    res.status(500).json({ mensaje: "Error al procesar la cancelación.", error: error.message });
+  }
+};
+
 //terminar un trabajo
 export const TerminarTrabajoController = async (req: Request, res: Response) => {
   try {
