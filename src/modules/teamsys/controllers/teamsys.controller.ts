@@ -197,7 +197,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     const userAgent = req.headers['user-agent'] || 'Unknown';
     const ip = (req.ip || req.socket.remoteAddress || 'Unknown').replace('::ffff:', '');
     const { accessToken, refreshToken } = authService.generateTokens(usuario);
-    await sessionService.create(usuario.id, userAgent, ip, accessToken, refreshToken);
+    await sessionService.create(usuario._id.toString(), userAgent, ip, accessToken, refreshToken);
 
     res.json({
       success: true,
@@ -205,7 +205,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
       data: {
         accessToken,
         refreshToken,
-        usuaer: usuario,
+        user: usuario,
       }
     });
   } catch (error) {
