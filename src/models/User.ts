@@ -15,6 +15,7 @@ export interface UserDoc extends Document {
   apellido?: string;
   telefono?: string;
   correo?: string;
+  ci?: string;
   fotoPerfil?: string;
   ubicacion?: UserLocation;
   terminosYCondiciones?: boolean;
@@ -36,6 +37,7 @@ const UserSchema = new Schema<UserDoc>(
     apellido: { type: String, trim: true },
     telefono: { type: String, trim: true },
     correo: { type: String, trim: true },
+    ci: { type: String, trim: true },
     fotoPerfil: { type: String, trim: true },
     ubicacion: {
       direccion: { type: String, trim: true },
@@ -54,5 +56,7 @@ const UserSchema = new Schema<UserDoc>(
     strict: false,
   }
 );
+
+UserSchema.index({ ci: 1 }, { unique: true, sparse: true });
 
 export const UserModel = usersConnection.models.User ?? usersConnection.model<UserDoc>("User", UserSchema);

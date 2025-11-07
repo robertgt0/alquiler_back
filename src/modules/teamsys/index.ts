@@ -1,5 +1,6 @@
 import { Router } from "express";
 import jwt, { Secret, SignOptions } from "jsonwebtoken";
+import { Types } from "mongoose";
 import { UserModel } from "../../models/User";
 
 const router = Router();
@@ -42,6 +43,15 @@ router.post("/usuario", async (req, res) => {
     const rol = payload.rol ? String(payload.rol) : "requester";
     const authProvider = payload.authProvider ? String(payload.authProvider) : "local";
     const password = resolvePassword(payload);
+    const rawCi = String(
+      payload.ci ??
+        payload.CI ??
+        payload.documento ??
+        payload.numeroDocumento ??
+        payload.documentId ??
+        ""
+    ).trim();
+    const ci = rawCi || `auto-${new Types.ObjectId().toString()}`;
 
     if (!nombre || !correo || !fotoPerfil) {
       return res.status(400).json({
@@ -64,6 +74,7 @@ router.post("/usuario", async (req, res) => {
       apellido: payload.apellido ?? undefined,
       telefono: payload.telefono ?? undefined,
       correo,
+      ci,
       fotoPerfil,
       ubicacion: coordinates && coordinates.length === 2
         ? { lat: coordinates[1], lng: coordinates[0] }
