@@ -4,7 +4,6 @@ import horarioRoutes from "./routes/horario_disponible.routes";
 import clienteRoutes from "./routes/cliente.routes";
 import proveedorRoutes from "./routes/proveedor.routes";
 import CalendarioDisponibilidad from './routes/calendario-disponibilidad.routes';
-import { DetallesTrabajo } from './services/cancelar-trabajo.service';
 
 const router = Router();
 
