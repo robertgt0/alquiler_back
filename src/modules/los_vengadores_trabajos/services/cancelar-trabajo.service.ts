@@ -46,6 +46,47 @@ export class DetallesTrabajo {
         return { mensaje: "Error al obtener detalles del trabajo" };
         }
     }
+
+    static async obtenerTrabajoCliente(TrabajoId: string) {
+        try {
+        const trabajo = await TrabajoModel.findById(
+            TrabajoId,
+            {
+            id_cliente: 1,
+            fecha: 1,
+            hora_inicio: 1,
+            hora_fin: 1,
+            descripcion_trabajo: 1,
+            costo: 1,
+            estado: 1,
+            }
+        ).populate<{ id_cliente: { nombre: string } }>(
+            "id_cliente",
+            "nombre -_id" // solo traer nombre del cliente
+        );
+
+        if (!trabajo) {
+            return { mensaje: "Trabajo no encontrado" };
+        }
+        return {
+        cliente: trabajo.id_cliente.nombre,
+        fecha: (() => {
+            const [año, mes, día] = trabajo.fecha.split("-").map(Number);
+            const fechaObj = new Date(año, mes - 1, día);
+            return new Intl.DateTimeFormat("es-ES", { weekday: "long", day: "numeric", month: "long" })
+                    .format(fechaObj)
+                    .replace(",", "");
+                    })(),
+        horario: `${trabajo.hora_inicio} - ${trabajo.hora_fin}`,
+        descripcion: trabajo.descripcion_trabajo,
+        costo: trabajo.costo,
+        estado: trabajo.estado,
+      };
+        } catch (err) {
+        console.error("Error al obtener detalles del trabajo:", err);
+        return { mensaje: "Error al obtener detalles del trabajo" };
+        }
+    }
 }
 
 export class CancelacionTrabajoPorProveedor {
