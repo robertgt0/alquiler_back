@@ -196,15 +196,30 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     // registarr en sessions
     const userAgent = req.headers['user-agent'] || 'Unknown';
     const ip = (req.ip || req.socket.remoteAddress || 'Unknown').replace('::ffff:', '');
-    const { accessToken, refreshToken } = authService.generateTokens(usuario);
-    await sessionService.create(usuario._id.toString(), userAgent, ip, accessToken, refreshToken);
+    const session = await sessionService.getSessionByIp(ip, usuario.id);
+
+    if (! session) {
+      const { accessToken, refreshToken } = authService.generateTokens(usuario);
+      await sessionService.create(usuario._id.toString(), userAgent, ip, accessToken, refreshToken);
+
+      res.json({
+        success: true,
+        message: 'Inicio de sesión exitoso',
+        data: {
+          accessToken,
+          refreshToken,
+          user: usuario,
+        }
+      });
+      return;
+    }
 
     res.json({
       success: true,
       message: 'Inicio de sesión exitoso',
       data: {
-        accessToken,
-        refreshToken,
+        accessToken: session.token,
+        refreshToken: session.refreshToken,
         user: usuario,
       }
     });

@@ -9,15 +9,12 @@ export class SessionService {
 	/**
 	 * Obtener la session por token 
 	 */
-	async getSessionsByToken(token: string): Promise<ISession> {
+	async getSessionByToken(token: string): Promise<ISession | null> {
 		const session = await Session.findOne({
 			token: token,
 			isActive: true,
+			expiresAt: { $gt: new Date() }
 		});
-
-		if (!session) {
-			throw new Error('Session no encontrada');
-		}
 
 		return session;
 	}
@@ -39,6 +36,19 @@ export class SessionService {
 	}
 
 	/**
+	 * Obtener la session por ip 
+	 */
+	async getSessionByIp(ip: string, userId: string): Promise<ISession | null> {
+		const session = await Session.findOne({
+			"deviceInfo.ip": ip,
+			userId: new mongoose.Types.ObjectId(userId),
+			isActive: true,
+		});
+
+		return session;
+	}
+
+	/**
 	 * Crear una sesion
 	 */
 	async create(userId: string, userAgent: string, ip: string, accessToken: string, refreshToken: string): Promise<{ session: ISession; accessToken: string; refreshToken: string }> {
@@ -54,7 +64,7 @@ export class SessionService {
 
 		const deviceInfo = DeviceParser.createDeviceInfo(userAgent, ip);
 
-		const refreshExpiresAt = 1;
+		const refreshExpiresAt = 60 * 60 * 1000; // 1 hour
 		const expiresAt = new Date(Date.now() + refreshExpiresAt);
 
 		const session = Session.create({
