@@ -44,6 +44,7 @@ export const eliminarTrabajoController = async (req: Request, res: Response) => 
 };
 
   //controllers para la HU2 y hu3 del segundo sprint
+  // controller para obtener los detalles del trabajo para el proveedor
   export const obtenerTrabajoProveedorController = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -62,6 +63,26 @@ export const eliminarTrabajoController = async (req: Request, res: Response) => 
     });
   }
 };
+// controller para obtener los detalles del trabajo para el cliente
+  export const obtenerTrabajoClienteController = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const resultado = await DetallesTrabajo.obtenerTrabajoCliente(id);
+
+    if ("mensaje" in resultado) {
+      return res.status(404).json({ message: resultado.mensaje });
+    }
+
+    res.status(200).json(resultado);
+  } catch (error: any) {
+    console.error("Error al obtener detalles del trabajo:", error.message);
+    res.status(500).json({
+      message: "Error al obtener detalles del trabajo",
+      error: error.message,
+    });
+  }
+};
+
 export const cancelarTrabajoProveedorController = async (req: Request, res: Response) => {
   try {
     const { trabajoId } = req.params;
