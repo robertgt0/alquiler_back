@@ -1,8 +1,16 @@
-import { Router } from "express";
-import {crearTrabajoController, obtenerTrabajosController, obtenerTrabajoPorIdController, eliminarTrabajoController,obtenerTrabajoProveedorController} from "../controllers/trabajo.controller";
-import {cancelarTrabajoProveedorController,cancelarTrabajoClienteController,TerminarTrabajoController,obtenerTrabajoClienteController} from "../controllers/trabajo.controller";
-const router = Router();
+// src/modules/los_vengadores_trabajos/routes/trabajo.routes.ts
+import { Router } from 'express';
 
+// Importamos las funciones del CONTROLADOR
+import {
+  crearTrabajoController,
+  obtenerTrabajosController,
+  obtenerTrabajoPorIdController,
+  eliminarTrabajoController,
+  getTrabajosProveedor,
+  getTrabajosCliente
+} from '../controllers/trabajo.controller';
+import {cancelarTrabajoProveedorController,cancelarTrabajoClienteController,TerminarTrabajoController,obtenerTrabajoProveedorController,obtenerTrabajoClienteController} from "../controllers/trabajo.controller";
 
 //obtener detalles del trabajo para el proveedor
 router.get("/detalles/proveedor/:id", obtenerTrabajoProveedorController);
@@ -14,18 +22,16 @@ router.put("/cancelar/proveedor/:trabajoId", cancelarTrabajoProveedorController)
 router.put("/cancelar/cliente/:trabajoId", cancelarTrabajoClienteController);
 // Ruta para marcar un trabajo como terminado
 router.put("/terminar/:trabajoId", TerminarTrabajoController);
+const router = Router();
 
+// --- RUTAS PARA HU 1.7 y 1.8 ---
+router.get('/proveedor', getTrabajosProveedor);
+router.get('/cliente/:clienteId', getTrabajosCliente);
 
-// Crear nuevo trabajo
-router.post("/", crearTrabajoController);
-
-// Obtener todos los trabajos
-router.get("/", obtenerTrabajosController);
-
-// Obtener trabajo por ID
-router.get("/:id", obtenerTrabajoPorIdController);
-
-// Eliminar trabajo
-router.delete("/:id", eliminarTrabajoController);
+// --- TUS RUTAS EXISTENTES ---
+router.get('/', obtenerTrabajosController);
+router.post('/', crearTrabajoController);
+router.get('/:id', obtenerTrabajoPorIdController);
+router.delete('/:id', eliminarTrabajoController);
 
 export default router;

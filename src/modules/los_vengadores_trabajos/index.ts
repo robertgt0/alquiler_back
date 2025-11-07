@@ -31,4 +31,5 @@ router.use("/clientes", clienteRoutes);         // recuperar información de cli
 router.use("/proveedores", proveedorRoutes);   // recuperar información de proveedores
 router.use('/calendario-disponibilidad', CalendarioDisponibilidad); // recuperar horarios disponibles sin horario ya ocupado
 
+
 export default router;
