@@ -1,23 +1,25 @@
+// src/index.ts
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/database';
-import routesDevcode from "./modules/DevCode/routes"
+import vengadoresModuleRouter from "./modules/los_vengadores_trabajos/index";
+
 // Cargar variables de entorno
 dotenv.config();
 
-// Crear aplicación Express
+// Crear aplicacion Express
 const app = express();
 
 // Conectar a MongoDB
-connectDB();
+connectDB(); //esta linea es la conectara a la bd del proyecto
 
 // Middlewares globales
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Ruta raíz
+// Ruta raiz
 app.get('/', (req: Request, res: Response) => {
   res.json({
     message: ' API Backend',
@@ -41,10 +43,9 @@ app.get('/api/health', (req: Request, res: Response) => {
 // MONTAR MÓDULOS/GRUPOS AQUÍ
 // ============================================
 // Montar tus módulos aquí:
-// app.use('/api/nombre_grupo_ejemplo', nombreGrupoEjemploRouter);
+app.use("/api/los_vengadores", vengadoresModuleRouter);
 
-// ROUTES DEVCODE
-app.use('/api/devcode', routesDevcode)
+
 // ============================================
 // Manejo de errores 404
 // ============================================
@@ -64,7 +65,7 @@ app.listen(PORT, () => {
   console.log(` URL: http://localhost:${PORT}`);
   console.log(`\n Módulos cargados:`);
   console.log(`   - /api/nombre_grupo_ejemplo`);
-  console.log(`\n Listo para recibir peticiones!\n`
+  console.log(`   - /api/vengadores/trabajos`); // iniciar sevidor con con la api
 
-  );
+  console.log(`\n Listo para recibir peticiones!\n`);
 });
