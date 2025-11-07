@@ -32,10 +32,14 @@ export class DetallesTrabajo {
         fecha: (() => {
             const [año, mes, día] = trabajo.fecha.split("-").map(Number);
             const fechaObj = new Date(año, mes - 1, día);
-            return new Intl.DateTimeFormat("es-ES", { weekday: "long", day: "numeric", month: "long" })
-                    .format(fechaObj)
-                    .replace(",", "");
-                    })(),
+            const fechaFormateada = new Intl.DateTimeFormat("es-ES", { 
+            weekday: "long", 
+            day: "numeric", 
+            month: "long" 
+        }).format(fechaObj).replace(",", "");
+        // Mayuscula la primera letra
+        return fechaFormateada.charAt(0).toUpperCase() + fechaFormateada.slice(1);
+            })(),
         horario: `${trabajo.hora_inicio} - ${trabajo.hora_fin}`,
         descripcion: trabajo.descripcion_trabajo,
         costo: trabajo.costo,
@@ -73,10 +77,14 @@ export class DetallesTrabajo {
         fecha: (() => {
             const [año, mes, día] = trabajo.fecha.split("-").map(Number);
             const fechaObj = new Date(año, mes - 1, día);
-            return new Intl.DateTimeFormat("es-ES", { weekday: "long", day: "numeric", month: "long" })
-                    .format(fechaObj)
-                    .replace(",", "");
-                    })(),
+            const fechaFormateada = new Intl.DateTimeFormat("es-ES", { 
+            weekday: "long", 
+            day: "numeric", 
+            month: "long" 
+        }).format(fechaObj).replace(",", "");
+        // Mayuscula la primera letra
+        return fechaFormateada.charAt(0).toUpperCase() + fechaFormateada.slice(1);
+            })(),
         horario: `${trabajo.hora_inicio} - ${trabajo.hora_fin}`,
         descripcion: trabajo.descripcion_trabajo,
         costo: trabajo.costo,
@@ -89,20 +97,35 @@ export class DetallesTrabajo {
     }
 }
 
-export class CancelacionTrabajoPorProveedor {
-  static async cancelarTrabajo(trabajoId: string, justificacion: string) {
+export class CancelacionTrabajo {
+  static async cancelarTrabajoProveedor(trabajoId: string, justificacion: string) {
     const trabajo = await TrabajoModel.findById(trabajoId)
    .populate<{ id_proveedor: { nombre: string } }>("id_proveedor", "nombre -_id");
 
     if (!trabajo) return null;
 
-    trabajo.estado = "cancelado";
+    trabajo.estado = "Cancelado";
     trabajo.justificacion_cancelacion = justificacion;
     trabajo.cancelado_por = "Cancelado por " + trabajo.id_proveedor.nombre;
 
     await trabajo.save();
     return trabajo;
   }
+
+    static async cancelarTrabajoCliente(trabajoId: string, justificacion: string) {
+    const trabajo = await TrabajoModel.findById(trabajoId)
+   .populate<{ id_cliente: { nombre: string } }>("id_cliente", "nombre -_id");
+
+    if (!trabajo) return null;
+
+    trabajo.estado = "Cancelado";
+    trabajo.justificacion_cancelacion = justificacion;
+    trabajo.cancelado_por = "Cancelado por " + trabajo.id_cliente.nombre;
+
+    await trabajo.save();
+    return trabajo;
+  }
+
 }
 
 export class TerminarTrabajo {
@@ -111,7 +134,7 @@ export class TerminarTrabajo {
 
     if (!trabajo) return null;
 
-    trabajo.estado = "completado"; // cambia solo el estado
+    trabajo.estado = "Terminado"; // cambia solo el estado
 
     await trabajo.save();
     return trabajo;
