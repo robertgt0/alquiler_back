@@ -48,7 +48,7 @@ export class AuthController {
           success: false,
           data: {accessToken: accessToken,
                 refreshToken: refreshToken,
-                user:result.user},
+                user:usuario},
           message: 'usuario ya registrado',
       });
       return;

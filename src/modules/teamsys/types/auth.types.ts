@@ -32,10 +32,10 @@ export interface GoogleUserProfile {
 
 /**h4 magiclink */
 export interface MagicLinkToken {
-  token: string;
-  email: string;
-  userId: string;
-  expiresAt: Date;
-  used: boolean;
-  createdAt: Date;
+    token: string;
+    email: string;
+    userId: string;
+    expiresAt: Date;
+    used: boolean;
+    createdAt: Date;
 }
