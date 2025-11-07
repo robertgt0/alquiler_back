@@ -4,6 +4,7 @@ import horarioRoutes from "./routes/horario_disponible.routes";
 import clienteRoutes from "./routes/cliente.routes";
 import proveedorRoutes from "./routes/proveedor.routes";
 import CalendarioDisponibilidad from './routes/calendario-disponibilidad.routes';
+import { DetallesTrabajo } from './services/cancelar-trabajo.service';
 
 const router = Router();
 
@@ -17,13 +18,14 @@ router.get('/', (req, res) => {
       horarios: "/horarios",
       clientes: "/clientes",
       proveedores: "/proveedores",
-      calendarioDisponibilidad: '/calendario-disponibilidad'
+      calendarioDisponibilidad: '/calendario-disponibilidad',
+      DetallesTrabajo: '/trabajos/detalle/proveedor/:id'
     }
   });
 });
 
 // Montar rutas
-router.use("/trabajos", trabajoRoutes);         // crear y eliminar trabajos
+router.use("/trabajos", trabajoRoutes);         // crear y eliminar trabajos ahora tambien ver detalles
 router.use("/horarios", horarioRoutes);         // crear o modificar horarios disponibles
 router.use("/clientes", clienteRoutes);         // recuperar información de clientes
 router.use("/proveedores", proveedorRoutes);   // recuperar información de proveedores

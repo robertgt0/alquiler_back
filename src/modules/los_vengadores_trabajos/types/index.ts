@@ -26,12 +26,12 @@ export interface OtraInterface {
 export interface HorarioDisponible{
   horaInicio: string;
   horaFin: string;
-  costoHora: number;
 }
 export interface DiaDisponibilidad{
   fecha: string; // Formato YYYY-MM-DD
   horarios: HorarioDisponible[];
 }
+
 ///
 
 

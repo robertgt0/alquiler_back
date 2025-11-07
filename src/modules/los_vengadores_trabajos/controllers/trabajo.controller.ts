@@ -8,6 +8,7 @@ import {
   getTrabajosProveedorService, // 1. ¡IMPORTAMOS LA FUNCIÓN DEL SERVICIO!
   getTrabajosClienteService,  // 1. ¡IMPORTAMOS LA FUNCIÓN DEL SERVICIO!
 } from '../services/trabajo.service';
+import { DetallesTrabajo, CancelacionTrabajo,TerminarTrabajo} from "../services/cancelar-trabajo.service";
 
 // --- NUEVA FUNCIÓN PARA HU 1.7 (VISTA PROVEEDOR) ---
 export const getTrabajosProveedor = async (req: Request, res: Response, next: NextFunction) => {
@@ -75,5 +76,120 @@ export const eliminarTrabajoController = async (req: Request, res: Response) => 
     res.json({ message: 'Trabajo eliminado correctamente' });
   } catch (error: any) {
     res.status(500).json({ message: 'Error al eliminar trabajo', error: error.message });
+  }
+};
+
+  //controllers para la HU2 y hu3 del segundo sprint
+  // controller para obtener los detalles del trabajo para el proveedor
+  export const obtenerTrabajoProveedorController = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const resultado = await DetallesTrabajo.obtenerTrabajoProveedor(id);
+
+    if ("mensaje" in resultado) {
+      return res.status(404).json({ message: resultado.mensaje });
+    }
+
+    res.status(200).json(resultado);
+  } catch (error: any) {
+    console.error("Error al obtener detalles del trabajo:", error.message);
+    res.status(500).json({
+      message: "Error al obtener detalles del trabajo",
+      error: error.message,
+    });
+  }
+};
+// controller para obtener los detalles del trabajo para el cliente
+  export const obtenerTrabajoClienteController = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const resultado = await DetallesTrabajo.obtenerTrabajoCliente(id);
+
+    if ("mensaje" in resultado) {
+      return res.status(404).json({ message: resultado.mensaje });
+    }
+
+    res.status(200).json(resultado);
+  } catch (error: any) {
+    console.error("Error al obtener detalles del trabajo:", error.message);
+    res.status(500).json({
+      message: "Error al obtener detalles del trabajo",
+      error: error.message,
+    });
+  }
+};
+//Cancelar trabajo por parte del proveedor
+export const cancelarTrabajoProveedorController = async (req: Request, res: Response) => {
+  try {
+    const { trabajoId } = req.params;
+    const { justificacion } = req.body;
+
+    if (!justificacion || justificacion.trim() === "") {
+      return res.status(400).json({ mensaje: "Debe ingresar una justificación antes de cancelar." });
+    }
+
+    const trabajoCancelado = await CancelacionTrabajo.cancelarTrabajoProveedor(trabajoId, justificacion);
+
+    if (!trabajoCancelado) {
+      return res.status(404).json({ mensaje: "Trabajo no encontrado." });
+    }
+
+    //Mensaje de confirmación al frontend
+    res.json({
+      mensaje: "Tu cancelación ha sido enviada al proveedor correctamente.",
+    });
+
+  } catch (error: any) {
+    console.error("Error al cancelar trabajo:", error);
+    res.status(500).json({ mensaje: "Error al procesar la cancelación.", error: error.message });
+  }
+};
+//Cancelar trabajo por parte del cliente
+export const cancelarTrabajoClienteController = async (req: Request, res: Response) => {
+  try {
+    const { trabajoId } = req.params;
+    const { justificacion } = req.body;
+
+    if (!justificacion || justificacion.trim() === "") {
+      return res.status(400).json({ mensaje: "Debe ingresar una justificación antes de cancelar." });
+    }
+
+    const trabajoCancelado = await CancelacionTrabajo.cancelarTrabajoCliente(trabajoId, justificacion);
+
+    if (!trabajoCancelado) {
+      return res.status(404).json({ mensaje: "Trabajo no encontrado." });
+    }
+
+    //Mensaje de confirmación al frontend
+    res.json({
+      mensaje: "Tu cancelación ha sido enviada al proveedor correctamente.",
+    });
+
+  } catch (error: any) {
+    console.error("Error al cancelar trabajo:", error);
+    res.status(500).json({ mensaje: "Error al procesar la cancelación.", error: error.message });
+  }
+};
+
+//terminar un trabajo
+export const TerminarTrabajoController = async (req: Request, res: Response) => {
+  try {
+    const { trabajoId } = req.params;
+
+    const trabajoTerminado = await TerminarTrabajo.marcarComoTerminado(trabajoId);
+
+    if (!trabajoTerminado) {
+      return res.status(404).json({ mensaje: "Trabajo no encontrado." });
+    }
+
+    res.json({
+      mensaje: "El trabajo ha sido marcado como terminado correctamente."
+    });
+  } catch (error: any) {
+    console.error("Error al finalizar trabajo:", error);
+    res.status(500).json({
+      mensaje: "Error al marcar el trabajo como terminado.",
+      error: error.message
+    });
   }
 };
