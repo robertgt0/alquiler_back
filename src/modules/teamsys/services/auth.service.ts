@@ -123,30 +123,53 @@ return data; // ahora sí es GoogleUserProfile
         }
     }
 
-    async loginWithGoogle(code: string): Promise<TokenResponse | null> {
+    async loginWithGoogle(code: string): Promise<TokenResponse> {
         const googleTokens = await this.exchangeCodeForTokens(code);
 
         const profile = await this.getGoogleUserProfile(googleTokens.access_token);
 
         const userDoc = await this.findOrCreateUser(profile);
-        if (userDoc==null) return null;
-
-        const tokens = this.generateTokens(userDoc as UsuarioDocument); 
-        const userForClient= {
+        let userForClient: CrearUsuarioDto;
+        
+        if (userDoc==null) {
+            userForClient= {
+            nombre: profile.name,
+            correo: profile.email,
+            fotoPerfil:profile.picture,
+            authProvider:"google",
+            terminosYCondiciones: false,
+        //     apellido: userDoc.apellido,
+        //     telefono: userDoc.telefono,
+        //     si quieres la foto de Google, pásala desde el service como campo aparte:
+        //     fotoPerfil: profile.picture,
+        }
+      }
+        else{
+            userForClient= {
             nombre: userDoc.nombre,
             correo: userDoc.correo,
             fotoPerfil:userDoc.fotoPerfil,
-            terminosYCondiciones: userDoc.terminosYCondiciones,
+            authProvider:userDoc.authProvider,
+            terminosYCondiciones: true,
         //     apellido: userDoc.apellido,
         //     telefono: userDoc.telefono,
         //     si quieres la foto de Google, pásala desde el service como campo aparte:
         //     fotoPerfil: profile.picture,
         };
+        }
+        if(userDoc!=null){
+        const tokens = this.generateTokens(userDoc as UsuarioDocument); 
+        
 
         return {
             accessToken: tokens.accessToken,
             refreshToken: tokens.refreshToken,
-            user: userDoc,
+            user: userForClient,
+            expiresAt: new Date(),
+        }}else return {
+            accessToken: "",
+            refreshToken: "",
+            user: userForClient,
             expiresAt: new Date(),
         }
     }

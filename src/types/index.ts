@@ -16,6 +16,6 @@ export interface ApiResponse<T> {
   count?: number;
 }
 
-export interface CustomRequest extends Request {
-  user?: IUser;
-}
+//export interface CustomRequest extends Request {
+  //user?: IUser;
+//}
