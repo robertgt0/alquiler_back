@@ -1,68 +1,96 @@
-import { IMessageData, IDestination } from "./Notification";
+import mongoose, { Document, Schema } from "mongoose";
+import connectDB from "../config/database"; // ✅ conexión central, igual que Gmail
+
+// ✅ Conecta si aún no hay conexión activa
+if (!mongoose.connection.readyState) {
+  connectDB(); // sin await → se conecta en segundo plano
+}
 
 // =============================================
-// 🧩 INTERFACES BASE
+// 💬 INTERFACES
 // =============================================
-export interface NotificationData {
-  transactionId?: string;
-  source?: "system" | "user";
-  message: IMessageData;
-  destinations?: IDestination[];
-  status?: "draft" | "pending" | "sent" | "failed";
-  fromName?: string; // ✅ Añadido para Gmail y WhatsApp
-  channel?: "gmail" | "whatsapp"; // ✅ Añadido para distinguir canal
-  isRegistration?: boolean; // ✅ Para controlar duplicados
-  meta?: {
-    provider?: string;
-    createdAt?: Date;
-    error?: string;
-  };
+export type NotificationChannel = "whatsapp";
+
+export interface IMessageData {
+  type?: string;
+  content: string;
+  template?: string;
   createdAt?: Date;
-  sentAt?: Date;
+  updatedAt?: Date;
 }
 
-// =============================================
-// 🧩 INPUT TIPO (para validaciones y creación)
-// =============================================
-export interface CreateNotificationInput {
-  message: string;
+export interface IDestination {
+  name?: string;
+  phone: string;
+}
+
+export interface INotificationPackage extends Document {
+  transactionId?: string;
+  channel: NotificationChannel;
+  message: IMessageData;
   destinations: IDestination[];
-  subject?: string;
-  fromName?: string; // ✅ Añadido
-  channel?: string; // ✅ Añadido
-  isRegistration?: boolean; // ✅ Añadido
+  status: "draft" | "pending" | "sent" | "failed";
+  meta?: Record<string, any>;
+  attempts?: number;
+  providerResponse?: any;
+  sentAt?: Date;
+  createdAt: Date;
 }
 
 // =============================================
-// 💾 ALMACÉN EN MEMORIA
+// 🧱 ESQUEMA
 // =============================================
-const memoryStore: NotificationData[] = [];
+const DestinationSchema = new Schema<IDestination>(
+  {
+    name: String,
+    phone: { type: String, required: true },
+  },
+  { _id: false }
+);
 
-// ✅ Guarda una notificación en memoria
-export async function saveNotification(data: NotificationData) {
-  const record: NotificationData = {
-    ...data,
-    transactionId:
-      data.transactionId ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`,
-    createdAt: data.createdAt ?? new Date(),
-    sentAt: data.sentAt ?? new Date(),
-    meta: {
-      provider: data.meta?.provider ?? data.channel ?? "unknown",
-      createdAt: data.meta?.createdAt ?? new Date(),
-      error: data.meta?.error,
+const NotificationSchema = new Schema<INotificationPackage>(
+  {
+    transactionId: String,
+    channel: { type: String, enum: ["whatsapp"], default: "whatsapp" },
+    message: Schema.Types.Mixed,
+    destinations: { type: [DestinationSchema], required: true },
+    status: {
+      type: String,
+      enum: ["draft", "pending", "sent", "failed"],
+      default: "pending",
     },
-  };
+    meta: { type: Schema.Types.Mixed },
+    attempts: Number,
+    providerResponse: Schema.Types.Mixed,
+    sentAt: Date,
+    createdAt: { type: Date, default: () => new Date() },
+  },
+  { collection: "notificaciones_whatsapp" }
+);
 
-  memoryStore.push(record);
-  console.log(
-    `💾 [Model] Notificación ${record.channel?.toUpperCase() ?? "GENÉRICA"} guardada:`,
-    record.transactionId
+// =============================================
+// 📦 MODELO (evita redefinir si ya existe)
+// =============================================
+export const WhatsAppNotificationModel =
+  mongoose.models.WhatsAppNotification ||
+  mongoose.model<INotificationPackage>(
+    "WhatsAppNotification",
+    NotificationSchema
   );
 
+// =============================================
+// 💾 FUNCIONES
+// =============================================
+export async function saveNotification(data: Partial<INotificationPackage>) {
+  const record = new WhatsAppNotificationModel({
+    ...data,
+    createdAt: new Date(),
+  });
+  await record.save();
+  console.log("✅ [MongoDB] Notificación WhatsApp registrada:", record._id);
   return record;
 }
 
-// ✅ Devuelve todas las notificaciones guardadas
 export async function listNotifications() {
-  return memoryStore;
+  return WhatsAppNotificationModel.find().sort({ createdAt: -1 });
 }

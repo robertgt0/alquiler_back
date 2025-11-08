@@ -1,34 +1,95 @@
-// src/modules/notifications/models/notification.model.ts
-import { NotificationData } from "../types/notification.types";
+import mongoose, { Document, Schema } from "mongoose";
+import connectDB from "../config/database"; // ⬅️ Importa la función, no "dbConnection"
 
-const memoryStore: NotificationData[] = [];
+// ✅ Conecta si aún no hay conexión activa
+if (!mongoose.connection.readyState) {
+  connectDB(); // sin await → se conecta en segundo plano
+}
 
-// ✅ Guarda una notificación en memoria
-export async function saveNotification(data: NotificationData) {
-  const record: NotificationData = {
-    ...data,
+// =============================================
+// 📧 INTERFACES
+// =============================================
+export type NotificationChannel = "gmail-api";
 
-    // ✅ Genera ID de transacción si no viene
-    transactionId:
-      data.transactionId ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+export interface IMessageData {
+  subject?: string;
+  content: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
 
-    // ✅ Asegura fecha de creación
-    createdAt: data.sentAt ?? new Date(),
+export interface IDestination {
+  name?: string;
+  email: string;
+}
 
-    // ✅ Asegura meta con fecha y proveedor
-    meta: {
-      ...(data.meta ?? {}),
-      provider: data.meta?.provider ?? "gmail-api",
-      createdAt: data.meta?.createdAt ?? new Date(),
+export interface INotificationPackage extends Document {
+  transactionId?: string;
+  channel: NotificationChannel;
+  message: string | IMessageData;
+  destinations: IDestination[];
+  status: "draft" | "pending" | "sent" | "failed";
+  meta?: Record<string, any>;
+  attempts?: number;
+  providerResponse?: any;
+  sentAt?: Date;
+  createdAt: Date;
+}
+
+// =============================================
+// 🧱 ESQUEMA
+// =============================================
+const DestinationSchema = new Schema<IDestination>(
+  {
+    name: String,
+    email: { type: String, required: true },
+  },
+  { _id: false }
+);
+
+const NotificationSchema = new Schema<INotificationPackage>(
+  {
+    transactionId: String,
+    channel: { type: String, enum: ["gmail-api"], default: "gmail-api" },
+    message: Schema.Types.Mixed,
+    destinations: { type: [DestinationSchema], required: true },
+    status: {
+      type: String,
+      enum: ["draft", "pending", "sent", "failed"],
+      default: "pending",
     },
-  } as NotificationData;
+    meta: { type: Schema.Types.Mixed },
+    attempts: Number,
+    providerResponse: Schema.Types.Mixed,
+    sentAt: Date,
+    createdAt: { type: Date, default: () => new Date() },
+  },
+  { collection: "notificaciones_gmail" }
+);
 
-  memoryStore.push(record);
-  console.log("💾 [Model] Notificación guardada en memoria");
+// =============================================
+// 📦 MODELO (evita redefinir si ya existe)
+// =============================================
+export const GmailNotificationModel =
+  mongoose.models.GmailNotification ||
+  mongoose.model<INotificationPackage>(
+    "GmailNotification",
+    NotificationSchema
+  );
+
+// =============================================
+// 💾 FUNCIONES
+// =============================================
+export async function saveNotification(data: Partial<INotificationPackage>) {
+  const record = new GmailNotificationModel({
+    ...data,
+    createdAt: new Date(),
+  });
+  await record.save();
+  console.log("✅ [MongoDB] Notificación Gmail registrada:", record._id);
   return record;
 }
 
-// ✅ Devuelve todas las notificaciones guardadas
 export async function listNotifications() {
-  return memoryStore;
+  return GmailNotificationModel.find().sort({ createdAt: -1 });
 }
