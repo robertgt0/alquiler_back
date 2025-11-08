@@ -1,6 +1,6 @@
 import FixerModel from "../models/Fixer"; 
 // Importa desde la carpeta 'types' DENTRO del módulo 'bitCrew'
-import { IFixer } from '../types/wallet.types'; 
+import { IFixer } from '../types/index'; 
 /**
  * Obtiene todos los fixers de la base de datos.
  */

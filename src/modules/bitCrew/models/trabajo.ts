@@ -1,5 +1,5 @@
 import mongoose, { Schema, model } from 'mongoose';
-import { ITrabajo } from '../types/wallet.types'; // Importa la nueva interfaz
+import { ITrabajo } from '../types/index'; // Importa la nueva interfaz
 
 // Esquema para 'trabajo'
 const TrabajoSchema = new Schema<ITrabajo>({

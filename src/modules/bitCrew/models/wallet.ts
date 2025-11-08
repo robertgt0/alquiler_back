@@ -1,5 +1,5 @@
 import mongoose, { Schema, model } from 'mongoose';
-import { IBilletera } from '../types/wallet.types'; 
+import { IBilletera } from '../types/index'; 
 
 // --- Esquema Billetera ---
 const BilleteraSchema = new Schema<IBilletera>({

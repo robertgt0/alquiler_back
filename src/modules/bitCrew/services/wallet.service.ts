@@ -1,7 +1,7 @@
 
 import { Types } from 'mongoose';
 import BilleteraModel from '../models/wallet';
-import { IBilletera } from '../types/wallet.types';
+import { IBilletera } from '../types/index';
 
 /**
  * Obtiene la billetera de un fixer por el ID del fixer.
@@ -56,4 +56,3 @@ export const checkAndUpdateBilleteraStatus = async (billeteraId: Types.ObjectId)
     throw new Error('Error al actualizar el estado de la billetera');
   }
 };
-//hola

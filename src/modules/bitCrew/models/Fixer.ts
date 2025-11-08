@@ -1,5 +1,5 @@
 import mongoose, { Schema, model } from 'mongoose';
-import { IFixer } from '../types/wallet.types'; 
+import { IFixer } from '../types/index'; 
 
 const FixerSchema = new Schema<IFixer>({
   nombre: { type: String, required: true },

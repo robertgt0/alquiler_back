@@ -45,11 +45,9 @@ export const handleGetBilleteraByUsuario = async (req: Request, res: Response) =
       // Si el chequeo falla, devolvemos la billetera tal como la encontramos
       return res.status(500).json({ success: false, message: 'Error al actualizar estado de billetera', billetera: billetera });
     }
-    // ================================================================
 
   } catch (error: any) {
     console.error(`[Controller] Error fatal en handleGetBilleteraByUsuario: ${error.message}`);
     return res.status(500).json({ success: false, message: 'Error interno del servidor' });
   }
 };
-//hola
