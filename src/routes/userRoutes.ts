@@ -1,28 +1,10 @@
-/**
+// import { Router } from "express";
+// import devCodeRoutes from "../modules/DevCode";
+// //import ejemploRoutes from "../modules/nombre_grupo_ejemplo";
+
+
+// // const router = Router();
 
 
 
-import express from 'express';
-import {
-  getUsers,
-  getUserById,
-  createUser,
-  updateUser,
-  deleteUser,
-} from '../controllers/userController';
-
-const router = express.Router();
-
-router.get('/', getUsers);
-router.get('/:id', getUserById);
-router.post('/', createUser);
-router.put('/:id', updateUser);
-router.delete('/:id', deleteUser);
-
-export default router;
-
-
-
-
-
- */
+// // export default router;
