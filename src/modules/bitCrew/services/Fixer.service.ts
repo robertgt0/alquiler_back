@@ -26,4 +26,3 @@ export const getFixerByUsuario = async (usuario: string): Promise<IFixer | null>
     throw new Error('Error al buscar fixer por usuario');
   }
 };
-///hola

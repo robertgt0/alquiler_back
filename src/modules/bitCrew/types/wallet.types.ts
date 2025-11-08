@@ -30,4 +30,3 @@ export interface IBilletera extends Document {
   estado: string; 
   fecha_actualizacion: Date;
 }
-//hola

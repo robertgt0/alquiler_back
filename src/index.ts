@@ -1,8 +1,10 @@
+
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/database';
-import routesDevcode from "./modules/DevCode/routes"
+//import routesDevcode from "./modules/DevCode/routes"
+import routeswallet from "./modules/bitCrew/routes"
 // Cargar variables de entorno
 dotenv.config();
 
@@ -44,7 +46,9 @@ app.get('/api/health', (req: Request, res: Response) => {
 // app.use('/api/nombre_grupo_ejemplo', nombreGrupoEjemploRouter);
 
 // ROUTES DEVCODE
-app.use('/api/devcode', routesDevcode)
+//app.use('/api/devcode', routesDevcode)
+//app.use('/api/devcode', routeswallet)
+app.use('/api/bitCrew', routeswallet)
 // ============================================
 // Manejo de errores 404
 // ============================================
@@ -68,3 +72,5 @@ app.listen(PORT, () => {
 
   );
 });
+
+//al iniciar ir a este link http://localhost:5000/api/bitcrew/billetera/tmolina
