@@ -165,7 +165,7 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
  */
 export const loginUser = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { correoElectronico, password, twoFactorToken } = req.body;
+    const { correoElectronico, password } = req.body;
 
     if (!correoElectronico || !password) {
       res.status(400).json({
@@ -186,6 +186,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     }
 
     if (usuario.twoFactorEnabled) {
+      const { twoFactorToken } = req.body;
       if (! twoFactorToken) {
         res.json({
           success: true,

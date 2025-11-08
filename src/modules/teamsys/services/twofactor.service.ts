@@ -5,7 +5,7 @@ import { TwoFactorSetupResponse } from '../types';
 
 export class TwoFactorService {
   private readonly APP_NAME = 'Servineo';
-  private readonly TOTP_WINDOW = 1;
+  private readonly TOTP_WINDOW = 2;
 
   /**
    * Genera un secreto para 2FA y el código QR
@@ -44,6 +44,7 @@ export class TwoFactorService {
       token,
       window: this.TOTP_WINDOW,
     });
+
 
     if (!isValid) {
       throw new Error('Invalid two-factor authentication token');
