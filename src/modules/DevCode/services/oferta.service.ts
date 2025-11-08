@@ -18,6 +18,9 @@ export class OfertaService {
       createdAt: { $gte: fechaLimite },
     }).populate('proveedorId');
 
+    // src/modules/DevCode/services/oferta.service.ts
+// ... dentro de detectarNuevasOfertas ...
+
     if (serviciosNuevos.length === 0) {
       return { nuevas: 0, servicios: [] };
     }

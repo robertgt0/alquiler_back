@@ -36,3 +36,10 @@
 2025-11-05T21:25:14.974Z | TxID: N/A | To: ricardovasquezovando@gmail.com | Estado: ERROR | Error: NOT_FOUND: Ruta no encontrada: /api/notifications
 2025-11-05T21:25:41.423Z | TxID: N/A | To: ricardovasquezovando@gmail.com | Estado: ERROR | Error: NOT_FOUND: Ruta no encontrada: /api/notifications
 2025-11-05T22:04:29.347Z | TxID: N/A | To: ricardovasquezovando@gmail.com | Estado: ERROR | Error: NOT_FOUND: Ruta no encontrada: /api/notifications
+2025-11-06T23:29:33.659Z | TxID: N/A | To: N/A | Estado: ERROR | Error: NOT_FOUND: Ruta no encontrada: /favicon.ico
+2025-11-06T23:29:38.999Z | TxID: N/A | To: N/A | Estado: ERROR | Error: NOT_FOUND: Ruta no encontrada: /.well-known/appspecific/com.chrome.devtools.json
+2025-11-06T23:29:44.496Z | TxID: N/A | To: N/A | Estado: ERROR | Error: NOT_FOUND: Ruta no encontrada: /.well-known/appspecific/com.chrome.devtools.json
+2025-11-06T23:30:09.861Z | TxID: N/A | To: N/A | Estado: ERROR | Error: NOT_FOUND: Ruta no encontrada: /.well-known/appspecific/com.chrome.devtools.json
+2025-11-06T23:30:38.298Z | TxID: N/A | To: N/A | Estado: ERROR | Error: NOT_FOUND: Ruta no encontrada: /.well-known/appspecific/com.chrome.devtools.json
+2025-11-07T00:48:15.095Z | TxID: N/A | To: N/A | Estado: ERROR | Error: NOT_FOUND: Ruta no encontrada: /.well-known/appspecific/com.chrome.devtools.json
+2025-11-07T22:04:47.179Z | TxID: N/A | To: N/A | Estado: ERROR | Error: NOT_FOUND: Ruta no encontrada: /api/devcode/ofertas
