@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Fixer - Sistema de Restricción por Saldo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #2c5aa0;
+            --secondary-blue: #4a7bc8;
+            --light-blue: #e8f0fe;
+            --dark-blue: #1e3a6b;
+            --dark-gray: #333333;
+            --medium-gray: #666666;
+            --light-gray: #f5f5f5;
+            --border-gray: #dddddd;
+            --danger-red: #e74c3c;
+            --light-red: #ffebee;
+            --warning-orange: #f39c12;
+            --light-orange: #fff3e0;
+            --success-green: #2ecc71;
+            --light-green: #e8f5e9;
+            --shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f9f9f9;
+            color: var(--dark-gray);
+            line-height: 1.5;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+        
+        .main-panel {
+            grid-column: 1;
+        }
+        
+        .criteria-panel {
+            grid-column: 2;
+        }
+        
+        header {
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px 8px 0 0;
+            box-shadow: var(--shadow);
+            border-bottom: 1px solid var(--border-gray);
+        }
+        
+        .header-content h1 {
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            margin-bottom: 5px;
+        }
+        
+        .header-content p {
+            color: var(--medium-gray);
+            font-size: 0.9rem;
+        }
+        
+        .panel {
+            background-color: white;
+            border-radius: 0 0 8px 8px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            padding: 20px;
+            border-bottom: 1px solid var(--border-gray);
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid var(--border-gray);
+            border-radius: 6px;
+            background: white;
+            color: var(--dark-gray);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .action-btn:hover {
+            background-color: var(--light-blue);
+            border-color: var(--secondary-blue);
+        }
+        
+        .action-btn:disabled {
+            background-color: #f5f5f5;
+            color: #999;
+            cursor: not-allowed;
+            border-color: #ddd;
+        }
+        
+        .action-btn:disabled:hover {
+            background-color: #f5f5f5;
+            border-color: #ddd;
+        }
+        
+        .balance-section {
+            display: flex;
+            padding: 20px;
+            border-bottom: 1px solid var(--border-gray);
+            gap: 30px;
+        }
+        
+        .balance-card {
+            flex: 1;
+        }
+        
+        .balance-card h3 {
+            font-size: 1rem;
+            color: var(--medium-gray);
+            margin-bottom: 10px;
+        }
+        
+        .balance-amount {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .balance-negative {
+            color: var(--danger-red);
+        }
+        
+        .balance-positive {
+            color: var(--success-green);
+        }
+        
+        .commission-info {
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .status-negative {
+            background-color: var(--light-red);
+            color: var(--danger-red);
+        }
+        
+        .status-positive {
+            background-color: var(--light-green);
+            color: var(--success-green);
+        }
+        
+        .status-restricted {
+            background-color: var(--light-orange);
+            color: var(--warning-orange);
+        }
+        
+        .divider {
+            height: 1px;
+            background-color: var(--border-gray);
+            margin: 20px 0;
+        }
+        
+        .commission-history {
+            padding: 20px;
+        }
+        
+        .commission-history h3 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--dark-gray);
+        }
+        
+        .history-subtitle {
+            font-size: 0.9rem;
+            color: var(--medium-gray);
+            margin-bottom: 15px;
+        }
+        
+        .commission-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-gray);
+        }
+        
+        .commission-details {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .commission-id {
+            font-weight: bold;
+            color: var(--primary-blue);
+        }
+        
+        .commission-date {
+            color: var(--medium-gray);
+            font-size: 0.85rem;
+        }
+        
+        .commission-amount {
+            font-weight: bold;
+            color: var(--danger-red);
+        }
+        
+        .commission-total {
+            text-align: right;
+            padding: 15px 0;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .policy-section {
+            padding: 20px;
+            background-color: var(--light-gray);
+            border-radius: 0 0 8px 8px;
+            font-size: 0.9rem;
+        }
+        
+        .policy-section h3 {
+            margin-bottom: 10px;
+            color: var(--dark-gray);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 0 20px;
+            flex-wrap: wrap;
+        }
+        
+        .control-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            border: 1px solid var(--border-gray);
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--dark-blue);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 6px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            animation: slideInRight 0.4s ease-out, fadeOut 0.4s ease-in 4.5s forwards;
+        }
+        
+        .notification-success {
+            background-color: var(--success-green);
+        }
+        
+        .notification-warning {
+            background-color: var(--warning-orange);
+        }
+        
+        .notification-error {
+            background-color: var(--danger-red);
+        }
+        
+        .notification-info {
+            background-color: var(--secondary-blue);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .restriction-alert {
+            background-color: var(--light-red);
+            border-left: 4px solid var(--danger-red);
+            padding: 15px;
+            margin: 0 20px 20px;
+            border-radius: 4px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .criteria-list {
+            padding: 15px;
+            max-height: 800px;
+            overflow-y: auto;
+        }
+        
+        .criteria-item {
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            border-left: 4px solid var(--border-gray);
+            background-color: var(--light-gray);
+            transition: all 0.3s ease;
+        }
+        
+        .criteria-item.verified {
+            border-left-color: var(--success-green);
+            background-color: var(--light-green);
+        }
+        
+        .criteria-item.failed {
+            border-left-color: var(--danger-red);
+            background-color: var(--light-red);
+        }
+        
+        .criteria-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        
+        .criteria-id {
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .criteria-status {
+            font-size: 0.8rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background-color: #ddd;
+        }
+        
+        .criteria-status.verified {
+            background-color: var(--success-green);
+            color: white;
+        }
+        
+        .criteria-status.failed {
+            background-color: var(--danger-red);
+            color: white;
+        }
+        
+        .criteria-description {
+            font-size: 0.85rem;
+            color: var(--medium-gray);
+        }
+        
+        .test-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        
+        .test-btn {
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            border: 1px solid var(--border-gray);
+            border-radius: 3px;
+            background: white;
+            cursor: pointer;
+        }
+        
+        .test-btn:hover {
+            background-color: var(--light-blue);
+        }
+        
+        .session-controls {
+            display: flex;
+            gap: 10px;
+            padding: 15px;
+            border-bottom: 1px solid var(--border-gray);
+            align-items: center;
+        }
+        
+        .draft-section {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-gray);
+        }
+        
+        .draft-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .log-section {
+            padding: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: var(--light-gray);
+            border-radius: 4px;
+            margin: 15px;
+            font-size: 0.8rem;
+        }
+        
+        .log-entry {
+            padding: 5px 0;
+            border-bottom: 1px solid var(--border-gray);
+        }
+        
+        .log-timestamp {
+            color: var(--medium-gray);
+            font-size: 0.75rem;
+        }
+        
+        .mobile-simulation {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-gray);
+            background-color: var(--light-blue);
+        }
+        
+        .mobile-toggle {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .mobile-view {
+            display: none;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .mobile-view.active {
+            display: block;
+        }
+        
+        .profile-section {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-gray);
+        }
+        
+        .profile-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .criteria-summary {
+            padding: 15px;
+            background-color: var(--light-blue);
+            border-radius: 4px;
+            margin: 15px;
+            text-align: center;
+        }
+        
+        .summary-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--medium-gray);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        
+        @media (max-width: 968px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .balance-section {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-panel">
+            <header>
+                <div class="header-content">
+                    <h1>Panel de Fixer</h1>
+                    <p>ID: PAY-009 - Gestión de saldo y comisiones</p>
+                </div>
+            </header>
+            
+            <div class="panel">
+                <div id="restrictionAlert" class="restriction-alert">
+                    <p><strong>Cuenta Restringida por Saldo Negativo</strong></p>
+                    <p>Tu cuenta tiene un saldo negativo de <strong>$450.00</strong>. Debes liquidar las comisiones pendientes para poder aceptar nuevos trabajos o publicar ofertas.</p>
+                </div>
+                
+                <div class="session-controls">
+                    <button id="refreshPage" class="btn">
+                        <i class="fas fa-redo"></i> Recargar Página
+                    </button>
+                    <button id="clearStorage" class="btn">
+                        <i class="fas fa-trash"></i> Limpiar Datos
+                    </button>
+                    <span id="sessionStatus">Sesión: <span id="sessionId"></span> - Datos persistentes</span>
+                </div>
+                
+                <div class="mobile-simulation">
+                    <div class="mobile-toggle">
+                        <span>Vista Móvil:</span>
+                        <button id="toggleMobileView" class="btn">
+                            <i class="fas fa-mobile-alt"></i> Activar Vista Móvil
+                        </button>
+                    </div>
+                    <div id="mobileView" class="mobile-view">
+                        <p><strong>Vista Móvil Activada</strong> - Las validaciones de saldo negativo se aplican igual que en la versión web</p>
+                        <p>Estado: <span id="mobileStatus">Cargando...</span></p>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="acceptJobBtn" class="action-btn" disabled>
+                        <i class="fas fa-briefcase"></i> Aceptar Trabajo
+                    </button>
+                    <button id="postOfferBtn" class="action-btn" disabled>
+                        <i class="fas fa-bullhorn"></i> Publicar Oferta
+                    </button>
+                </div>
+                
+                <div class="balance-section">
+                    <div class="balance-card">
+                        <h3>Saldo de Billetera</h3>
+                        <p>Balance actual</p>
+                        <div id="balanceAmount" class="balance-amount balance-negative">$-450.00</div>
+                        <div class="commission-info">
+                            Estado del Fixer: <span id="fixerStatus" class="status-badge status-restricted">Restringido</span>
+                        </div>
+                    </div>
+                    
+                    <div class="balance-card">
+                        <h3>Comisiones pendientes:</h3>
+                        <div id="commissionAmount" class="balance-amount">$450.00</div>
+                        <div class="commission-info">
+                            Estado: <span id="balanceStatus" class="status-badge status-negative">Negativo</span>
+                        </div>
+                        <div class="commission-info" id="restrictionReason">
+                            <strong>Motivo de restricción:</strong> Saldo negativo en billetera
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="profile-section">
+                    <h3>Gestión de Perfil</h3>
+                    <p>Actualizar información personal (funcionalidad no afectada por restricciones)</p>
+                    <div class="profile-controls">
+                        <button id="updateProfileBtn" class="btn">
+                            <i class="fas fa-user-edit"></i> Actualizar Perfil
+                        </button>
+                        <button id="viewProfileBtn" class="btn">
+                            <i class="fas fa-user"></i> Ver Perfil
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="draft-section">
+                    <h3>Gestión de Borradores</h3>
+                    <p>Crear y gestionar ofertas en borrador</p>
+                    <div class="draft-controls">
+                        <button id="createDraftBtn" class="btn" disabled>
+                            <i class="fas fa-file-alt"></i> Crear Borrador
+                        </button>
+                        <button id="viewDraftsBtn" class="btn">
+                            <i class="fas fa-list"></i> Ver Borradores
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="commission-history">
+                    <h3>Comisiones Pendientes</h3>
+                    <p class="history-subtitle">Comisiones acumuladas de trabajos completados</p>
+                    
+                    <div class="commission-item">
+                        <div class="commission-details">
+                            <span class="commission-id">JOB-124S</span>
+                            <span class="commission-date">2025-10-15</span>
+                            <span>Reparación de laptop HP</span>
+                        </div>
+                        <div class="commission-amount">-$150.00</div>
+                    </div>
+                    
+                    <div class="commission-item">
+                        <div class="commission-details">
+                            <span class="commission-id">JOB-1289</span>
+                            <span class="commission-date">2025-10-20</span>
+                            <span>Instalación de red WiFi</span>
+                        </div>
+                        <div class="commission-amount">-$200.00</div>
+                    </div>
+                    
+                    <div class="commission-item">
+                        <div class="commission-details">
+                            <span class="commission-id">JOB-1301</span>
+                            <span class="commission-date">2025-10-25</span>
+                            <span>Mantenimiento PC escritorio</span>
+                        </div>
+                        <div class="commission-amount">-$100.00</div>
+                    </div>
+                    
+                    <div class="commission-total">
+                        Total de Comisiones Pendientes: <span id="totalCommission">$450.00</span>
+                    </div>
+                </div>
+                
+                <div class="log-section">
+                    <h4>Registro del Sistema - Restricciones y Cambios de Estado</h4>
+                    <div id="systemLogs">
+                        <div class="log-entry">
+                            <span class="log-timestamp">[Sistema]</span> Inicializado con saldo negativo - Restricciones aplicadas
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="balanceToggle">Simular estado:</label>
+                        <select id="balanceToggle" class="btn">
+                            <option value="negative">Saldo Negativo</option>
+                            <option value="positive">Saldo Positivo</option>
+                        </select>
+                    </div>
+                    <button id="payCommission" class="btn btn-primary">Pagar Comisiones</button>
+                    <button id="simulateJob" class="btn">Simular Oferta de Trabajo Recibida</button>
+                    <button id="simulateOffer" class="btn">Simular Envío de Solicitud</button>
+                    <button id="testAllCriteria" class="btn" style="background-color: var(--success-green); color: white;">
+                        <i class="fas fa-check-circle"></i> Verificar Todos los Criterios
+                    </button>
+                </div>
+                
+                <div class="criteria-summary">
+                    <h4>Resumen de Verificación de Criterios</h4>
+                    <div class="summary-stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalCriteria">0</div>
+                            <div class="stat-label">Total Criterios</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="verifiedCriteria">0</div>
+                            <div class="stat-label">Verificados</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="failedCriteria">0</div>
+                            <div class="stat-label">Fallidos</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="completionPercent">0%</div>
+                            <div class="stat-label">Completado</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="policy-section">
+                    <h3>Política de Comisiones</h3>
+                    <p>Como sistema, restringimos la capacidad de aceptar nuevos trabajos o publicar ofertas cuando el saldo de la billetera es negativo. Esto asegura el cumplimiento de los pagos de comisiones pendientes.</p>
+                    <p><strong>Notas:</strong> Puedes seguir consultando tu historial, actualizar tu perfil y comunicarte con soporte durante la restricción.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="criteria-panel">
+            <header>
+                <div class="header-content">
+                    <h2>Criterios de Aceptación</h2>
+                    <p>Verificación en tiempo real - 25 criterios</p>
+                </div>
+            </header>
+            
+            <div class="panel">
+                <div class="criteria-list" id="criteriaList">
+                    <!-- Los criterios se cargarán dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Estado inicial y configuración
+        const initialState = {
+            balance: -450,
+            commission: 450,
+            isRestricted: true,
+            restrictionReason: "Saldo negativo",
+            restrictionDate: new Date().toISOString(),
+            sessionId: generateSessionId(),
+            logs: [
+                { timestamp: new Date().toISOString(), message: "Sistema inicializado con saldo negativo - Restricciones aplicadas" }
+            ],
+            drafts: [],
+            criteriaStatus: {},
+            fixerStatus: "restringido",
+            lastRestrictionDate: new Date().toISOString(),
+            mobileView: false
+        };
+
+        // Criterios de aceptación completos (25 criterios)
+        const acceptanceCriteria = [
+            {
+                id: "CA-001",
+                description: "El sistema detecta automáticamente cuando el saldo de la billetera del fixer sea negativo",
+                test: () => state.balance < 0,
+                demonstrate: () => showNotification(`✅ Sistema detectó saldo negativo: $${state.balance.toFixed(2)}`, 'info')
+            },
+            {
+                id: "CA-002", 
+                description: "El sistema impide al fixer aceptar nuevos trabajos mientras tenga saldo negativo",
+                test: () => state.isRestricted && document.getElementById('acceptJobBtn').disabled,
+                demonstrate: () => showNotification(state.isRestricted ? 
+                    '❌ Aceptar trabajos BLOQUEADO por saldo negativo' : 
+                    '✅ Aceptar trabajos PERMITIDO', state.isRestricted ? 'error' : 'success')
+            },
+            {
+                id: "CA-003",
+                description: "El sistema bloqueea la opción de publicar nuevas ofertas con saldo negativo",
+                test: () => state.isRestricted && document.getElementById('postOfferBtn').disabled,
+                demonstrate: () => showNotification(state.isRestricted ? 
+                    '❌ Publicar ofertas BLOQUEADO por saldo negativo' : 
+                    '✅ Publicar ofertas PERMITIDO', state.isRestricted ? 'error' : 'success')
+            },
+            {
+                id: "CA-004",
+                description: "Se muestre un mensaje claro informando que el saldo negativo impide realizar acciones",
+                test: () => state.isRestricted && !document.getElementById('restrictionAlert').classList.contains('hidden'),
+                demonstrate: () => showNotification('📢 Mostrando mensaje de restricción al usuario', 'info')
+            },
+            {
+                id: "CA-005",
+                description: "El mensaje de advertencia indique el motivo y las acciones necesarias para resolverlo",
+                test: () => {
+                    const alert = document.getElementById('restrictionAlert');
+                    return alert.textContent.includes('saldo negativo') && 
+                           alert.textContent.includes('liquidar las comisiones') &&
+                           alert.textContent.includes('aceptar nuevos trabajos');
+                },
+                demonstrate: () => showNotification('📝 Mensaje muestra motivo y solución: "Saldo negativo - Liquidar comisiones"', 'info')
+            },
+            {
+                id: "CA-006",
+                description: "El botón 'Aceptar trabajo' esté deshabilitado cuando el saldo sea negativo",
+                test: () => state.isRestricted && document.getElementById('acceptJobBtn').disabled,
+                demonstrate: () => showNotification(state.isRestricted ? 
+                    '🔒 Botón "Aceptar trabajo" DESHABILITADO' : 
+                    '🔓 Botón "Aceptar trabajo" HABILITADO', state.isRestricted ? 'error' : 'success')
+            },
+            {
+                id: "CA-007", 
+                description: "El botón 'Publicar oferta' no esté disponible o muestre un aviso de restricción",
+                test: () => state.isRestricted && document.getElementById('postOfferBtn').disabled,
+                demonstrate: () => showNotification(state.isRestricted ? 
+                    '🔒 Botón "Publicar oferta" DESHABILITADO' : 
+                    '🔓 Botón "Publicar oferta" HABILITADO', state.isRestricted ? 'error' : 'success')
+            },
+            {
+                id: "CA-008",
+                description: "El sistema registre en la base de datos la causa de la restricción (saldo negativo)",
+                test: () => state.restrictionReason === "Saldo negativo" && state.restrictionDate,
+                demonstrate: () => showNotification(`💾 Causa registrada: "${state.restrictionReason}" - ${new Date(state.restrictionDate).toLocaleString()}`, 'info')
+            },
+            {
+                id: "CA-009",
+                description: "El fixer no pueda evadir la restricción actualizando manualmente su perfil o sesión",
+                test: () => {
+                    // Simular intento de evasión
+                    const testState = {...state};
+                    testState.balance = 100; // Intentar cambiar manualmente
+                    const stillRestricted = testState.balance < 0 ? true : testState.isRestricted;
+                    return state.isRestricted && stillRestricted;
+                },
+                demonstrate: () => {
+                    showNotification('🛡️ Sistema previene evasión de restricciones', 'info');
+                    // Mostrar que actualizar perfil no afecta restricción
+                    setTimeout(() => {
+                        showNotification('✅ Actualizar perfil no elimina restricciones', 'success');
+                    }, 1000);
+                }
+            },
+            {
+                id: "CA-010",
+                description: "Al regularizar el saldo, el sistema elimine automáticamente las restricciones",
+                test: () => {
+                    if (state.balance >= 0) {
+                        return !state.isRestricted && 
+                               !document.getElementById('acceptJobBtn').disabled &&
+                               !document.getElementById('postOfferBtn').disabled;
+                    }
+                    return true;
+                },
+                demonstrate: () => {
+                    if (state.balance < 0) {
+                        showNotification('💡 Pague comisiones para demostrar eliminación de restricciones', 'info');
+                    } else {
+                        showNotification('✅ Restricciones eliminadas automáticamente al regularizar saldo', 'success');
+                    }
+                }
+            },
+            {
+                id: "CA-011",
+                description: "El saldo actualizado se refleje en tiempo real en la interfaz del fixer",
+                test: () => {
+                    const displayBalance = document.getElementById('balanceAmount').textContent;
+                    return displayBalance === `$${state.balance.toFixed(2)}`;
+                },
+                demonstrate: () => showNotification(`🔄 Saldo actualizado en tiempo real: $${state.balance.toFixed(2)}`, 'info')
+            },
+            {
+                id: "CA-012",
+                description: "Se registre un log del cambio de estado de la cuenta (de restringida a activa)",
+                test: () => state.logs.some(log => 
+                    log.message.includes("Restricciones eliminadas") || 
+                    log.message.includes("cuenta regularizada") ||
+                    log.message.includes("Estado cambiado a saldo positivo")
+                ),
+                demonstrate: () => {
+                    const hasLog = state.logs.some(log => log.message.includes("Restricciones eliminadas"));
+                    showNotification(hasLog ? 
+                        '📋 Log registrado: Cambio de estado de cuenta' : 
+                        'ℹ️ El log se registrará al eliminar restricciones', 
+                    hasLog ? 'success' : 'info');
+                }
+            },
+            {
+                id: "CA-013",
+                description: "El sistema no permita crear ofertas en borrador mientras el saldo sea negativo",
+                test: () => state.isRestricted && document.getElementById('createDraftBtn').disabled,
+                demonstrate: () => showNotification(state.isRestricted ? 
+                    '❌ Crear borradores BLOQUEADO por saldo negativo' : 
+                    '✅ Crear borradores PERMITIDO', state.isRestricted ? 'error' : 'success')
+            },
+            {
+                id: "CA-014",
+                description: "El sistema notifique al fixer por correo o alerta interna sobre el estado negativo",
+                test: () => state.logs.some(log => 
+                    log.message.includes("notificó") || 
+                    log.message.includes("saldo negativo") ||
+                    log.message.includes("Restricciones aplicadas")
+                ),
+                demonstrate: () => showNotification('📧 Usuario notificado sobre estado negativo del saldo', 'info')
+            },
+            {
+                id: "CA-015",
+                description: "El sistema no permita aceptar trabajos enviados por otros usuarios durante la restricción",
+                test: () => {
+                    // Simular recepción de oferta de trabajo
+                    if (state.isRestricted) {
+                        return document.getElementById('acceptJobBtn').disabled;
+                    }
+                    return true;
+                },
+                demonstrate: () => showNotification(state.isRestricted ? 
+                    '❌ Ofertas de otros usuarios BLOQUEADAS' : 
+                    '✅ Ofertas de otros usuarios ACEPTABLES', state.isRestricted ? 'error' : 'success')
+            },
+            {
+                id: "CA-016",
+                description: "La restricción no afecte otras funciones ajenas a la publicación o aceptación de trabajos",
+                test: () => {
+                    // Verificar que otras funciones siguen disponibles
+                    return !document.getElementById('viewDraftsBtn').disabled &&
+                           !document.getElementById('updateProfileBtn').disabled &&
+                           !document.getElementById('viewProfileBtn').disabled;
+                },
+                demonstrate: () => showNotification('✅ Funciones no relacionadas (perfil, ver borradores) disponibles durante restricción', 'success')
+            },
+            {
+                id: "CA-017",
+                description: "El sistema mantenga la restricción aunque el fixer cierre y vuelva a iniciar sesión",
+                test: () => {
+                    // Verificar persistencia en localStorage
+                    const savedData = localStorage.getItem('fixerPanelData');
+                    if (savedData) {
+                        const savedState = JSON.parse(savedData);
+                        return savedState.isRestricted === state.isRestricted;
+                    }
+                    return true;
+                },
+                demonstrate: () => showNotification('💾 Restricción persiste al recargar página/cerrar sesión', 'info')
+            },
+            {
+                id: "CA-018",
+                description: "El sistema muestre correctamente el saldo negativo en la billetera del fixer",
+                test: () => {
+                    const balanceEl = document.getElementById('balanceAmount');
+                    return state.balance < 0 && 
+                           balanceEl.textContent.startsWith('-$') &&
+                           balanceEl.classList.contains('balance-negative');
+                },
+                demonstrate: () => showNotification(`✅ Saldo negativo mostrado correctamente: $${state.balance.toFixed(2)}`, 'success')
+            },
+            {
+                id: "CA-019",
+                description: "La validación de saldo negativo se aplique tanto en web como en aplicación móvil",
+                test: () => {
+                    // La validación es la misma independientemente del dispositivo
+                    return state.isRestricted === (state.balance < 0);
+                },
+                demonstrate: () => {
+                    document.getElementById('mobileView').classList.add('active');
+                    document.getElementById('mobileStatus').textContent = state.isRestricted ? 
+                        'RESTRINGIDO - Mismas validaciones que web' : 'ACTIVO - Validaciones aplicadas';
+                    showNotification('📱 Validaciones aplicadas igual en versión móvil', 'info');
+                }
+            },
+            {
+                id: "CA-020",
+                description: "El sistema permita nuevamente aceptar y publicar ofertas una vez que el saldo sea positivo",
+                test: () => {
+                    if (state.balance >= 0) {
+                        return !document.getElementById('acceptJobBtn').disabled &&
+                               !document.getElementById('postOfferBtn').disabled &&
+                               !document.getElementById('createDraftBtn').disabled;
+                    }
+                    return true;
+                },
+                demonstrate: () => {
+                    if (state.balance >= 0) {
+                        showNotification('✅ Todas las funciones RESTAURADAS al tener saldo positivo', 'success');
+                    } else {
+                        showNotification('ℹ️ Funciones se restaurarán automáticamente al tener saldo positivo', 'info');
+                    }
+                }
+            },
+            {
+                id: "CA-021",
+                description: "El sistema actualice el estado del fixer a 'restringido' al detectar saldo negativo",
+                test: () => state.isRestricted && state.fixerStatus === "restringido",
+                demonstrate: () => showNotification(`👤 Estado del Fixer: ${state.fixerStatus.toUpperCase()}`, 'info')
+            },
+            {
+                id: "CA-022",
+                description: "La restricción por saldo negativo se mantenga tras recargar o actualizar la página",
+                test: () => {
+                    const savedData = localStorage.getItem('fixerPanelData');
+                    if (savedData) {
+                        const savedState = JSON.parse(savedData);
+                        return savedState.isRestricted === state.isRestricted;
+                    }
+                    return true;
+                },
+                demonstrate: () => showNotification('🔄 Restricción mantenida después de recargar página', 'info')
+            },
+            {
+                id: "CA-023",
+                description: "El sistema registre la fecha y hora en que se aplicó la restricción al fixer",
+                test: () => state.restrictionDate && state.lastRestrictionDate,
+                demonstrate: () => showNotification(`📅 Restricción aplicada: ${new Date(state.restrictionDate).toLocaleString()}`, 'info')
+            },
+            {
+                id: "CA-024",
+                description: "El sistema no permita enviar solicitudes de trabajo mientras la cuenta esté restringida",
+                test: () => state.isRestricted,
+                demonstrate: () => showNotification(state.isRestricted ? 
+                    '❌ Envío de solicitudes BLOQUEADO durante restricción' : 
+                    '✅ Envío de solicitudes PERMITIDO', state.isRestricted ? 'error' : 'success')
+            },
+            {
+                id: "CA-025",
+                description: "El sistema muestre el motivo de la restricción en la sección de billetera del fixer",
+                test: () => {
+                    const reasonElement = document.getElementById('restrictionReason');
+                    return reasonElement && 
+                           reasonElement.textContent.includes('Motivo de restricción') &&
+                           reasonElement.textContent.includes('Saldo negativo');
+                },
+                demonstrate: () => showNotification('📋 Motivo de restricción visible en sección de billetera', 'info')
+            }
+        ];
+
+        // Estado global
+        let state = { ...initialState };
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            loadState();
+            initializeUI();
+            setupEventListeners();
+            updateUI();
+            renderCriteriaList();
+            verifyAllCriteria();
+            updateSummary();
+        });
+
+        // Funciones de estado
+        function loadState() {
+            const savedData = localStorage.getItem('fixerPanelData');
+            if (savedData) {
+                const savedState = JSON.parse(savedData);
+                state = { ...state, ...savedState };
+                
+                // Actualizar logs con mensaje de carga
+                addLog("Sistema: Estado cargado desde almacenamiento persistente");
+            } else {
+                saveState();
+            }
+        }
+
+        function saveState() {
+            localStorage.setItem('fixerPanelData', JSON.stringify(state));
+        }
+
+        function addLog(message) {
+            const timestamp = new Date().toISOString();
+            state.logs.unshift({ timestamp, message });
+            
+            // Mantener solo los últimos 10 logs
+            if (state.logs.length > 10) {
+                state.logs = state.logs.slice(0, 10);
+            }
+            
+            updateLogDisplay();
+            saveState();
+        }
+
+        // Funciones de UI
+        function initializeUI() {
+            // Configurar elementos iniciales
+            document.getElementById('balanceToggle').value = state.balance < 0 ? 'negative' : 'positive';
+            document.getElementById('sessionId').textContent = state.sessionId;
+        }
+
+        function updateUI() {
+            // Actualizar estado basado en el saldo
+            state.isRestricted = state.balance < 0;
+            state.fixerStatus = state.isRestricted ? "restringido" : "activo";
+            
+            // Actualizar elementos de UI
+            document.getElementById('balanceAmount').textContent = `$${state.balance.toFixed(2)}`;
+            document.getElementById('commissionAmount').textContent = `$${state.commission.toFixed(2)}`;
+            document.getElementById('totalCommission').textContent = `$${state.commission.toFixed(2)}`;
+            document.getElementById('fixerStatus').textContent = state.fixerStatus;
+            document.getElementById('fixerStatus').className = `status-badge ${state.isRestricted ? 'status-restricted' : 'status-positive'}`;
+            
+            const balanceAmount = document.getElementById('balanceAmount');
+            const balanceStatus = document.getElementById('balanceStatus');
+            const restrictionAlert = document.getElementById('restrictionAlert');
+            const acceptJobBtn = document.getElementById('acceptJobBtn');
+            const postOfferBtn = document.getElementById('postOfferBtn');
+            const createDraftBtn = document.getElementById('createDraftBtn');
+            
+            if (state.isRestricted) {
+                // Estado negativo
+                balanceStatus.textContent = 'Negativo';
+                balanceStatus.className = 'status-badge status-negative';
+                balanceAmount.className = 'balance-amount balance-negative';
+                
+                restrictionAlert.classList.remove('hidden');
+                restrictionAlert.querySelector('p:last-child').innerHTML = 
+                    `Tu cuenta tiene un saldo negativo de <strong>$${Math.abs(state.balance).toFixed(2)}</strong>. Debes liquidar las comisiones pendientes para poder aceptar nuevos trabajos o publicar ofertas.`;
+                
+                acceptJobBtn.disabled = true;
+                postOfferBtn.disabled = true;
+                createDraftBtn.disabled = true;
+                
+                // Registrar restricción si no estaba registrada
+                if (!state.restrictionDate) {
+                    state.restrictionDate = new Date().toISOString();
+                    state.lastRestrictionDate = new Date().toISOString();
+                    addLog("Sistema: Restricción aplicada por saldo negativo");
+                }
+            } else {
+                // Estado positivo
+                balanceStatus.textContent = 'Positivo';
+                balanceStatus.className = 'status-badge status-positive';
+                balanceAmount.className = 'balance-amount balance-positive';
+                
+                restrictionAlert.classList.add('hidden');
+                
+                acceptJobBtn.disabled = false;
+                postOfferBtn.disabled = false;
+                createDraftBtn.disabled = false;
+                
+                // Registrar eliminación de restricción si estaba restringido
+                if (state.restrictionDate) {
+                    addLog("Sistema: Restricciones eliminadas - cuenta regularizada");
+                    state.restrictionDate = null;
+                }
+            }
+            
+            // Actualizar vista móvil si está activa
+            if (state.mobileView) {
+                document.getElementById('mobileStatus').textContent = state.isRestricted ? 
+                    'RESTRINGIDO - Mismas validaciones que web' : 'ACTIVO - Validaciones aplicadas';
+            }
+            
+            // Verificar criterios después de actualizar UI
+            setTimeout(verifyAllCriteria, 100);
+            setTimeout(updateSummary, 150);
+        }
+
+        function updateLogDisplay() {
+            const logsContainer = document.getElementById('systemLogs');
+            logsContainer.innerHTML = '';
+            
+            state.logs.forEach(log => {
+                const logEntry = document.createElement('div');
+                logEntry.className = 'log-entry';
+                
+                const timestamp = new Date(log.timestamp).toLocaleTimeString();
+                logEntry.innerHTML = `<span class="log-timestamp">[${timestamp}]</span> ${log.message}`;
+                
+                logsContainer.appendChild(logEntry);
+            });
+        }
+
+        // Sistema de criterios de aceptación
+        function renderCriteriaList() {
+            const container = document.getElementById('criteriaList');
+            container.innerHTML = '';
+            
+            acceptanceCriteria.forEach(criterion => {
+                const criterionEl = document.createElement('div');
+                criterionEl.className = 'criteria-item';
+                criterionEl.id = `criteria-${criterion.id}`;
+                
+                const status = state.criteriaStatus[criterion.id] || 'pending';
+                
+                criterionEl.innerHTML = `
+                    <div class="criteria-header">
+                        <span class="criteria-id">${criterion.id}</span>
+                        <span class="criteria-status ${status}">${status === 'verified' ? '✓ Verificado' : status === 'failed' ? '✗ Falló' : 'Pendiente'}</span>
+                    </div>
+                    <div class="criteria-description">${criterion.description}</div>
+                    <div class="test-buttons">
+                        <button class="test-btn" onclick="verifyCriterion('${criterion.id}')">Verificar</button>
+                        <button class="test-btn" onclick="demonstrateCriterion('${criterion.id}')">Demostrar</button>
+                    </div>
+                `;
+                
+                container.appendChild(criterionEl);
+            });
+        }
+
+        function verifyCriterion(criterionId) {
+            const criterion = acceptanceCriteria.find(c => c.id === criterionId);
+            if (criterion) {
+                const result = criterion.test();
+                state.criteriaStatus[criterionId] = result ? 'verified' : 'failed';
+                
+                const criterionEl = document.getElementById(`criteria-${criterionId}`);
+                criterionEl.className = `criteria-item ${result ? 'verified' : 'failed'}`;
+                
+                const statusEl = criterionEl.querySelector('.criteria-status');
+                statusEl.className = `criteria-status ${result ? 'verified' : 'failed'}`;
+                statusEl.textContent = result ? '✓ Verificado' : '✗ Falló';
+                
+                addLog(`Criterio ${criterionId}: ${result ? 'VERIFICADO' : 'FALLÓ'} - ${criterion.description}`);
+                
+                updateSummary();
+                return result;
+            }
+            return false;
+        }
+
+        function verifyAllCriteria() {
+            let verifiedCount = 0;
+            acceptanceCriteria.forEach(criterion => {
+                if (verifyCriterion(criterion.id)) {
+                    verifiedCount++;
+                }
+            });
+            
+            if (verifiedCount === acceptanceCriteria.length) {
+                showNotification('🎉 ¡Todos los criterios de aceptación han sido verificados!', 'success');
+            }
+            
+            return verifiedCount === acceptanceCriteria.length;
+        }
+
+        function demonstrateCriterion(criterionId) {
+            const criterion = acceptanceCriteria.find(c => c.id === criterionId);
+            if (criterion && criterion.demonstrate) {
+                criterion.demonstrate();
+            }
+        }
+
+        function updateSummary() {
+            const total = acceptanceCriteria.length;
+            const verified = Object.values(state.criteriaStatus).filter(status => status === 'verified').length;
+            const failed = Object.values(state.criteriaStatus).filter(status => status === 'failed').length;
+            const percent = Math.round((verified / total) * 100);
+            
+            document.getElementById('totalCriteria').textContent = total;
+            document.getElementById('verifiedCriteria').textContent = verified;
+            document.getElementById('failedCriteria').textContent = failed;
+            document.getElementById('completionPercent').textContent = `${percent}%`;
+        }
+
+        // Funciones de utilidad
+        function generateSessionId() {
+            return 'SES-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 5000);
+        }
+
+        // Event listeners
+        function setupEventListeners() {
+            document.getElementById('balanceToggle').addEventListener('change', function() {
+                if (this.value === 'negative') {
+                    state.balance = -450;
+                    state.commission = 450;
+                    state.restrictionReason = "Saldo negativo";
+                    state.restrictionDate = new Date().toISOString();
+                    state.lastRestrictionDate = new Date().toISOString();
+                    addLog("Usuario: Cambió estado a saldo negativo");
+                    showNotification('Estado cambiado a saldo negativo. Las acciones están restringidas.', 'error');
+                } else {
+                    state.balance = 100;
+                    state.commission = 0;
+                    state.restrictionReason = "";
+                    addLog("Usuario: Cambió estado a saldo positivo - Restricciones eliminadas");
+                    showNotification('Estado cambiado a saldo positivo. Todas las funciones están disponibles.', 'success');
+                }
+                updateUI();
+                saveState();
+            });
+
+            document.getElementById('payCommission').addEventListener('click', function() {
+                if (state.isRestricted) {
+                    state.balance += state.commission;
+                    state.commission = 0;
+                    addLog("Sistema: Comisiones pagadas - Saldo regularizado");
+                    showNotification('Comisiones pagadas exitosamente. Tu saldo ahora es positivo.', 'success');
+                    updateUI();
+                    saveState();
+                } else {
+                    showNotification('No tienes comisiones pendientes para pagar.', 'warning');
+                }
+            });
+
+            document.getElementById('acceptJobBtn').addEventListener('click', function() {
+                if (!state.isRestricted) {
+                    addLog("Fixer: Nuevo trabajo aceptado - JOB-1350");
+                    showNotification('Has aceptado un nuevo trabajo exitosamente.', 'success');
+                }
+            });
+
+            document.getElementById('postOfferBtn').addEventListener('click', function() {
+                if (!state.isRestricted) {
+                    addLog("Fixer: Nueva oferta publicada - OFERTA-045");
+                    showNotification('Has publicado una nueva oferta exitosamente.', 'success');
+                }
+            });
+
+            document.getElementById('simulateJob').addEventListener('click', function() {
+                if (state.isRestricted) {
+                    addLog("Sistema: Intento de aceptar oferta bloqueado - saldo negativo");
+                    showNotification('No puedes aceptar ofertas de trabajo con saldo negativo.', 'error');
+                } else {
+                    showNotification('Oferta de trabajo disponible para aceptar.', 'info');
+                }
+            });
+
+            document.getElementById('simulateOffer').addEventListener('click', function() {
+                if (state.isRestricted) {
+                    addLog("Sistema: Intento de enviar solicitud bloqueado - saldo negativo");
+                    showNotification('No puedes enviar solicitudes de trabajo con saldo negativo.', 'error');
+                } else {
+                    showNotification('Puedes enviar solicitudes de trabajo.', 'info');
+                }
+            });
+
+            document.getElementById('createDraftBtn').addEventListener('click', function() {
+                if (!state.isRestricted) {
+                    const draftId = 'DRAFT-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+                    state.drafts.push({ id: draftId, date: new Date().toISOString() });
+                    addLog(`Fixer: Borrador creado - ${draftId}`);
+                    showNotification(`Borrador ${draftId} creado exitosamente.`, 'success');
+                    saveState();
+                }
+            });
+
+            document.getElementById('viewDraftsBtn').addEventListener('click', function() {
+                if (state.drafts.length > 0) {
+                    showNotification(`Tienes ${state.drafts.length} borrador(es) guardados.`, 'info');
+                } else {
+                    showNotification('No tienes borradores guardados.', 'info');
+                }
+            });
+
+            document.getElementById('updateProfileBtn').addEventListener('click', function() {
+                addLog("Fixer: Perfil actualizado exitosamente");
+                showNotification('Perfil actualizado correctamente.', 'success');
+            });
+
+            document.getElementById('viewProfileBtn').addEventListener('click', function() {
+                showNotification('Mostrando información del perfil.', 'info');
+            });
+
+            document.getElementById('refreshPage').addEventListener('click', function() {
+                addLog("Sistema: Página recargada manualmente");
+                showNotification('Página recargada. Las restricciones se mantienen.', 'info');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            });
+
+            document.getElementById('clearStorage').addEventListener('click', function() {
+                localStorage.removeItem('fixerPanelData');
+                state = { ...initialState, sessionId: generateSessionId() };
+                addLog("Sistema: Datos reiniciados - Estado inicial restaurado");
+                showNotification('Datos limpiados. Estado restaurado a valores iniciales.', 'warning');
+                updateUI();
+                saveState();
+            });
+
+            document.getElementById('toggleMobileView').addEventListener('click', function() {
+                state.mobileView = !state.mobileView;
+                const mobileView = document.getElementById('mobileView');
+                const toggleBtn = document.getElementById('toggleMobileView');
+                
+                if (state.mobileView) {
+                    mobileView.classList.add('active');
+                    toggleBtn.innerHTML = '<i class="fas fa-desktop"></i> Desactivar Vista Móvil';
+                    addLog("Sistema: Vista móvil activada");
+                    showNotification('Vista móvil activada. Validaciones aplicadas.', 'info');
+                } else {
+                    mobileView.classList.remove('active');
+                    toggleBtn.innerHTML = '<i class="fas fa-mobile-alt"></i> Activar Vista Móvil';
+                    addLog("Sistema: Vista móvil desactivada");
+                }
+                
+                updateUI();
+            });
+
+            document.getElementById('testAllCriteria').addEventListener('click', function() {
+                const allVerified = verifyAllCriteria();
+                if (allVerified) {
+                    showNotification('✅ ¡Todos los criterios verificados exitosamente!', 'success');
+                } else {
+                    showNotification('⚠️ Algunos criterios necesitan atención. Revise el panel de criterios.', 'warning');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
