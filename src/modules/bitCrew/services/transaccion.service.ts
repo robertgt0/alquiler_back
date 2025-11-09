@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import TransaccionModel from '../models/transaccion';
+import TransaccionModel from '../models/transacion';
 import { ITransaccion } from '../types';
 
 /**

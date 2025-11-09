@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import * as fixerService from '../services/fixer.service';
+import * as fixerService from '../services/Fixer.service';
 import * as transaccionService from '../services/transaccion.service';
 
 /**
