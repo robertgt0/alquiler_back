@@ -1,8 +1,8 @@
 import { Router } from "express";
-import availabilityRoutes from "./routes/availability.routes";
+import routes from "./routes/index.ts";
 
 const router = Router();
 
-router.use("/availability", availabilityRoutes);
+router.use("/routes", routes);
 
 export default router;
