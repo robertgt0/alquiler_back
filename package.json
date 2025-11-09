@@ -27,12 +27,8 @@
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "mogoose": "^0.0.1-security",
-<<<<<<< HEAD
-    "mongoose": "^8.19.0",
-    "mongose": "^0.0.2-security"
-=======
     "mongoose": "^8.19.3"
->>>>>>> dev/bitcrew-sprint2-wallet
+
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
