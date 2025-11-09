@@ -742,3 +742,8 @@
 {"ts":"2025-10-31T17:31:14.835Z","level":"INFO","message":"request:finish","id":"2604d5c0-355f-4387-971b-7e6bda8dec6d","status":304,"method":"GET","url":"/api/devcode/citas/proveedor/68fb9f7500274d5a7972bdb1","duration":340}
 {"ts":"2025-10-31T17:31:16.421Z","level":"INFO","message":"request:start","id":"3ff24faa-2e50-4959-8ecf-faee794cef96","method":"GET","url":"/api/devcode/citas/cliente/68fb93e079308369b5a0f264","ip":"::1"}
 {"ts":"2025-10-31T17:31:16.767Z","level":"INFO","message":"request:finish","id":"3ff24faa-2e50-4959-8ecf-faee794cef96","status":304,"method":"GET","url":"/api/devcode/citas/cliente/68fb93e079308369b5a0f264","duration":346}
+{"ts":"2025-11-09T00:08:30.095Z","level":"INFO","message":"🚀 Servidor corriendo en puerto 5000"}
+{"ts":"2025-11-09T00:08:30.098Z","level":"INFO","message":"🔧 Modo: development"}
+{"ts":"2025-11-09T00:08:30.099Z","level":"INFO","message":"🌐 URL: http://localhost:5000"}
+{"ts":"2025-11-09T00:08:30.099Z","level":"INFO","message":"📦 Módulos activos: \n/gmail-notifications, \n/api/gmail-notifications, \n/whatsapp-notifications, \n/api/whatsapp-notifications"}
+{"ts":"2025-11-09T00:08:30.100Z","level":"INFO","message":"✅ Listo para recibir peticiones!"}

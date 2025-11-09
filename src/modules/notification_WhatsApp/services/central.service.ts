@@ -1,12 +1,12 @@
 import { v4 as uuidv4 } from "uuid";
 import { saveNotification } from "../models/notification.model";
+import connectDB from "../../../config/database";
 import {
   InvalidNotificationDataError,
   NotificationProviderError,
 } from "../errors/notification.errors";
 import { sendTextViaEvolution } from "../providers/evolution.api";
 
-/* ======= INTERFACES ======= */
 interface Destination {
   name?: string;
   phone: string;
@@ -17,11 +17,11 @@ interface CreateNotificationInput {
   destinations: Destination[];
 }
 
-/* ======= VALIDACIÓN SIMPLE ======= */
 const phoneRegex = /^[0-9]{7,15}$/; // 7–15 dígitos
 
 export class CentralNotificationService {
   async receiveAndSend(data: CreateNotificationInput) {
+    await connectDB();
     this.validatePayload(data);
 
     const transactionId = uuidv4();
@@ -35,7 +35,6 @@ export class CentralNotificationService {
     for (const dest of data.destinations) {
       try {
         const phone = dest.phone;
-
         if (!phone || !phoneRegex.test(String(phone))) {
           throw new InvalidNotificationDataError({
             message: "Número inválido para WhatsApp",
@@ -45,15 +44,14 @@ export class CentralNotificationService {
 
         const text = data.message;
 
-        // ✅ Enviar directamente con la URL completa (ya incluye instancia)
         const sendRes = await sendTextViaEvolution({
           number: String(phone),
           text,
+          // baseUrl, // ✅ Descomenta si tu provider lo necesita
         });
 
         const status = sendRes.success ? "sent" : "failed";
 
-        // ✅ Guardar registro
         await saveNotification({
           transactionId,
           message: {
@@ -62,8 +60,9 @@ export class CentralNotificationService {
             createdAt: new Date(),
           },
           destinations: [dest],
+          channel: "whatsapp",
           status,
-          meta: { provider: "evolution" },
+          meta: { provider: "evolution", createdAt: new Date() },
           sentAt: new Date(),
         });
 
@@ -73,7 +72,6 @@ export class CentralNotificationService {
           providerResponse: sendRes.data ?? sendRes.error,
         });
       } catch (err: any) {
-        // ❌ Registrar fallo
         await saveNotification({
           transactionId,
           message: {
@@ -82,8 +80,9 @@ export class CentralNotificationService {
             createdAt: new Date(),
           },
           destinations: [dest],
+          channel: "whatsapp",
           status: "failed",
-          meta: { error: err.message ?? String(err) },
+          meta: { provider: "evolution", error: err.message ?? String(err) },
           sentAt: new Date(),
         });
 
@@ -91,10 +90,9 @@ export class CentralNotificationService {
       }
     }
 
-    return { ok: true, transactionId, results };
+    return { success: true, transactionId, total: results.length, results };
   }
 
-  /* ======= VALIDACIÓN DEL PAYLOAD ======= */
   private validatePayload(data: CreateNotificationInput): void {
     if (!data) {
       throw new InvalidNotificationDataError({ message: "Payload cannot be empty" });

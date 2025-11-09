@@ -2,9 +2,7 @@ Para ejecutar la prueba desde el backend y simular un evento interno sin usar Po
 
 Una donde haremos el clásico: npm run dev
 
-Y otra donde ejecutaremos: 
-<npx ts-node src/testsNotification/exitoSimpleGmail.ts>
-<npx ts-node src/testsNotification/exitoSimpleWhatsApp.ts>
+Y otra donde ejecutaremos: npx ts-node src/testsNotification/exitoSimple.ts
 
 Deberemos ver en ambas terminales la confirmación clásica. Además, se deberá ver que en el workflow, en la sección de "Executions" 
 (Ejecuciones), se haya recorrido correctamente.

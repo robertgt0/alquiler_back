@@ -17,11 +17,12 @@ import routesDevcode from "./modules/DevCode/routes"
 // ============================================
 // BASE DE DATOS (solo si se usa Gmail o registro de notificaciones)
 // ============================================
-import connectDB from "./modules/notification_Gmail/config/database";
+import connectDB from "./config/database";
 
 connectDB().catch((err) => {
   console.error("❌ Error al conectar con la base de datos:", err.message);
 });
+
 
 // ============================================
 // MIDDLEWARES GLOBALES

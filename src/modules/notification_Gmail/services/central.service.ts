@@ -1,6 +1,7 @@
 // src/modules/notification_Gmail/services/central.service.ts
 import { v4 as uuidv4 } from "uuid";
 import { saveNotification } from "../models/notification.model";
+import connectDB from "../../../config/database";
 import {
   InvalidNotificationDataError,
   NotificationCreationError,
@@ -36,6 +37,9 @@ interface GmailSendResponse {
 
 export class CentralNotificationService {
   async receiveAndSend(data: CreateNotificationInput) {
+     // 🔹 0️⃣ Asegurar conexión antes de cualquier operación con MongoD
+    await connectDB();
+
     // --- 1️⃣ Validar estructura del payload
     this.validatePayload(data);
 
@@ -65,8 +69,10 @@ export class CentralNotificationService {
       // --- 4️⃣ Registrar en la base de datos ---
       notification = await saveNotification({
         transactionId,
-        subject: data.subject,
-        message: data.message,
+        message: {
+          subject: data.subject,
+          content: data.message,
+        },
         destinations: data.destinations,
         channel: "gmail-api",
         status: gmailResult.success ? "sent" : "failed",
