@@ -1,4 +1,4 @@
-=import { Request, Response } from 'express';
+import { Request, Response } from 'express';
 import * as fixerService from '../services/Fixer.service';
 import * as billeteraService from '../services/wallet.service';
 
