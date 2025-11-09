@@ -84,7 +84,7 @@ Gracias por confiar en nosotros.
       destinations: [{ phone }],
       fromName: "Sistema",
       channel: "whatsapp",
-    });
+    }as any);
 
     return res.status(200).json({
       ok: true,
