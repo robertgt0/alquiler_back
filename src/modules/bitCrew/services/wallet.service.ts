@@ -11,15 +11,6 @@ export const getBilleteraByFixerId = async (fixerId: Types.ObjectId): Promise<IB
 };
 
 
-// ================================================================
-// NUEVA FUNCIÓN: Chequear saldo y actualizar ESTADO DE BILLETERA
-// ================================================================
-/**
- * Verifica el saldo de una billetera y actualiza su estado.
- * Si el saldo es <= 0, el estado cambia a 'restringido'.
- * Si el saldo es > 0, el estado cambia a 'activo'.
- * Devuelve la billetera actualizada.
- */
 export const checkAndUpdateBilleteraStatus = async (billeteraId: Types.ObjectId): Promise<IBilletera | null> => {
   try {
     const billetera = await BilleteraModel.findById(billeteraId);

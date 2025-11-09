@@ -30,3 +30,19 @@ export interface IBilletera extends Document {
   estado: string; 
   fecha_actualizacion: Date;
 }
+
+// Interfaz para 'Transacciones'
+export interface ITransaccion extends Document {
+  _id: Types.ObjectId;
+  fixer_id: Types.ObjectId;
+  billetera_id: Types.ObjectId;
+  tipo: 'credito' | 'debito'; 
+  monto: number;
+  descripcion: string;
+  fecha: Date;
+  saldo_resultante: number;
+}
+
+
+
+
