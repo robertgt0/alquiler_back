@@ -36,7 +36,7 @@ const TrabajoSchema = new Schema<ITrabajo>({
   descripcion_trabajo: { type: String, required: true },
   estado: {
     type: String,
-    enum: ["pendiente", "en_proceso", "completado", "cancelado"],
+    enum: ["pendiente", "en_proceso", "terminado", "cancelado"],
     default: "pendiente"
   },
   numero_estrellas: { type: Number, min: 1, max: 5 },
