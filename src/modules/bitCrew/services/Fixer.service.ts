@@ -1,6 +1,6 @@
 import FixerModel from "../models/Fixer"; 
-// Importa desde la carpeta 'types' DENTRO del módulo 'bitCrew'
-import { IFixer } from '../types/wallet.types'; 
+import { IFixer } from '../types/index'; 
+
 /**
  * Obtiene todos los fixers de la base de datos.
  */
@@ -19,7 +19,7 @@ export const getAllFixers = async (): Promise<IFixer[]> => {
  */
 export const getFixerByUsuario = async (usuario: string): Promise<IFixer | null> => {
   try {
-    const fixer = await FixerModel.findOne({ usuario: usuario });
+    const fixer = await FixerModel.findOne({ usuario });
     return fixer;
   } catch (error) {
     console.error('Error en servicio - getFixerByUsuario:', error);

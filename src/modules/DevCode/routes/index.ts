@@ -3,7 +3,7 @@ import { Router } from "express";
 import billeteraRoutes from './wallet.routes';
 import fixerRoutes from './fixer.routes';
 import trabajoRoutes from './trabajo.routes';
-import transaccionRoutes from './transaccion.routes';
+import transaccionRoutes from '../../bitCrew/routes/transaccion.routes';
 
 const router = Router();
 

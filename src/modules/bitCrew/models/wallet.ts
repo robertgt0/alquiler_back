@@ -1,5 +1,5 @@
 import mongoose, { Schema, model } from 'mongoose';
-import { IBilletera } from '../types/wallet.types'; 
+import { IBilletera } from '../types/index';
 
 // --- Esquema Billetera ---
 const BilleteraSchema = new Schema<IBilletera>({
@@ -14,7 +14,6 @@ const BilleteraSchema = new Schema<IBilletera>({
     required: true, 
     default: 0 
   },
-
   estado: {
     type: String,
     enum: ['activo', 'restringido'], // Solo permite estos valores
@@ -29,7 +28,6 @@ const BilleteraSchema = new Schema<IBilletera>({
     type: Date, 
     default: Date.now 
   }
-
 }, {
   collection: 'wallet' // Apunta a la colección 'wallet'
 });
