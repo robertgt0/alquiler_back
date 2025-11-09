@@ -28,5 +28,6 @@ export interface IBilletera extends Document {
   fixer_id: Types.ObjectId;
   saldo: number;
   estado: string; 
+  alerta?: 'saldo_bajo' | 'restringido' | null;
   fecha_actualizacion: Date;
 }

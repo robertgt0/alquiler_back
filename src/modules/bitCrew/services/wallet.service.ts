@@ -1,4 +1,3 @@
-
 import { Types } from 'mongoose';
 import BilleteraModel from '../models/wallet';
 import { IBilletera } from '../types/wallet.types';
@@ -29,17 +28,26 @@ export const checkAndUpdateBilleteraStatus = async (billeteraId: Types.ObjectId)
     }
 
     let nuevoEstado: string;
+    let nuevaAlerta: string | null = null;
 
     // 1. Aplicar la lógica de negocio
     if (billetera.saldo <= 0) {
       nuevoEstado = 'restringido';
+      nuevaAlerta = 'restringido';
+      console.log(`[ALERTA] La billetera del fixer '${billetera.fixer_id}' fue restringida (saldo: ${billetera.saldo}).`);
+    } else if (billetera.saldo > 0 && billetera.saldo < 50) {
+      nuevoEstado = 'activo';
+      nuevaAlerta = 'saldo_bajo';
+      console.log(`[ALERTA] El fixer '${billetera.fixer_id}' tiene saldo bajo: ${billetera.saldo}.`);
     } else {
       nuevoEstado = 'activo';
+      nuevaAlerta = null;
     }
 
     // 2. Actualizar solo si el estado es diferente
-    if (billetera.estado !== nuevoEstado) {
+    if (billetera.estado !== nuevoEstado || billetera.alerta !== nuevaAlerta) {
       billetera.estado = nuevoEstado;
+      billetera.alerta = nuevaAlerta;
       billetera.fecha_actualizacion = new Date();
       await billetera.save(); // Guarda los cambios
       

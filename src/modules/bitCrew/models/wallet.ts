@@ -20,6 +20,11 @@ const BilleteraSchema = new Schema<IBilletera>({
     enum: ['activo', 'restringido'], // Solo permite estos valores
     default: 'activo'
   },
+  alerta: { 
+    type: String, 
+    enum: ['saldo_bajo', 'restringido'], 
+    default: null 
+  },
   fecha_actualizacion: { 
     type: Date, 
     default: Date.now 

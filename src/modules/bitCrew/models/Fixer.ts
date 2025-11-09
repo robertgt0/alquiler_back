@@ -13,6 +13,5 @@ const FixerSchema = new Schema<IFixer>({
   collection: 'Fixer'
 });
 
-const FixerModel = mongoose.models.Fixer || model<IFixer>('Fixer', FixerSchema);
-
+const FixerModel = mongoose.models.Fixer || model<IFixer>('Fixer', FixerSchema, 'Fixer');
 export default FixerModel;
