@@ -11,7 +11,6 @@ import {
   getTrabajosCliente
 } from '../controllers/trabajo.controller';
 
-
 // --- RUTAS PARA HU 1.7 y 1.8 ---
 router.get('/proveedor', getTrabajosProveedor);
 router.get('/cliente/:clienteId', getTrabajosCliente);
