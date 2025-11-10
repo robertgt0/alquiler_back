@@ -225,3 +225,98 @@ export const getUsuariosPaginados = async (req: Request, res: Response) => {
   }
 };
 
+export const validarPaginaExistente = async (req: Request, res: Response) => {
+  try {
+    console.log('🔄 Validando existencia de página...');
+
+    const db = await getDatabase();
+    if (!db) {
+      console.error('❌ getDatabase devolvió undefined');
+      return res.status(500).json({
+        success: false,
+        message: 'Error al obtener la conexión a la base de datos'
+      });
+    }
+    const usuariosCollection = db.collection('usuarios');
+
+    // Parámetros de validación
+    const paginaGuardada = parseInt(req.query.paginaGuardada as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+
+    // Parámetros de filtro opcionales (deben ser los mismos que se usaron originalmente)
+    const filtros: any = {};
+
+    if (req.query.activo) {
+      filtros.activo = req.query.activo === 'true';
+    }
+
+    if (req.query.ciudad) {
+      filtros['ciudad.nombre'] = { $regex: req.query.ciudad, $options: 'i' };
+    }
+
+    if (req.query.especialidad) {
+      filtros['especialidades.nombre'] = { $regex: req.query.especialidad, $options: 'i' };
+    }
+
+    if (req.query.servicio) {
+      filtros['servicios.nombre'] = { $regex: req.query.servicio, $options: 'i' };
+    }
+
+    if (req.query.zona) {
+      filtros['zona.nombre'] = { $regex: req.query.zona, $options: 'i' };
+    }
+
+    if (req.query.horario) {
+      filtros['horarios_disponibles.nombre'] = { $regex: req.query.horario, $options: 'i' };
+    }
+
+    if (req.query.precio_min || req.query.precio_max) {
+      filtros['servicios.precio'] = {};
+
+      if (req.query.precio_min) {
+        filtros['servicios.precio'].$gte = parseInt(req.query.precio_min as string);
+      }
+
+      if (req.query.precio_max) {
+        filtros['servicios.precio'].$lte = parseInt(req.query.precio_max as string);
+      }
+    }
+
+    console.log('📋 Validando página:', {
+      paginaGuardada,
+      limit,
+      filtros
+    });
+
+    // Obtener el total actual de documentos con los mismos filtros
+    const total = await usuariosCollection.countDocuments(filtros);
+    const totalPages = Math.ceil(total / limit);
+
+    // Validar si la página guardada existe en el nuevo total
+    const paginaExiste = paginaGuardada <= totalPages && paginaGuardada > 0;
+    const paginaAjustada = paginaExiste ? paginaGuardada : 1;
+
+    console.log(`✅ Validación completada: Página ${paginaGuardada} ${paginaExiste ? 'existe' : 'no existe'}`);
+
+    res.json({
+      success: true,
+      data: {
+        paginaGuardada,
+        paginaExiste,
+        paginaAjustada,
+        totalPages,
+        totalItems: total,
+        itemsPerPage: limit,
+        necesitaAjuste: !paginaExiste
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Error en validarPaginaExistente:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor al validar página',
+      error: error instanceof Error ? error.message : 'Error desconocido'
+    });
+  }
+};
