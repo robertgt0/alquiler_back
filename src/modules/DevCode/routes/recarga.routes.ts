@@ -3,7 +3,7 @@ import Recarga from "../../../models/recarga.model";
 
 const router = Router();
 
-router.post("/recargar", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const { nombre, detalle, monto } = req.body;
 

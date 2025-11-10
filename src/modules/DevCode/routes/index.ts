@@ -13,5 +13,6 @@ router.use('/fixers', fixerRoutes);
 router.use('/trabajos', trabajoRoutes);
 router.use('/historial', transaccionRoutes);
 router.use('/recarga', recargaRoutes);
+router.use("/recargar", recargaRoutes);
 
 export default router;
