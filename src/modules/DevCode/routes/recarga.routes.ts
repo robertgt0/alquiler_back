@@ -5,13 +5,13 @@ const router = Router();
 
 router.post("/", async (req, res) => {
   try {
-    const { nombre, detalle, monto } = req.body;
+    const { nombre, detalle, monto, correo, telefono, tipoDocumento, numeroDocumento } = req.body;
 
-    if (!nombre || !detalle || !monto) {
+    if (!nombre || !detalle || !monto || !correo || !telefono || !tipoDocumento || !numeroDocumento) {
       return res.status(400).json({ success: false, message: "Faltan datos obligatorios" });
     }
 
-    const nuevaRecarga = new Recarga({ nombre, detalle, monto });
+    const nuevaRecarga = new Recarga({ nombre, detalle, monto, correo, telefono, tipoDocumento, numeroDocumento });
     await nuevaRecarga.save();
 
     res.status(201).json({
