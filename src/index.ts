@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/database';
-import routesDevcode from "./modules/DevCode/routes"
+import routesDevcode from "./modules/DevCode/routes";
 // Cargar variables de entorno
 dotenv.config();
 
@@ -44,7 +44,7 @@ app.get('/api/health', (req: Request, res: Response) => {
 // app.use('/api/nombre_grupo_ejemplo', nombreGrupoEjemploRouter);
 
 // ROUTES DEVCODE
-app.use('/api/devcode', routesDevcode)
+app.use('/api/devcode', routesDevcode);
 // ============================================
 // Manejo de errores 404
 // ============================================
