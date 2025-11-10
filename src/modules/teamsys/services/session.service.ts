@@ -43,6 +43,7 @@ export class SessionService {
 			"deviceInfo.ip": ip,
 			userId: new mongoose.Types.ObjectId(userId),
 			isActive: true,
+			expiresAt: { $gt: new Date() }
 		});
 
 		return session;
@@ -130,16 +131,21 @@ export class SessionService {
 			isActive: true,
 		},)
 
-		const result = await Session.updateMany({
+		// const result = await Session.updateMany({
+		// 	userId: new mongoose.Types.ObjectId(userId),
+		// 	_id: { $ne: new mongoose.Types.ObjectId(currentSessionId) },
+		// 	isActive: true,
+		// },
+		// {
+		// 	$set: { isActive: false }
+		// });
+
+		await Session.deleteMany({
 			userId: new mongoose.Types.ObjectId(userId),
 			_id: { $ne: new mongoose.Types.ObjectId(currentSessionId) },
-			isActive: true,
-		},
-		{
-			$set: { isActive: false }
 		});
 
-		return result.modifiedCount
+		return 1;
 	}
 	/**
     * Eliminar sesiones de usuario Miguel H3 "cambiar contraseña"
