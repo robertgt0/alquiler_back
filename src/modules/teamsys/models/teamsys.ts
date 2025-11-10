@@ -87,6 +87,17 @@ const userSchema = new Schema(
       default: 'requester', // todos los nuevos usuarios serán requester
       required: true,
     },
+    twoFactorSecret: {
+      type: String,
+    },
+    twoFactorEnabled: {
+      type: Boolean,
+      default: false,
+    },
+    twoFactorBackupCodes: {
+      type: [String],
+      default: [],
+    }
   },
   { timestamps: true }
 );

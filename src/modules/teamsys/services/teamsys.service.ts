@@ -213,6 +213,35 @@ async cambiarContraseña(
 async getUserByEmail(email: string): Promise<UserDocument | null> {
   return await Usuario.findOne({ correo: email });
 }
+async updateTwoFactorSecret(userId: string, secret: string, enabled: boolean): Promise<UserDocument> {
+    const user = await this.getById(userId);
+
+    if (!user) {
+      throw new Error("User Not Found");
+    }
+
+    await Usuario.findByIdAndUpdate(user.id, {
+      twoFactorSecret: secret,
+      twoFactorEnabled: enabled
+    });
+
+    return user;
+  }
+
+  async disableTwoFactor(userId: string): Promise<UserDocument> {
+    const user = await this.getById(userId);
+
+    if (!user) {
+      throw new Error("User Not Found");
+    }
+
+    await Usuario.findByIdAndUpdate(user.id, {
+      twoFactorSecret: undefined,
+      twoFactorEnabled: false
+    });
+
+    return user;
+  }
 }
 
 export default new UsuarioService();

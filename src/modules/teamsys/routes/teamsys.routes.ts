@@ -22,6 +22,7 @@ import { registerUser, loginUser } from '../controllers/teamsys.controller';
 import { sessionController } from '../controllers/session.controller';
 import { authMiddleware } from '../middlewares/auth.middleware';
 import { magicLinkController } from '../controllers/magic-link.controller';
+import { twofactorController } from '../controllers/twofactor.controller';
 
 const router = Router();
 
@@ -82,5 +83,9 @@ router.get("/me", authMiddleware, authController.getCurrentUser);
 router.get("/sessions/user/:userId", authMiddleware, sessionController.getSessionsByUserId);
 router.delete("/sessions/:sessionId/", authMiddleware, sessionController.deleteSession);
 router.delete("/sessions/user/all-except-current", authMiddleware, sessionController.deleteAllSessionsExceptCurrent);
+
+router.post("/2fa/setup", authMiddleware, twofactorController.setupTwoFactor);
+router.post("/2fa/verify", authMiddleware, twofactorController.verifyAndEnable);
+router.post("/2fa/verify-login", twofactorController.verifyLoginToken);
 
 export default router;
