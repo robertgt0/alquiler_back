@@ -5,7 +5,7 @@ export interface IRecarga extends Document {
   nombre: string;
   detalle: string;
   monto: number;
-  fecha: Date;
+  fecha?: Date;
 }
 
 const RecargaSchema = new Schema<IRecarga>({
