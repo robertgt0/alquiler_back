@@ -67,7 +67,7 @@ export class SessionController {
 	}
 	/**
 	  * Eliminar todas las sesiones excepto la actual
-	* DELETE /api/sessions/user/:userId/all-except-current
+	* DELETE /api/sessions/user/all-except-current
 	*/
 	deleteAllSessionsExceptCurrent = async (req: Request, res: Response): Promise<void> => {
 		try {
