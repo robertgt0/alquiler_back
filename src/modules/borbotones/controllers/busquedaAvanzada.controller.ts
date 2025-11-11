@@ -308,3 +308,4 @@ export const buscarPorZona = async (req: Request, res: Response) => {
     handleError(error, res);
   }
 };
+

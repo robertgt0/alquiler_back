@@ -19,4 +19,6 @@ router.get("/avanzada/disponibilidad", buscarPorDisponibilidad);
 // GET http://localhost:5000/api/borbotones/search/avanzada/zona?zona=Norte
 router.get("/avanzada/zona", buscarPorZona);
 
+
+
 export default router;
