@@ -73,7 +73,7 @@ app.use('/api/borbotones/search', busquedaRouter);
 app.use('/api/borbotones/filtros', filtrosRouter);
 
 // Rutas de búsqueda avanzada
-app.use("/api/borbotones/search", busquedaAvanzadaRouter);
+app.use("/api/borbotones/search/avanzada", busquedaAvanzadaRouter);
 
 // ============================================
 // 🩺 Endpoint de salud (para monitoreo)
