@@ -4,6 +4,7 @@ import horarioRoutes from "./routes/horario_disponible.routes";
 import clienteRoutes from "./routes/cliente.routes";
 import proveedorRoutes from "./routes/proveedor.routes";
 import CalendarioDisponibilidad from './routes/calendario-disponibilidad.routes';
+import trabajoCanceladoRoutes from "./routes/trabajo-terminado.routes";
 
 const router = Router();
 
@@ -13,12 +14,13 @@ router.get('/', (req, res) => {
     version: '1.0.0',
     description: 'Endpoints para listar trabajos agendados y horarios.',
     endpoints: {
-      trabajos: "/trabajos",
-      horarios: "/horarios",
-      clientes: "/clientes",
-      proveedores: "/proveedores",
-      calendarioDisponibilidad: '/calendario-disponibilidad',
-      DetallesTrabajo: '/trabajos/detalle/proveedor/:id'
+    trabajos: "/trabajos",
+    horarios: "/horarios",
+    clientes: "/clientes",
+    proveedores: "/proveedores",
+    calendarioDisponibilidad: '/calendario-disponibilidad',
+    DetallesTrabajo: '/trabajos/detalle/proveedor/:id',
+    trabajoCancelado: '/trabajo-cancelado'
     }
   });
 });
@@ -29,6 +31,6 @@ router.use("/horarios", horarioRoutes);         // crear o modificar horarios di
 router.use("/clientes", clienteRoutes);         // recuperar información de clientes
 router.use("/proveedores", proveedorRoutes);   // recuperar información de proveedores
 router.use('/calendario-disponibilidad', CalendarioDisponibilidad); // recuperar horarios disponibles sin horario ya ocupado
-
+router.use("/trabajo-cancelado", trabajoCanceladoRoutes); //recupera detalles de trabajos
 
 export default router;
