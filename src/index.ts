@@ -18,6 +18,7 @@ import paginationRouter from './modules/borbotones/routes/pagination.router';
 import ordenamientoRouter from './modules/borbotones/routes/ordering.routes';
 import busquedaRouter from './modules/borbotones/routes/busqueda.router';
 import filtrosRouter from './modules/borbotones/routes/filtros.routes';
+import busquedaAvanzadaRouter from './modules/borbotones/routes/busquedaAvanzada.router';
 
 
 // ============================================
@@ -70,6 +71,9 @@ app.use('/api/borbotones/search', busquedaRouter);
 
 
 app.use('/api/borbotones/filtros', filtrosRouter);
+
+// Rutas de búsqueda avanzada
+app.use("/api/borbotones/search", busquedaAvanzadaRouter);
 
 // ============================================
 // 🩺 Endpoint de salud (para monitoreo)
