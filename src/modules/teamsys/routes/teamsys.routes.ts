@@ -86,6 +86,7 @@ router.delete("/sessions/user/all-except-current", authMiddleware, sessionContro
 
 router.post("/2fa/setup", authMiddleware, twofactorController.setupTwoFactor);
 router.post("/2fa/verify", authMiddleware, twofactorController.verifyAndEnable);
+router.post("/2fa/disable", authMiddleware, twofactorController.disableTwoFactor);
 router.post("/2fa/verify-login", twofactorController.verifyLoginToken);
 
 export default router;
