@@ -82,9 +82,8 @@ const userSchema = new Schema(
 
     // === Rol ===
     rol: {
-      type: String,
-      enum: ['requester', 'provider', 'admin'],
-      default: 'requester', // todos los nuevos usuarios serán requester
+      type: [String],
+      default: ['requester'], // todos los nuevos usuarios serán requester
       required: true,
     },
     twoFactorSecret: {

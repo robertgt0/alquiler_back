@@ -446,6 +446,7 @@ export const agregarAutentificacion = async (req: Request, res: Response): Promi
           res.status(400).json({ success: false, message: 'La contraseña no cumple con los requisitos mínimos.' });
           return;
         }
+        user.password=password
       }
       if(provider=='google'){
         if(!(user.correo===email)){
@@ -459,8 +460,13 @@ export const agregarAutentificacion = async (req: Request, res: Response): Promi
       auth.authProvider=providers;
       
     
-
-    const data = await teamsysService.update(req.params.id, user);
+      console.log(user)
+    
+    let data;
+    if(password!=null)
+     data=await teamsysService.setPasswordUnderCorreo(req.params.id, password);
+    else data=await teamsysService.update(req.params.id, user);
+    console.log(data)
     const authData=await teamsysService.updateUserAuthProviders(req.params.id,auth.authProvider)
     if (!data || !authData) {
       res.status(404).json({
@@ -496,16 +502,17 @@ export const eliminarAutentificacion = async (req: Request, res: Response): Prom
         res.status(409).json({ success: false, message: 'No puedes eliminar tu único método de autenticación.' });
         return;
       }
-
+      console.log(provider)
       // Si eliminamos LOCAL, removemos password
-      if (provider === 'local') {
+      if (provider == 'local') {
         user.password = undefined;
       }
       if(provider=='google')user.authProvider='local';
       // Eliminar provider
       auth.authProvider = providers.filter(p => p !== provider);
-
-    const data = await teamsysService.update(req.params.id, user);
+      console.log(user)
+    const data = await teamsysService.eliminarPasswordUser(req.params.id);
+    console.log(data)
     const authData=await teamsysService.updateUserAuthProviders(req.params.id,auth.authProvider)
     if (!data || !authData) {
       res.status(404).json({
