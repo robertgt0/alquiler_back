@@ -64,9 +64,16 @@ export async function getMongoClient(): Promise<any> {
 
 // Función para obtener la base de datos directamente
 export async function getDatabase() {
-  await testConnection();
+  if (mongoose.connection.readyState === 0) {
+    // Si no está conectado, hacemos la conexión
+    await testConnection();
+  } else if (mongoose.connection.readyState !== 1) {
+    // Si está conectando o desconectado, esperamos un poco
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
   return mongoose.connection.db;
 }
+
 
 // ⭐ Ejecutar la prueba si se ejecuta directamente este archivo
 if (require.main === module) {

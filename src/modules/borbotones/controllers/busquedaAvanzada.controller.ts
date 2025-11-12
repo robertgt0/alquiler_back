@@ -273,7 +273,7 @@ export const buscarPorZona = async (req: Request, res: Response) => {
       {
         "zona.nombre": new RegExp(escapeRegex(zonaEncontrada), "i")
       },
-      { activo: true }
+      
     ];
 
 
