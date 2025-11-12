@@ -34,7 +34,7 @@ export class MagicLinkController {
       const token = await this.authService.generateMagicLinkToken(email);
       // URL del frontend donde el usuario hará clic
     //const frontendBaseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-    const frontendUrl=process.env.URL_FRONTEND||'http://localhost:3000';
+    const frontendUrl=process.env.URL_FRONTEND??'http://localhost:3000';
     const magicLink = `${frontendUrl}/auth/magic-link?token=${token}`;
     //const magicLink = `http://localhost:3000/api/teamsys/magic-link/verify?token=${token}`;
     //const magicLink = `http://localhost:3000/auth/magic-link?token=${token}`;-----------------------
