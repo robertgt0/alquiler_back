@@ -1,5 +1,7 @@
 import { Document, Types } from 'mongoose'; 
 
+//  ENTIDADES PRINCIPALES
+
 // Interfaz para 'Fixer'
 export interface IFixer extends Document {
   _id: Types.ObjectId; 
@@ -28,16 +30,38 @@ export interface IBilletera extends Document {
   fixer_id: Types.ObjectId;
   saldo: number;
   estado: string; 
+  alerta?: 'saldo_bajo' | 'restringido' | null; // 🚨 Nueva propiedad añadida
   fecha_actualizacion: Date;
 }
 
+// Interfaz para 'Transacciones'
 export interface ITransaccion extends Document {
   _id: Types.ObjectId;
   fixer_id: Types.ObjectId;
   billetera_id: Types.ObjectId;
-  tipo: 'credito' | 'debito'; // Tu imagen muestra 'credito', asumo que 'debito' también existe
+  tipo: 'credito' | 'debito'; 
   monto: number;
   descripcion: string;
   fecha: Date;
   saldo_resultante: number;
+}
+
+export interface EjemploEntity {
+  _id?: string;
+  nombre: string;
+  descripcion?: string;
+  estado: 'activo' | 'inactivo';
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  message?: string;
+  count?: number;
+}
+
+export interface OtraInterface {
+  
 }

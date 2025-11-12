@@ -2,8 +2,9 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/database';
-import nombreGrupoEjemploRouter from './modules/nombre_grupo_ejemplo';
-import availabilityRoutes from "./modules/DevCode/routes/availability.routes";
+// import routesDevcode from "./modules/DevCode/routes"
+import routeswallet from "./modules/bitCrew/routes";
+
 // Cargar variables de entorno
 dotenv.config();
 
@@ -21,7 +22,7 @@ app.use(express.urlencoded({ extended: true }));
 // Ruta raíz
 app.get('/', (req: Request, res: Response) => {
   res.json({
-    message: ' API Backend',
+    message: 'API Backend',
     status: 'OK',
     version: '1.0.0',
     timestamp: new Date().toISOString(),
@@ -41,14 +42,12 @@ app.get('/api/health', (req: Request, res: Response) => {
 // ============================================
 // MONTAR MÓDULOS/GRUPOS AQUÍ
 // ============================================
-// Montar tus módulos aquí:
-app.use('/api/nombre_grupo_ejemplo', nombreGrupoEjemploRouter);
-app.use('/api/devcode', availabilityRoutes)
-// ============================================
-// Manejo de errores 404
-// ============================================
+// app.use('/api/devcode', routesDevcode)
+app.use('/api/bitCrew', routeswallet);
+
+
 app.use((req: Request, res: Response) => {
-  res.status(404).json({ 
+  res.status(404).json({
     success: false,
     message: 'Ruta no encontrada',
     path: req.path
@@ -58,12 +57,13 @@ app.use((req: Request, res: Response) => {
 // Iniciar servidor
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`\n Servidor corriendo en puerto ${PORT}`);
-  console.log(` Modo: ${process.env.NODE_ENV}`);
-  console.log(` URL: http://localhost:${PORT}`);
+  console.log(`\n 🚀 Servidor corriendo en puerto ${PORT}`);
+  console.log(` 🧩 Modo: ${process.env.NODE_ENV}`);
+  console.log(` 🌐 URL: http://localhost:${PORT}`);
   console.log(`\n Módulos cargados:`);
-  console.log(`   - /api/nombre_grupo_ejemplo`);
-  console.log(`\n Listo para recibir peticiones!\n`
-
-  );
+  console.log(`   - /api/bitCrew`);
+  console.log(`\n ✅ Listo para recibir peticiones!\n`);
 });
+
+//(.env)
+//MONGODB_URI=mongodb+srv://isindira:j5z3oE8XJx4kQb8V@isindira.nqvltjf.mongodb.net/?retryWrites=true&w=majority

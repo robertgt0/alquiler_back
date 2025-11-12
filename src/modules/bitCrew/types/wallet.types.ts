@@ -28,16 +28,6 @@ export interface IBilletera extends Document {
   fixer_id: Types.ObjectId;
   saldo: number;
   estado: string; 
+  alerta?: 'saldo_bajo' | 'restringido' | null;
   fecha_actualizacion: Date;
-}
-
-export interface ITransaccion extends Document {
-  _id: Types.ObjectId;
-  fixer_id: Types.ObjectId;
-  billetera_id: Types.ObjectId;
-  tipo: 'credito' | 'debito'; // Tu imagen muestra 'credito', asumo que 'debito' también existe
-  monto: number;
-  descripcion: string;
-  fecha: Date;
-  saldo_resultante: number;
 }
