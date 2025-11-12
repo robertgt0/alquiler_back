@@ -38,4 +38,4 @@ const UbicacionSchema: Schema = new Schema({
   timestamps: true
 });
 
-export default mongoose.models.Ubicacion || mongoose.model<IUbicacion>('Ubicacion', UbicacionSchema);
+export default mongoose.model<IUbicacion>('Ubicacion', UbicacionSchema);

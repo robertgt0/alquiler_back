@@ -6,8 +6,8 @@ export interface IUbicacion extends Document {
     lat: number;
     lng: number;
   };
-  direccion?: string;
-  tipo?: string;
+  direccion: string;
+  tipo: string;
 }
 
 const UbicacionSchema: Schema = new Schema({
@@ -28,14 +28,16 @@ const UbicacionSchema: Schema = new Schema({
   },
   direccion: {
     type: String,
+    required: true,
     trim: true
   },
   tipo: {
     type: String,
+    required: true,
     default: 'punto-interes'
   }
 }, {
   timestamps: true
 });
 
-export default mongoose.models.Ubicacion || mongoose.model<IUbicacion>('Ubicacion', UbicacionSchema);
+export default mongoose.model<IUbicacion>('Ubicacion', UbicacionSchema);
