@@ -5,19 +5,19 @@ import {
   obtenerTrabajos,
   obtenerTrabajoPorId,
   eliminarTrabajo,
-  getTrabajosProveedorService, // 1. ¡IMPORTAMOS LA FUNCIÓN DEL SERVICIO!
-  getTrabajosClienteService,  // 1. ¡IMPORTAMOS LA FUNCIÓN DEL SERVICIO!
+  getTrabajosProveedorService,
+  getTrabajosClienteService,
+  confirmarTrabajoService, // ✅ IMPORTAMOS LAS FUNCIONES EXISTENTES
+  rechazarTrabajoService,
 } from '../services/trabajo.service';
 
-// --- NUEVA FUNCIÓN PARA HU 1.7 (VISTA PROVEEDOR) ---
+/* -------------------------------------------------------------------------- */
+/* 🔹 NUEVA FUNCIÓN PARA HU 1.7 (VISTA PROVEEDOR)                             */
+/* -------------------------------------------------------------------------- */
 export const getTrabajosProveedor = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // ID de prueba de un proveedor que SÍ existe en tu BD (Juan D)
-    const proveedorId = '6902c43438df4e88b6680640'; 
-    
+    const proveedorId = '6902c43438df4e88b6680640'; // ID de prueba (Juan D)
     const estado = req.query.estado as string | undefined;
-
-    // 2. ¡AQUÍ USAMOS LA FUNCIÓN DEL SERVICIO!
     const trabajos = await getTrabajosProveedorService(proveedorId, estado);
     res.json(trabajos);
   } catch (error: any) {
@@ -25,12 +25,13 @@ export const getTrabajosProveedor = async (req: Request, res: Response, next: Ne
   }
 };
 
-// --- NUEVA FUNCIÓN PARA HU 1.8 (VISTA CLIENTE) ---
+/* -------------------------------------------------------------------------- */
+/* 🔹 NUEVA FUNCIÓN PARA HU 1.8 (VISTA CLIENTE)                               */
+/* -------------------------------------------------------------------------- */
 export const getTrabajosCliente = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { clienteId } = req.params;
     const estado = req.query.estado as string | undefined;
-
     const trabajos = await getTrabajosClienteService(clienteId, estado);
     res.json(trabajos);
   } catch (error: any) {
@@ -38,7 +39,49 @@ export const getTrabajosCliente = async (req: Request, res: Response, next: Next
   }
 };
 
-// --- TUS FUNCIONES EXISTENTES ---
+/* -------------------------------------------------------------------------- */
+/* 🔹 HU 1: PROVEEDOR ACEPTA O RECHAZA UNA SOLICITUD                         */
+/* -------------------------------------------------------------------------- */
+
+// PUT /trabajos/:id/confirmar
+export const confirmarTrabajoController = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const result = await confirmarTrabajoService(id);
+
+    res.json({
+      message: result.message,
+      trabajo: result.data,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      message: 'Error al confirmar el trabajo',
+      error: error.message,
+    });
+  }
+};
+
+// PUT /trabajos/:id/rechazar
+export const rechazarTrabajoController = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const result = await rechazarTrabajoService(id);
+
+    res.json({
+      message: result.message,
+      trabajo: result.data,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      message: 'Error al rechazar el trabajo',
+      error: error.message,
+    });
+  }
+};
+
+/* -------------------------------------------------------------------------- */
+/* 🔹 FUNCIONES EXISTENTES                                                    */
+/* -------------------------------------------------------------------------- */
 
 export const crearTrabajoController = async (req: Request, res: Response) => {
   try {

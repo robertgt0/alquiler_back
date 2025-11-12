@@ -4,12 +4,58 @@ import TrabajoModel from '../models/trabajo.model';
 import ClienteModel from '../models/cliente.model';
 import ProveedorModel from '../models/proveedor.model';
 
-// --- NUEVAS FUNCIONES PARA HU 1.7 y 1.8 ---
+/* -------------------------------------------------------------------------- */
+/* 🔹 NUEVAS FUNCIONES PARA HU 1 (Aceptar / Rechazar trabajo)                */
+/* -------------------------------------------------------------------------- */
 
 /**
- * HU 1.7: Obtener la lista de trabajos para un Proveedor
+ * Cambia el estado de un trabajo a "confirmado".
  */
-// ✅ ¡AQUÍ ESTÁ LA FUNCIÓN QUE FALTABA!
+export const confirmarTrabajoService = async (id: string) => {
+  const trabajo = await TrabajoModel.findById(id);
+  if (!trabajo) throw new Error('Trabajo no encontrado');
+
+  // Solo puede confirmar si está pendiente
+  if (trabajo.estado !== 'pendiente') {
+    throw new Error('Solo se pueden confirmar trabajos pendientes');
+  }
+
+  trabajo.estado = 'confirmado';
+  await trabajo.save();
+
+  return {
+    success: true,
+    message: 'Trabajo confirmado correctamente',
+    data: trabajo,
+  };
+};
+
+/**
+ * Cambia el estado de un trabajo a "cancelado".
+ */
+export const rechazarTrabajoService = async (id: string) => {
+  const trabajo = await TrabajoModel.findById(id);
+  if (!trabajo) throw new Error('Trabajo no encontrado');
+
+  // Solo puede rechazar si está pendiente
+  if (trabajo.estado !== 'pendiente') {
+    throw new Error('Solo se pueden rechazar trabajos pendientes');
+  }
+
+  trabajo.estado = 'cancelado';
+  await trabajo.save();
+
+  return {
+    success: true,
+    message: 'Trabajo rechazado correctamente',
+    data: trabajo,
+  };
+};
+
+/* -------------------------------------------------------------------------- */
+/* 🔹 FUNCIONES HU 1.7 (Proveedor) Y HU 1.8 (Cliente)                        */
+/* -------------------------------------------------------------------------- */
+
 export const getTrabajosProveedorService = async (
   proveedorId: string,
   estado?: string
@@ -17,18 +63,13 @@ export const getTrabajosProveedorService = async (
   const filtro: any = {
     id_proveedor: new mongoose.Types.ObjectId(proveedorId),
   };
-  if (estado) {
-    filtro.estado = estado;
-  }
+  if (estado) filtro.estado = estado;
+
   return await TrabajoModel.find(filtro)
-    .populate('id_cliente', 'nombre') 
+    .populate('id_cliente', 'nombre')
     .sort({ fecha: -1 });
 };
 
-/**
- * HU 1.8: Obtener la lista de trabajos para un Cliente
- */
-// ✅ ¡AQUÍ ESTÁ LA OTRA FUNCIÓN QUE FALTABA!
 export const getTrabajosClienteService = async (
   clienteId: string,
   estado?: string
@@ -36,15 +77,16 @@ export const getTrabajosClienteService = async (
   const filtro: any = {
     id_cliente: new mongoose.Types.ObjectId(clienteId),
   };
-  if (estado) {
-    filtro.estado = estado;
-  }
+  if (estado) filtro.estado = estado;
+
   return await TrabajoModel.find(filtro)
-    .populate('id_proveedor', 'nombre') 
+    .populate('id_proveedor', 'nombre')
     .sort({ fecha: -1 });
 };
 
-// --- TUS FUNCIONES EXISTENTES ---
+/* -------------------------------------------------------------------------- */
+/* 🔹 FUNCIONES EXISTENTES                                                   */
+/* -------------------------------------------------------------------------- */
 
 export const crearTrabajo = async (data: any) => {
   const cliente = await ClienteModel.findById(data.id_cliente);
@@ -58,6 +100,7 @@ export const crearTrabajo = async (data: any) => {
     id_proveedor: data.id_proveedor,
     fecha: data.fecha,
   });
+
   if (existeTrabajo)
     throw new Error(
       'Ya existe un trabajo entre este cliente y proveedor en esa fecha'
