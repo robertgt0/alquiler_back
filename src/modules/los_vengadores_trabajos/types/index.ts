@@ -31,6 +31,7 @@ export interface DiaDisponibilidad{
   fecha: string; // Formato YYYY-MM-DD
   horarios: HorarioDisponible[];
 }
+
 ///
 
 
