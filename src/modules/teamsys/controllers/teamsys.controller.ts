@@ -437,6 +437,7 @@ export const agregarAutentificacion = async (req: Request, res: Response): Promi
         return;
         
       }
+      let data;
         if (provider === 'local') {
         if (!password) {
           res.status(400).json({ success: false, message: 'Debe proporcionar una contraseña para habilitar "local".' });
@@ -446,7 +447,7 @@ export const agregarAutentificacion = async (req: Request, res: Response): Promi
           res.status(400).json({ success: false, message: 'La contraseña no cumple con los requisitos mínimos.' });
           return;
         }
-        user.password=password
+        data=await teamsysService.setPasswordUnderCorreo(req.params.id, password);
       }
       if(provider=='google'){
         if(!(user.correo===email)){
@@ -454,18 +455,13 @@ export const agregarAutentificacion = async (req: Request, res: Response): Promi
             return;
         }
         user.authProvider=provider;
+        data=await teamsysService.update(req.params.id, user);
       }
       providers.push(provider);
-      if(provider=='google')user.authProvider=provider;
-      auth.authProvider=providers;
       
     
       console.log(user)
     
-    let data;
-    if(password!=null)
-     data=await teamsysService.setPasswordUnderCorreo(req.params.id, password);
-    else data=await teamsysService.update(req.params.id, user);
     console.log(data)
     const authData=await teamsysService.updateUserAuthProviders(req.params.id,auth.authProvider)
     if (!data || !authData) {
@@ -504,15 +500,16 @@ export const eliminarAutentificacion = async (req: Request, res: Response): Prom
       }
       console.log(provider)
       // Si eliminamos LOCAL, removemos password
+      let data;
       if (provider == 'local') {
         user.password = undefined;
+        data = await teamsysService.eliminarPasswordUser(req.params.id);
       }
-      if(provider=='google')user.authProvider='local';
+      if(provider=='google'){user.authProvider='local';
       // Eliminar provider
-      auth.authProvider = providers.filter(p => p !== provider);
       console.log(user)
-    const data = await teamsysService.eliminarPasswordUser(req.params.id);
-    console.log(data)
+    data=await teamsysService.update(req.params.id,user);}
+    auth.authProvider = providers.filter(p => p !== provider);
     const authData=await teamsysService.updateUserAuthProviders(req.params.id,auth.authProvider)
     if (!data || !authData) {
       res.status(404).json({
