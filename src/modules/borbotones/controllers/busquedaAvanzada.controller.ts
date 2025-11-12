@@ -3,8 +3,6 @@ import { getDatabase } from '../config/conecction';
 import { handleError } from '../errors/errorHandler';
 
 const escapeRegex = (text: string) => text.replace(/[.*+?^${}()|[\]]/g, '\\$&');
-
-
 export const buscarPorServicio = async (req: Request, res: Response) => {
   try {
     const { servicio, ciudad, page = "1", limit = "50" } = req.query;
@@ -16,7 +14,7 @@ export const buscarPorServicio = async (req: Request, res: Response) => {
       });
     }
 
-    const servicioNombre = servicio.trim();
+    const servicioNombre = servicio.trim().toLowerCase();
     const pageSize = Math.min(Number(limit) || 50, 200);
     const currentPage = Math.max(Number(page) || 1, 1);
     const skip = (currentPage - 1) * pageSize;
@@ -32,10 +30,20 @@ export const buscarPorServicio = async (req: Request, res: Response) => {
     const usuarios = db.collection('usuarios');
     const servicios = db.collection('servicios');
 
-
-    const serviciosCoincidentes = await servicios.find({
-      nombre: new RegExp(escapeRegex(servicioNombre), "i")
-    }).toArray();
+    // Traemos todos los servicios y filtramos normalizando tildes
+    const serviciosCoincidentesRaw = await servicios.find({}).toArray();
+    const serviciosCoincidentes = serviciosCoincidentesRaw.filter(s =>
+      s.nombre
+        .normalize("NFD") // descompone acentos
+        .replace(/[\u0300-\u036f]/g, "") // quita acentos
+        .toLowerCase()
+        .includes(
+          servicioNombre
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase()
+        )
+    );
 
     if (serviciosCoincidentes.length === 0) {
       return res.json({
@@ -44,21 +52,16 @@ export const buscarPorServicio = async (req: Request, res: Response) => {
         page: currentPage,
         pageSize: pageSize,
         data: [],
-        message: `No se encontraron servicios con el nombre "${servicioNombre}"`
+        message: `No se encontraron servicios con el nombre "${servicio}"` // usamos el nombre original
       });
     }
 
-
     const idsServicios = serviciosCoincidentes.map(s => s.id_servicio);
 
-
     const filters: any[] = [
-      {
-        "servicios.id_servicio": { $in: idsServicios }
-      },
+      { "servicios.id_servicio": { $in: idsServicios } },
       { activo: true }
     ];
-
 
     if (ciudad && typeof ciudad === 'string' && ciudad.trim()) {
       const ciudadRegex = new RegExp(escapeRegex(ciudad.trim()), "i");
@@ -73,9 +76,7 @@ export const buscarPorServicio = async (req: Request, res: Response) => {
             $filter: {
               input: "$servicios",
               as: "serv",
-              cond: {
-                $in: ["$$serv.id_servicio", idsServicios]
-              }
+              cond: { $in: ["$$serv.id_servicio", idsServicios] }
             }
           }
         }
@@ -102,15 +103,27 @@ export const buscarPorServicio = async (req: Request, res: Response) => {
       usuarios.countDocuments({ $and: filters })
     ]);
 
+    // Mapear servicios_coincidentes para devolver siempre el nombre original
+    const resultadosConNombreOriginal = resultados.map(u => ({
+      ...u,
+      servicios_coincidentes: u.servicios_coincidentes.map((s: any) => {
+        const servicioOriginal = serviciosCoincidentes.find(sc => sc.id_servicio === s.id_servicio);
+        return {
+          ...s,
+          nombre: servicioOriginal?.nombre || s.nombre // nombre original con tilde
+        };
+      })
+    }));
+
     res.json({
       success: true,
       total,
       page: currentPage,
       pageSize: pageSize,
-      data: resultados,
+      data: resultadosConNombreOriginal,
       servicios_encontrados: serviciosCoincidentes.map(s => ({
         id_servicio: s.id_servicio,
-        nombre: s.nombre,
+        nombre: s.nombre, // nombre original con tilde
         descripcion: s.descripcion
       }))
     });
@@ -120,6 +133,7 @@ export const buscarPorServicio = async (req: Request, res: Response) => {
     handleError(error, res);
   }
 };
+
 
 
 export const buscarPorDisponibilidad = async (req: Request, res: Response) => {
@@ -561,27 +575,18 @@ export const buscarPorRangoPrecio = async (req: Request, res: Response) => {
     handleError(error, res);
   }
 };
-
 export const buscarPorFechaCreacion = async (req: Request, res: Response) => {
   try {
-    const {
-      fecha_inicio,    // Fecha de inicio (YYYY-MM-DD)
-      fecha_fin,       // Fecha de fin (YYYY-MM-DD)
-      fecha_exacta,    // Fecha exacta (YYYY-MM-DD)
-      orden = "desc",  // Orden: "asc" o "desc"
-      page = "1",
-      limit = "50"
-    } = req.query;
+    const { fecha_exacta, orden = "desc", page = "1", limit = "50" } = req.query;
 
-    // Validar que al menos un parámetro de fecha esté presente
-    if (!fecha_inicio && !fecha_fin && !fecha_exacta) {
+    if (!fecha_exacta) {
       return res.status(400).json({
         success: false,
-        message: "Debe proporcionar al menos un parámetro: 'fecha_inicio', 'fecha_fin' o 'fecha_exacta'"
+        message: "Debe proporcionar el parámetro 'fecha_exacta'"
       });
     }
 
-    // Validar formato de fechas
+    // Validar formato de fecha
     const isValidDate = (dateString: string) => {
       const regex = /^\d{4}-\d{2}-\d{2}$/;
       if (!regex.test(dateString)) return false;
@@ -589,38 +594,11 @@ export const buscarPorFechaCreacion = async (req: Request, res: Response) => {
       return date instanceof Date && !isNaN(date.getTime());
     };
 
-    if (fecha_inicio && !isValidDate(fecha_inicio as string)) {
-      return res.status(400).json({
-        success: false,
-        message: "Formato de 'fecha_inicio' inválido. Use YYYY-MM-DD"
-      });
-    }
-
-    if (fecha_fin && !isValidDate(fecha_fin as string)) {
-      return res.status(400).json({
-        success: false,
-        message: "Formato de 'fecha_fin' inválido. Use YYYY-MM-DD"
-      });
-    }
-
-    if (fecha_exacta && !isValidDate(fecha_exacta as string)) {
+    if (!isValidDate(fecha_exacta as string)) {
       return res.status(400).json({
         success: false,
         message: "Formato de 'fecha_exacta' inválido. Use YYYY-MM-DD"
       });
-    }
-
-    // Validar que fecha_inicio no sea mayor que fecha_fin
-    if (fecha_inicio && fecha_fin) {
-      const startDate = new Date(fecha_inicio as string);
-      const endDate = new Date(fecha_fin as string);
-
-      if (startDate > endDate) {
-        return res.status(400).json({
-          success: false,
-          message: "La fecha de inicio no puede ser mayor que la fecha de fin"
-        });
-      }
     }
 
     const pageSize = Math.min(Number(limit) || 50, 200);
@@ -637,41 +615,17 @@ export const buscarPorFechaCreacion = async (req: Request, res: Response) => {
 
     const servicios = db.collection('servicios');
 
-    // Construir filtro para fecha
-    const filters: any[] = [];
+    // Filtrar por fecha exacta
+    const exactDate = new Date(fecha_exacta as string);
+    const nextDay = new Date(exactDate);
+    nextDay.setDate(nextDay.getDate() + 1);
 
-    if (fecha_exacta) {
-      // Búsqueda por fecha exacta
-      const exactDate = new Date(fecha_exacta as string);
-      const nextDay = new Date(exactDate);
-      nextDay.setDate(nextDay.getDate() + 1);
-
-      filters.push({
-        fecha_creacion: {
-          $gte: exactDate,
-          $lt: nextDay
-        }
-      });
-    } else {
-      // Búsqueda por rango de fechas
-      const fechaFilter: any = {};
-
-      if (fecha_inicio) {
-        fechaFilter.$gte = new Date(fecha_inicio as string);
+    const filters = [
+      {
+        fecha_creacion: { $gte: exactDate, $lt: nextDay }
       }
+    ];
 
-      if (fecha_fin) {
-        const endDate = new Date(fecha_fin as string);
-        endDate.setDate(endDate.getDate() + 1); // Incluir todo el día de fin
-        fechaFilter.$lt = endDate;
-      }
-
-      if (Object.keys(fechaFilter).length > 0) {
-        filters.push({ fecha_creacion: fechaFilter });
-      }
-    }
-
-    // Determinar orden
     const sortOrder = orden === "asc" ? 1 : -1;
 
     const pipeline = [
@@ -693,16 +647,10 @@ export const buscarPorFechaCreacion = async (req: Request, res: Response) => {
           precio_base: 1,
           duracion_estimada: 1,
           fecha_creacion: 1,
-          // Formatear fecha para respuesta
           fecha_formateada: {
-            $dateToString: {
-              format: "%Y-%m-%d",
-              date: "$fecha_creacion"
-            }
+            $dateToString: { format: "%Y-%m-%d", date: "$fecha_creacion" }
           },
-          dia_semana: {
-            $dayOfWeek: "$fecha_creacion"
-          }
+          dia_semana: { $dayOfWeek: "$fecha_creacion" }
         }
       }
     ];
@@ -712,48 +660,13 @@ export const buscarPorFechaCreacion = async (req: Request, res: Response) => {
       servicios.countDocuments({ $and: filters })
     ]);
 
-    // Calcular estadísticas de fechas
-    const statsPipeline = [
-      { $match: { $and: filters } },
-      {
-        $group: {
-          _id: null,
-          fecha_mas_antigua: { $min: "$fecha_creacion" },
-          fecha_mas_reciente: { $max: "$fecha_creacion" },
-          total_servicios: { $sum: 1 },
-          servicios_por_mes: {
-            $push: {
-              mes: { $month: "$fecha_creacion" },
-              año: { $year: "$fecha_creacion" }
-            }
-          }
-        }
-      }
-    ];
-
-    const statsResult = await servicios.aggregate(statsPipeline).toArray();
-    const estadisticas = statsResult[0] || {};
-
     res.json({
       success: true,
       total,
       page: currentPage,
       pageSize: pageSize,
       totalPages: Math.ceil(total / pageSize),
-      filtro: {
-        fecha_inicio: fecha_inicio || null,
-        fecha_fin: fecha_fin || null,
-        fecha_exacta: fecha_exacta || null,
-        orden: orden
-      },
-      estadisticas: {
-        fecha_mas_antigua: estadisticas.fecha_mas_antigua || null,
-        fecha_mas_reciente: estadisticas.fecha_mas_reciente || null,
-        total_servicios: estadisticas.total_servicios || 0,
-        rango_fechas: fecha_inicio && fecha_fin ?
-          `${fecha_inicio} a ${fecha_fin}` :
-          fecha_exacta ? `Fecha exacta: ${fecha_exacta}` : 'Personalizado'
-      },
+      filtro: { fecha_exacta, orden },
       data: resultados
     });
 
@@ -762,4 +675,3 @@ export const buscarPorFechaCreacion = async (req: Request, res: Response) => {
     handleError(error, res);
   }
 };
-
