@@ -537,7 +537,8 @@ export const cambiarContraseña = async (req: Request, res: Response): Promise<v
   try {
     //const { userId} = req.user as JWTPayload;
     //2daModif          const user = req.user as JWTPayload | undefined;
-    const user = (req as any).user as JWTPayload;
+    //const user = (req as any).user as JWTPayload; 12/11/25
+    const user = (req as any).authuser as JWTPayload;
     console.log('🔍 user en controlador:', user);
     //if(!userId){
     if (!user || !user.userId) {

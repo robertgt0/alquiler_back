@@ -4,6 +4,7 @@ import { handleError } from "../errors/errorHandler";
 import { SessionService } from "../services/session.service";
 import mongoose from "mongoose";
 import teamsysService from "../services/teamsys.service";
+import { emailService } from '../services/email.service';
 
 export class MagicLinkController {
   private authService: AuthService;
@@ -33,12 +34,15 @@ export class MagicLinkController {
       const token = await this.authService.generateMagicLinkToken(email);
       // URL del frontend donde el usuario hará clic
     //const frontendBaseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-    const magicLink = `http://localhost:3000/auth/magic-link?token=${token}`;
+    const frontendUrl=process.env.URL_FRONTEND||'http://localhost:3000';
+    const magicLink = `${frontendUrl}/auth/magic-link?token=${token}`;
+    //const magicLink = `http://localhost:3000/api/teamsys/magic-link/verify?token=${token}`;
+    //const magicLink = `http://localhost:3000/auth/magic-link?token=${token}`;-----------------------
 
       // Aquí deberías integrar con tu servicio de email
       // Por ahora solo devolvemos el token para pruebas
       //const magicLink = `http://localhost:3000/api/teamsys/magic-link/verify?token=${token}`;
-      
+      await emailService.sendMagicLink(email, magicLink);
       console.log('🔗 Magic Link generado:', magicLink);
       //await emailService.sendMagicLink(email, magicLink);
 
