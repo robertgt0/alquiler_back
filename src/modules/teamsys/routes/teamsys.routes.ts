@@ -82,7 +82,7 @@ router.get("/me", authMiddleware, authController.getCurrentUser);
  */
 router.get("/sessions/user/:userId", authMiddleware, sessionController.getSessionsByUserId);
 router.delete("/sessions/:sessionId/", authMiddleware, sessionController.deleteSession);
-router.delete("/sessions/user/all-except-current", authMiddleware, sessionController.deleteAllSessionsExceptCurrent);
+//router.delete("/sessions/user/all-except-current", authMiddleware, sessionController.deleteAllSessionsExceptCurrent);
 
 router.post("/2fa/setup", authMiddleware, twofactorController.setupTwoFactor);
 router.post("/2fa/verify", authMiddleware, twofactorController.verifyAndEnable);
