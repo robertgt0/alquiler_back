@@ -149,7 +149,7 @@ export const buscarPorDisponibilidad = async (req: Request, res: Response) => {
     const usuarios = db.collection('usuarios');
 
 
-    const turnosValidos = ["Mañana", "Tarde", "Noche", "Madrugada"];
+    const turnosValidos = ["Mañana", "Tarde", "Noche", "Madrugada", "Tiempo Completo"];
     const turnoEncontrado = turnosValidos.find(t =>
       t.toLowerCase().includes(turnoNombre.toLowerCase())
     );
