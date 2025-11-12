@@ -1,4 +1,4 @@
-// src/types/index.ts
+// src/types/index.ts      prueba
 export interface IUser {
   name: string;
   email: string;
