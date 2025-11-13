@@ -46,6 +46,17 @@ export interface ITransaccion extends Document {
   saldo_resultante: number;
 }
 
+export interface IRecarga {
+  nombre: string;
+  detalle: string;
+  monto: number;
+  correo: string;
+  telefono: string;
+  tipoDocumento: string;
+  numeroDocumento: string;
+  fecha?: Date;
+}
+
 export interface EjemploEntity {
   _id?: string;
   nombre: string;
