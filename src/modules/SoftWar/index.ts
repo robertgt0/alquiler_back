@@ -1,24 +1,20 @@
 import { Router } from 'express';
-import ejemploRoutes from './routes/ejemplo.routes';
+import categoryRoutes from './routes/category.routes.ts'; // 👈 Importa las rutas
 
 const router = Router();
 
-// Ruta de bienvenida del módulo
+// Ruta de bienvenida del módulo (opcional)
 router.get('/', (req, res) => {
   res.json({
-    message: '📦 Módulo de Ejemplo',
-    version: '1.0.0',
-    description: 'Este es un módulo de ejemplo para mostrar la estructura',
+    message: '📦 Módulo SoftWar',
+    description: 'Endpoints para categorías y servicios.',
     endpoints: {
-      ejemplo: '/api/nombre_grupo_ejemplo/ejemplo'
+      categories: '/api/softwar/categories'
     }
   });
 });
 
 // Montar sub-rutas del módulo
-router.use('/ejemplo', ejemploRoutes);
-
-// Puedes agregar más rutas aquí:
-// router.use('/otra-ruta', otraRoutes);
+router.use('/categories', categoryRoutes); // 👈 Registra las rutas
 
 export default router;

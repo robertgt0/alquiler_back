@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/database';
 import userRoutes from './modules/teamsys/index';
+import softWarRoutes from './modules/SoftWar/index'; // 👈 LÍNEA 1 (Importar)
 
 dotenv.config();
 
@@ -45,12 +46,13 @@ app.get('/', (_req: Request, res: Response) => {
     status: 'OK',
     version: '1.0.0',
     timestamp: new Date().toISOString(),
-    modules: ['/api/teamsys'],
+    modules: ['/api/teamsys', '/api/softwar'], // 👈 LÍNEA 2 (Log)
   });
 });
 
 // 🚏 Módulos
 app.use('/api/teamsys', userRoutes);
+app.use('/api/softwar', softWarRoutes); // 👈 LÍNEA 3 (Usar ruta)
 
 // 🚫 404
 app.use((req: Request, res: Response) => {
@@ -80,5 +82,6 @@ app.listen(PORT, HOST, () => {
   console.log(` URL: ${publicURL || localURL}`);
   console.log(`\n Módulos cargados:`);
   console.log(`   - /api/teamsys`);
+  console.log(`   - /api/softwar`); // 👈 LÍNEA 4 (Log de inicio)
   console.log(`\n Listo para recibir peticiones!\n`);
 });
