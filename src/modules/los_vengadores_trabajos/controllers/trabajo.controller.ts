@@ -84,7 +84,7 @@ export const eliminarTrabajoController = async (req: Request, res: Response) => 
   export const obtenerTrabajoProveedorController = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const resultado = await DetallesTrabajo.obtenerTrabajoProveedor(id);
+    const resultado = await DetallesTrabajo.obtenerTrabajoVistaProveedor(id);
 
     if ("mensaje" in resultado) {
       return res.status(404).json({ message: resultado.mensaje });
@@ -103,7 +103,7 @@ export const eliminarTrabajoController = async (req: Request, res: Response) => 
   export const obtenerTrabajoClienteController = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const resultado = await DetallesTrabajo.obtenerTrabajoCliente(id);
+    const resultado = await DetallesTrabajo.obtenerTrabajoVistaCliente(id);
 
     if ("mensaje" in resultado) {
       return res.status(404).json({ message: resultado.mensaje });

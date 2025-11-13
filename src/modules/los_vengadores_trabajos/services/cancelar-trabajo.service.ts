@@ -6,12 +6,13 @@ import TrabajoModel from "../models/trabajo.model";
 //import { DetallesTrabajoCanceladoProveedor, DetallesTrabajoCanceladoCliente } from "../types/index";
 
 export class DetallesTrabajo {
-    static async obtenerTrabajoProveedor(TrabajoId: string) {
+    static async obtenerTrabajoVistaProveedor(TrabajoId: string) {
         try {
         const trabajo = await TrabajoModel.findById(
             TrabajoId,
             {
-            id_proveedor: 1,
+            _id: 1,
+            id_cliente: 1,
             fecha: 1,
             hora_inicio: 1,
             hora_fin: 1,
@@ -19,16 +20,17 @@ export class DetallesTrabajo {
             costo: 1,
             estado: 1,
             }
-        ).populate<{ id_proveedor: { nombre: string } }>(
-            "id_proveedor",
-            "nombre -_id" // solo traer nombre del proveedor
+        ).populate<{ id_cliente: { nombre: string } }>(
+            "id_cliente",
+            "nombre -_id" // solo traer nombre del cliente
         );
 
         if (!trabajo) {
             return { mensaje: "Trabajo no encontrado" };
         }
         return {
-        proveedor: trabajo.id_proveedor.nombre,
+        id: trabajo._id,
+        cliente: trabajo.id_cliente.nombre,
         fecha: (() => {
             const [año, mes, día] = trabajo.fecha.split("-").map(Number);
             const fechaObj = new Date(año, mes - 1, día);
@@ -51,12 +53,13 @@ export class DetallesTrabajo {
         }
     }
 
-    static async obtenerTrabajoCliente(TrabajoId: string) {
+    static async obtenerTrabajoVistaCliente(TrabajoId: string) {
         try {
         const trabajo = await TrabajoModel.findById(
             TrabajoId,
             {
-            id_cliente: 1,
+            _id: 1,
+            id_proveedor: 1,
             fecha: 1,
             hora_inicio: 1,
             hora_fin: 1,
@@ -64,8 +67,8 @@ export class DetallesTrabajo {
             costo: 1,
             estado: 1,
             }
-        ).populate<{ id_cliente: { nombre: string } }>(
-            "id_cliente",
+        ).populate<{ id_proveedor: { nombre: string } }>(
+            "id_proveedor",
             "nombre -_id" // solo traer nombre del cliente
         );
 
@@ -73,7 +76,8 @@ export class DetallesTrabajo {
             return { mensaje: "Trabajo no encontrado" };
         }
         return {
-        cliente: trabajo.id_cliente.nombre,
+        id: trabajo._id,
+        proveedor: trabajo.id_proveedor.nombre,
         fecha: (() => {
             const [año, mes, día] = trabajo.fecha.split("-").map(Number);
             const fechaObj = new Date(año, mes - 1, día);
