@@ -1,52 +1,113 @@
-// src/modules/los_vengadores_trabajos/services/trabajo.service.ts
 import mongoose from 'mongoose';
 import TrabajoModel from '../models/trabajo.model';
 import ClienteModel from '../models/cliente.model';
 import ProveedorModel from '../models/proveedor.model';
 
-// --- NUEVAS FUNCIONES PARA HU 1.7 y 1.8 ---
+/* -------------------------------------------------------------------------- */
+/* 🔹 NUEVAS FUNCIONES PARA HU 1 (Confirmar / Rechazar trabajo)              */
+/* -------------------------------------------------------------------------- */
 
 /**
- * HU 1.7: Obtener la lista de trabajos para un Proveedor
+ * Cambia el estado de un trabajo a "Confirmado".
  */
-// ✅ ¡AQUÍ ESTÁ LA FUNCIÓN QUE FALTABA!
+export const confirmarTrabajoService = async (id: string) => {
+  const trabajo = await TrabajoModel.findById(id);
+  if (!trabajo) throw new Error('Trabajo no encontrado');
+
+  console.log("🔍 Estado actual del trabajo (confirmar):", trabajo.estado);
+
+  // Normalizamos el estado a minúsculas para comparar
+  const estado = (trabajo.estado || '').toLowerCase();
+
+  // ✅ Solo si está "pendiente" (cualquier combinación de mayúsculas)
+  if (estado !== 'pendiente') {
+    throw new Error('Solo se pueden confirmar trabajos pendientes');
+  }
+
+  // ✅ Corregimos el valor exacto según el enum del modelo
+  trabajo.estado = 'Confirmado';
+
+  // ✅ Evita error de validación si numero_estrellas está en 0
+  if (trabajo.numero_estrellas !== undefined && trabajo.numero_estrellas < 1) {
+    trabajo.numero_estrellas = 1;
+  }
+
+  await trabajo.save();
+
+  return {
+    success: true,
+    message: 'Trabajo confirmado correctamente',
+    data: trabajo,
+  };
+};
+
+/**
+ * Cambia el estado de un trabajo a "Cancelado".
+ */
+export const rechazarTrabajoService = async (id: string) => {
+  const trabajo = await TrabajoModel.findById(id);
+  if (!trabajo) throw new Error('Trabajo no encontrado');
+
+  console.log("🔍 Estado actual del trabajo (rechazar):", trabajo.estado);
+
+  const estado = (trabajo.estado || '').toLowerCase();
+
+  if (estado !== 'pendiente') {
+    throw new Error('Solo se pueden rechazar trabajos pendientes');
+  }
+
+  trabajo.estado = 'Cancelado';
+
+  if (trabajo.numero_estrellas !== undefined && trabajo.numero_estrellas < 1) {
+    trabajo.numero_estrellas = 1;
+  }
+
+  await trabajo.save();
+
+  return {
+    success: true,
+    message: 'Trabajo rechazado correctamente',
+    data: trabajo,
+  };
+};
+
+/* -------------------------------------------------------------------------- */
+/* 🔹 FUNCIONES HU 1.7 (Proveedor) Y HU 1.8 (Cliente)                        */
+/* -------------------------------------------------------------------------- */
+
 export const getTrabajosProveedorService = async (
   proveedorId: string,
   estado?: string
 ) => {
-  const filtro: any = {
+  const filtro: Record<string, unknown> = {
     id_proveedor: new mongoose.Types.ObjectId(proveedorId),
   };
-  if (estado) {
-    filtro.estado = estado;
-  }
+  if (estado) filtro.estado = estado;
+
   return await TrabajoModel.find(filtro)
-    .populate('id_cliente', 'nombre') 
+    .populate('id_cliente', 'nombre')
     .sort({ fecha: -1 });
 };
 
-/**
- * HU 1.8: Obtener la lista de trabajos para un Cliente
- */
-// ✅ ¡AQUÍ ESTÁ LA OTRA FUNCIÓN QUE FALTABA!
 export const getTrabajosClienteService = async (
   clienteId: string,
   estado?: string
 ) => {
-  const filtro: any = {
+  const filtro: Record<string, unknown> = {
     id_cliente: new mongoose.Types.ObjectId(clienteId),
   };
-  if (estado) {
-    filtro.estado = estado;
-  }
+  if (estado) filtro.estado = estado;
+
   return await TrabajoModel.find(filtro)
-    .populate('id_proveedor', 'nombre') 
+    .populate('id_proveedor', 'nombre')
     .sort({ fecha: -1 });
 };
 
-// --- TUS FUNCIONES EXISTENTES ---
+/* -------------------------------------------------------------------------- */
+/* 🔹 FUNCIONES EXISTENTES                                                   */
+/* -------------------------------------------------------------------------- */
 
-export const crearTrabajo = async (data: any) => {
+export const crearTrabajo = async (data: Record<string, unknown>) => {
   const cliente = await ClienteModel.findById(data.id_cliente);
   const proveedor = await ProveedorModel.findById(data.id_proveedor);
 
@@ -58,12 +119,19 @@ export const crearTrabajo = async (data: any) => {
     id_proveedor: data.id_proveedor,
     fecha: data.fecha,
   });
+
   if (existeTrabajo)
     throw new Error(
       'Ya existe un trabajo entre este cliente y proveedor en esa fecha'
     );
 
   const nuevoTrabajo = new TrabajoModel(data);
+
+  // Evita validación por defecto
+  if (!nuevoTrabajo.numero_estrellas || nuevoTrabajo.numero_estrellas < 1) {
+    nuevoTrabajo.numero_estrellas = 1;
+  }
+
   return await nuevoTrabajo.save();
 };
 
