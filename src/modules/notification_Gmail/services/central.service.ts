@@ -1,6 +1,6 @@
 // src/modules/notification_Gmail/services/central.service.ts
 import { v4 as uuidv4 } from "uuid";
-import { saveNotification } from "../models/notification.model";
+import { notificacionGmailController } from "../../../controllers/notificacionGmail.controller";
 import connectDB from "../../../config/database";
 import {
   InvalidNotificationDataError,
@@ -67,7 +67,7 @@ export class CentralNotificationService {
       });
 
       // --- 4️⃣ Registrar en la base de datos ---
-      notification = await saveNotification({
+      const notificationData = {
         transactionId,
         message: {
           subject: data.subject,
@@ -80,7 +80,28 @@ export class CentralNotificationService {
         attempts: 1,
         providerResponse: gmailResult,
         sentAt: new Date(),
-      });
+      };
+
+      // Creamos mocks de req y res para invocar al controlador interno
+      const mockReq: any = { body: notificationData };
+      const mockRes: any = {
+        statusCode: 200,
+        jsonData: null,
+        status(code: number) {
+          this.statusCode = code;
+          return this;
+        },
+        json(data: any) {
+          this.jsonData = data;
+          return this;
+        },
+      };
+
+      // Llamar directamente al método create del controlador base
+      await notificacionGmailController.create(mockReq, mockRes);
+
+      // Recuperamos la notificación creada (respuesta del controlador)
+      notification = mockRes.jsonData;
 
       // --- 5️⃣ Retornar resumen de la operación ---
       return {

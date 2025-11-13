@@ -11,7 +11,7 @@ import path from "path";
 
 
 dotenv.config({ path: path.resolve(process.cwd(), ".env") });
-import routesDevcode from "./modules/DevCode/routes"
+//import routesDevcode from "./modules/DevCode/routes"
 // Cargar variables de entorno
 
 // ============================================
@@ -38,16 +38,34 @@ import { logSystem } from "./modules/notification_Gmail/utils/loggerExtended";
 import { generateCode } from "./modules/notification_Gmail/utils/helpers";
 
 // ============================================
-// RUTAS: GMAIL MODULE
+// RUTAS: NOTIFICACIONES
 // ============================================
 import gmailRoutes from "./modules/notification_Gmail/routes/notification.routes";
 import gmailCentralRouter from "./modules/notification_Gmail/routes/central.router";
-
-// ============================================
-// RUTAS: WHATSAPP MODULE
-// ============================================
 import whatsappRoutes from "./modules/notification_WhatsApp/routes/notification.routes";
 import whatsappCentralRouter from "./modules/notification_WhatsApp/routes/central.router";
+
+// ============================================
+// RUTAS GENERALES PARA EL PROYECTO - BACKEND
+// ============================================
+import citaRoutes from "./routes/cita.routes";
+import ciudadRoutes from "./routes/ciudad.routes";
+import clienteRoutes from "./routes/cliente.routes";
+import especialidadRoutes from "./routes/especialidad.routes";
+import fixerRoutes from "./routes/fixer.routes";
+import historialRoutes from "./routes/historial.routes";
+import horarioDisponibleRoutes from "./routes/horario_disponible.routes";
+import notificacionGmailRoutes from "./routes/notificacionGmail.routes";
+import notificacionWhatsAppRoutes from "./routes/notificacionWhatsApp.routes";
+import magiclinkRoutes from "./routes/magiclink.routes";
+import provinciaRoutes from "./routes/provincia.routes";
+import servicioRoutes from "./routes/servicio.routes";
+import sessionRoutes from "./routes/session.routes";
+import trabajoRoutes from "./routes/trabajo.routes";
+import userRoutes from "./routes/user.routes";
+import userAuthRoutes from "./routes/userAuth.routes";
+import walletRoutes from "./routes/wallet.routes";
+
 
 // ============================================
 // INICIALIZACIÓN DE APP
@@ -99,10 +117,29 @@ app.use("/whatsapp-notifications", whatsappRoutes);
 app.use("/api/whatsapp-notifications", whatsappCentralRouter);
 
 
+// --- Rutas Generales del Proyecto ---
+app.use("/api/cita", citaRoutes);
+app.use("/api/ciudad", ciudadRoutes);
+app.use("/api/cliente", clienteRoutes);
+app.use("/api/especialidad", especialidadRoutes);
+app.use("/api/fixer", fixerRoutes);
+app.use("/api/historial", historialRoutes);
+app.use("/api/horario-disponible", horarioDisponibleRoutes);
+app.use("/api/notificacion-gmail", notificacionGmailRoutes);
+app.use("/api/notificacion-whatsapp", notificacionWhatsAppRoutes);
+app.use("/api/magiclink", magiclinkRoutes);
+app.use("/api/provincia", provinciaRoutes);
+app.use("/api/servicio", servicioRoutes);
+app.use("/api/session", sessionRoutes);
+app.use("/api/trabajo", trabajoRoutes);
+app.use("/api/user", userRoutes);
+app.use("/api/auth", userAuthRoutes);
+app.use("/api/wallet", walletRoutes);
+
 // app.use('/api/nombre_grupo_ejemplo', nombreGrupoEjemploRouter);
 
 // ROUTES DEVCODE
-app.use('/api/devcode', routesDevcode)
+//app.use('/api/devcode', routesDevcode)
 // ============================================
 // MANEJO DE ERRORES
 // ============================================
@@ -115,9 +152,40 @@ app.use(globalErrorHandler);
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
+  const baseUrl = `http://localhost:${PORT}`;
+
+  const modules = [
+    "📩 Gmail Notifications:",
+    "   - /gmail-notifications",
+    "   - /api/gmail-notifications",
+    "",
+    "💬 WhatsApp Notifications:",
+    "   - /whatsapp-notifications",
+    "   - /api/whatsapp-notifications",
+    "",
+    "🗂️ Rutas Generales del Proyecto:",
+    "   - /api/cita",
+    "   - /api/ciudad",
+    "   - /api/cliente",
+    "   - /api/especialidad",
+    "   - /api/fixer",
+    "   - /api/historial",
+    "   - /api/horario-disponible",
+    "   - /api/magiclink",
+    "   - /api/notificacion-gmail",
+    "   - /api/notificacion-whatsapp",
+    "   - /api/provincia",
+    "   - /api/servicio",
+    "   - /api/session",
+    "   - /api/trabajo",
+    "   - /api/user",
+    "   - /api/auth",
+    "   - /api/wallet",
+  ];
+
   logSystem("INFO", `🚀 Servidor corriendo en puerto ${PORT}`);
   logSystem("INFO", `🔧 Modo: ${process.env.NODE_ENV}`);
-  logSystem("INFO", `🌐 URL: http://localhost:${PORT}`);
-  logSystem("INFO", `📦 Módulos activos: \n/gmail-notifications, \n/api/gmail-notifications, \n/whatsapp-notifications, \n/api/whatsapp-notifications`);
+  logSystem("INFO", `🌐 URL base: ${baseUrl}`);
+  logSystem("INFO", "📦 Módulos activos:\n" + modules.join("\n"));
   logSystem("INFO", "✅ Listo para recibir peticiones!");
 });
