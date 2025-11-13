@@ -4,11 +4,14 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import connectDB from './config/database';
 
-import Ubicacion from './models/Ubicacion';
+// ⬇️ Importa el modelo CORRECTO para ubicaciones
+import UbicacionEstaticaModel from './models/ubicacion.model';
 import Fixer from './models/Fixer';
 import { ubicacionesDefinidas } from './data/ubicacionesData';
 import { fixersDefinidos } from './data/fixersData';
 
+// ⬇️ Importa las rutas del módulo
+import ubicacionRoutes from './routes/ubicacion.routes';
 
 import availabilityRoutes from './modules/DevCode/routes/availability.routes';
 import userRoutes from './modules/teamsys/index';
@@ -18,19 +21,18 @@ dotenv.config();
 
 const app = express();
 
-// 🔐 Confía en el proxy (Render/NGINX) para detectar HTTPS y IPs reales
+// 🔐 Confía en el proxy
 app.set('trust proxy', 1);
 
-// 🗄️ Conexión a MongoDB (usa MONGODB_URI desde el panel)
+// 🗄️ Conexión a MongoDB - debería conectar a SoftWarDB
 connectDB();
 
-// 🌐 CORS: define orígenes permitidos por ENV (coma-separados)
+// 🌐 CORS
 const allowedOrigins = (process.env.CORS_ORIGINS || '')
   .split(',')
   .map(s => s.trim())
   .filter(Boolean);
 
-// Ej.: CORS_ORIGINS="http://localhost:3000,https://tu-front.vercel.app"
 app.use(cors({
   origin: allowedOrigins.length ? allowedOrigins : true,
   credentials: true,
@@ -41,16 +43,17 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // ===============================
-// Health check (incluye estado de MongoDB)
+// Health check
 // ===============================
 app.get('/api/health', async (req: Request, res: Response) => {
   try {
-    const dbState = mongoose.connection.readyState; // 0 disconnected, 1 connected, 2 connecting, 3 disconnecting
+    const dbState = mongoose.connection.readyState;
     const isConnected = dbState === 1;
 
     res.json({
       status: 'healthy',
       database: isConnected ? 'connected' : 'disconnected',
+      dbName: mongoose.connection.db?.databaseName, // ← Muestra el nombre de la BD
       dbState,
       uptime: process.uptime(),
       timestamp: new Date().toISOString()
@@ -68,44 +71,23 @@ app.get('/api/health', async (req: Request, res: Response) => {
 // ===============================
 // ENDPOINTS: Ubicaciones
 // ===============================
-// GET ubicaciones
-app.get('/api/ubicaciones', async (req: Request, res: Response) => {
-  try {
-    const ubicaciones = await Ubicacion.find().sort({ nombre: 1 });
 
-    console.log(`📊 Ubicaciones encontradas en MongoDB: ${ubicaciones.length}`);
-
-    res.json({
-      success: true,
-      data: ubicaciones,
-      count: ubicaciones.length,
-      source: 'mongodb'
-    });
-  } catch (error) {
-    console.error('Error al obtener ubicaciones:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error de base de datos'
-    });
-  }
-});
-
-// POST cargar ubicaciones definidas
+// POST cargar ubicaciones definidas en SoftWarDB.ubicasiones_estaticas
 app.post('/api/ubicaciones/cargar-definidas', async (req: Request, res: Response) => {
   try {
-    console.log('🔄 Cargando datos a MongoDB...');
+    console.log('🔄 Cargando datos a SoftWarDB.ubicasiones_estaticas...');
 
-    const deleteResult = await Ubicacion.deleteMany({});
+    const deleteResult = await UbicacionEstaticaModel.deleteMany({});
     console.log(`🗑️ Eliminados: ${deleteResult.deletedCount} documentos`);
 
-    const insertResult = await Ubicacion.insertMany(ubicacionesDefinidas);
-    console.log(`✅ Insertados: ${insertResult.length} documentos`);
+    const insertResult = await UbicacionEstaticaModel.insertMany(ubicacionesDefinidas);
+    console.log(`✅ Insertados: ${insertResult.length} documentos en ubicasiones_estaticas`);
 
-    const count = await Ubicacion.countDocuments();
+    const count = await UbicacionEstaticaModel.countDocuments();
 
     res.json({
       success: true,
-      message: 'Datos cargados en MongoDB',
+      message: 'Datos cargados en SoftWarDB.ubicasiones_estaticas',
       deleted: deleteResult.deletedCount,
       inserted: insertResult.length,
       total: count
@@ -175,12 +157,11 @@ app.post('/api/fixers/cargar-definidos', async (req: Request, res: Response) => 
 });
 
 // ===============================
-// GEOLOCALIZACIÓN - Servicio y endpoints
+// GEOLOCALIZACIÓN
 // ===============================
 class GeolocationService {
-  // Calcular distancia entre dos puntos (Haversine formula)
   static calculateDistance(loc1: { lat: number; lng: number }, loc2: { lat: number; lng: number }): number {
-    const R = 6371; // Radio de la Tierra en km
+    const R = 6371;
     const dLat = this.deg2rad(loc2.lat - loc1.lat);
     const dLng = this.deg2rad(loc2.lng - loc1.lng);
 
@@ -190,12 +171,9 @@ class GeolocationService {
       Math.sin(dLng / 2) * Math.sin(dLng / 2);
 
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const distance = R * c; // Distancia en km
-
-    return distance;
+    return R * c;
   }
 
-  // Encontrar fixers cercanos
   static findNearbyFixers(userLocation: { lat: number; lng: number }, fixers: any[], maxDistanceKm: number = 5) {
     return fixers.filter(fixer => {
       const fixerLocation = {
@@ -207,7 +185,6 @@ class GeolocationService {
     });
   }
 
-  // Encontrar ubicaciones cercanas
   static findNearbyUbicaciones(userLocation: { lat: number; lng: number }, ubicaciones: any[], maxDistanceKm: number = 2) {
     return ubicaciones.filter(ubicacion => {
       const ubicacionLocation = {
@@ -241,15 +218,8 @@ app.get('/api/geolocation/nearby-fixers', async (req: Request, res: Response) =>
       lng: parseFloat(lng as string)
     };
 
-    // Obtener todos los fixers
     const allFixers = await Fixer.find();
-
-    // Filtrar fixers cercanos
-    const nearbyFixers = GeolocationService.findNearbyFixers(
-      userLocation,
-      allFixers,
-      parseFloat(String(radius))
-    );
+    const nearbyFixers = GeolocationService.findNearbyFixers(userLocation, allFixers, parseFloat(String(radius)));
 
     console.log(`📍 Fixers cercanos encontrados: ${nearbyFixers.length} en radio de ${radius}km`);
 
@@ -270,7 +240,7 @@ app.get('/api/geolocation/nearby-fixers', async (req: Request, res: Response) =>
   }
 });
 
-// GET ubicaciones cercanas
+// GET ubicaciones cercanas desde SoftWarDB.ubicasiones_estaticas
 app.get('/api/geolocation/nearby-ubicaciones', async (req: Request, res: Response) => {
   try {
     const { lat, lng, radius = 2 } = req.query;
@@ -287,12 +257,8 @@ app.get('/api/geolocation/nearby-ubicaciones', async (req: Request, res: Respons
       lng: parseFloat(lng as string)
     };
 
-    const allUbicaciones = await Ubicacion.find();
-    const nearbyUbicaciones = GeolocationService.findNearbyUbicaciones(
-      userLocation,
-      allUbicaciones,
-      parseFloat(String(radius))
-    );
+    const allUbicaciones = await UbicacionEstaticaModel.find();
+    const nearbyUbicaciones = GeolocationService.findNearbyUbicaciones(userLocation, allUbicaciones, parseFloat(String(radius)));
 
     console.log(`📍 Ubicaciones cercanas encontradas: ${nearbyUbicaciones.length} en radio de ${radius}km`);
 
@@ -317,6 +283,9 @@ app.get('/api/geolocation/nearby-ubicaciones', async (req: Request, res: Respons
 // MONTAR MÓDULOS/GRUPOS AQUÍ
 // ============================================
 
+// ⬇️ El módulo de ubicaciones maneja GET /api/ubicaciones
+app.use('/api/ubicaciones', ubicacionRoutes);
+
 app.use('/api/devcode', availabilityRoutes);
 app.use('/api/teamsys', userRoutes);
 
@@ -340,7 +309,7 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 
 // 🚀 Start
 const PORT = Number(process.env.PORT) || 5000;
-const HOST = '0.0.0.0'; // importante en Render
+const HOST = '0.0.0.0';
 app.listen(PORT, HOST, () => {
   const publicURL = process.env.RENDER_EXTERNAL_URL;
   const localURL = `http://localhost:${PORT}`;
@@ -355,5 +324,5 @@ app.listen(PORT, HOST, () => {
   console.log(`   POST ${localURL}/api/fixers/cargar-definidos`);
   console.log(`   GET  ${localURL}/api/geolocation/nearby-fixers?lat=X&lng=Y&radius=5`);
   console.log(`   GET  ${localURL}/api/geolocation/nearby-ubicaciones?lat=X&lng=Y&radius=2`);
-  console.log(`\nMódulos montados: /api/nombre_grupo_ejemplo, /api/devcode, /api/teamsys\n`);
+  console.log(`\nMódulos montados: /api/ubicaciones, /api/devcode, /api/teamsys\n`);
 });
