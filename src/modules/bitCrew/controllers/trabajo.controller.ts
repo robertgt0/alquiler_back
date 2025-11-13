@@ -25,6 +25,9 @@ export const handleGetTrabajosByUsuario = async (req: Request, res: Response) =>
   }
 };
 
+/**
+ * ✅ SOLUCIÓN BUG 2: Mejorado para devolver mensajes específicos de error
+ */
 export const handlePagarTrabajoEfectivo = async (req: Request, res: Response) => {
   const { id } = req.params; // ID del *trabajo*
 
@@ -33,20 +36,38 @@ export const handlePagarTrabajoEfectivo = async (req: Request, res: Response) =>
     
     res.status(200).json({ 
       success: true, 
-      message: 'Trabajo pagado exitosamente.',
+      message: 'El sistema descontará la comisión (5%) de su billetera y marcará el trabajo como pagado.',
       trabajo: trabajoActualizado 
     });
 
   } catch (error: any) {
     console.error(`[Controller] Error al pagar trabajo ${id}: ${error.message}`);
     
-    // Enviar errores específicos al frontend
-    if (error.message === 'Saldo insuficiente' || 
-        error.message.includes('no encontrado') ||
-        error.message.includes('ya ha sido pagado')) {
-      return res.status(400).json({ success: false, message: error.message });
+    // ✅ SOLUCIÓN: Detectar el error de saldo insuficiente específicamente
+    if (error.message.includes('Saldo insuficiente')) {
+      return res.status(400).json({ 
+        success: false, 
+        message: error.message, // Mensaje completo: "Saldo insuficiente (Bs. X) para pagar la comisión (Bs. Y)."
+        errorCode: 'SALDO_INSUFICIENTE' // Código específico para el frontend
+      });
     }
     
-    res.status(500).json({ success: false, message: 'Error interno del servidor' });
+    // Otros errores de validación del negocio
+    if (error.message.includes('no encontrado') ||
+        error.message.includes('ya ha sido pagado') ||
+        error.message.includes('debe estar "completado"')) {
+      return res.status(400).json({ 
+        success: false, 
+        message: error.message,
+        errorCode: 'VALIDATION_ERROR'
+      });
+    }
+    
+    // Error genérico del servidor (cuando no sabemos qué pasó)
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error interno del servidor',
+      errorCode: 'SERVER_ERROR'
+    });
   }
 };
