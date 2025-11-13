@@ -1,7 +1,7 @@
 // src/modules/los_vengadores_trabajos/routes/trabajo.routes.ts
 import { Router } from 'express';
-const router = Router();
-
+const router = Router(); //corregido
+// Importamos las funciones del CONTROLADOR
 import {
   crearTrabajoController,
   obtenerTrabajosController,
@@ -30,6 +30,7 @@ router.get("/detalles/cliente/:id", obtenerTrabajoClienteController);
 router.put("/cancelar/proveedor/:trabajoId", cancelarTrabajoProveedorController);
 router.put("/cancelar/cliente/:trabajoId", cancelarTrabajoClienteController);
 router.put("/terminar/:trabajoId", TerminarTrabajoController);
+
 
 // --- RUTAS PARA HU 1.7 y 1.8 ---
 router.get('/proveedor', getTrabajosProveedor);
