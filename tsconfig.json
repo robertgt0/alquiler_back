@@ -38,8 +38,8 @@
     },
 
     /* === Nueva opción para desarrolladores === */
-    "noEmit": true,
-    "allowImportingTsExtensions": true,
+    // "noEmit": true, // (Esto ya lo habíamos borrado, está bien)
+    // "allowImportingTsExtensions": true, // 👈 CORRECCIÓN: Borramos esta línea
     "noUncheckedIndexedAccess": false,
     "incremental": true
   },
@@ -49,6 +49,6 @@
     "dist",
     "**/*.test.ts",
     "src/modules/nombre_grupo_ejemplo/**",
-    "src/utils/**" // 👈 CORRECCIÓN: Añadido para ignorar el seeder en el build
+    "src/utils/**"
   ]
 }

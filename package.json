@@ -6,9 +6,8 @@
    "scripts": {
       "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
       "build": "tsc",
-      "start": "node dist/index.js",
-      "start:dev": "npm run build && npm start",
-      "clean": "rimraf dist"
+      "seed:import": "ts-node src/utils/seeder.ts -i",
+      "seed:delete": "ts-node src/utils/seeder.ts -d"
    },
    "repository": {
       "type": "git",
