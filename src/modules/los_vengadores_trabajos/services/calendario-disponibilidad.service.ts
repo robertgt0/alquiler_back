@@ -112,10 +112,12 @@ export class DisponibilidadService {
       if (!proveedor) {
       return { mensaje: "Proveedor no encontrado", nombre: "", profesion: "" };
     }
-    const profesiones = proveedor.servicios
-  .map(servicio => servicio.nombre_servicio)
-  .join(" ");
+    const servicios = proveedor.servicios
+      .map(s => s.nombre_servicio?.trim())
+      .filter(Boolean);
 
+    const profesiones =
+      servicios.length > 1 ? servicios.join(", ") : (servicios[0] || "");
     return {
       nombre: proveedor.nombre,
       profesion: profesiones
