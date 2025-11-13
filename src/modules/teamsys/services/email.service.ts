@@ -85,13 +85,16 @@ export class EmailService {
     return `
       <html>
         <body>
-          <p>Hola,</p>
+          <p>Hola, este link sirve para iniciar sesion en Servineo.</p>
+          <p>El tiempo de duracion de este link es de 5 minutos y el link es de un solo uso</p>
+          <p>despues de 5 minutos el enlace ya no funcionara</p>
           <p>Haz clic para iniciar sesión en TeamSys:</p>
           <p><a href="${magicLink}">Iniciar sesión</a></p>
           <p>Si el botón no funciona, copia y pega este enlace en tu navegador:</p>
           <p>${magicLink}</p>
           <br />
           <p>Si no solicitaste este correo, puedes ignorarlo.</p>
+          <p>Teamsys raa</p>
         </body>
       </html>
     `;
