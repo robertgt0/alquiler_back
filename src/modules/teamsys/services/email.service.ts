@@ -1,74 +1,97 @@
 // src/modules/teamsys/services/email.service.ts
-import nodemailer from 'nodemailer';
-import 'dotenv/config';
+import axios from "axios";
+import "dotenv/config";
 
 export class EmailService {
-  private transporter: nodemailer.Transporter | null = null;
+  private apiKey: string | null;
+  private from: string;
 
   constructor() {
-    const user = (process.env.GMAIL_USER ?? '').trim();
-    const pass = (process.env.GMAIL_APP_PASSWORD ?? '').trim();
+    this.apiKey = process.env.BREVO_API_KEY ?? null;
+    this.from = process.env.EMAIL_FROM ?? "TeamSys <no-reply@example.com>";
 
-    if (!user || !pass) {
-      console.warn('⚠️ GMAIL_USER o GMAIL_APP_PASSWORD no configurados. Modo dev (no se enviará a Gmail).');
-      return; // ← deja transporter en null
+    if (!this.apiKey) {
+      console.warn("⚠️ BREVO_API_KEY no configurada. Modo dev (no se enviará a Brevo).");
+    } else {
+      console.log("📨 EmailService inicializado con Brevo");
     }
-
-    // TLS directo (465). Alternativa: STARTTLS (587) cambiando port/secure.
-    this.transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 465,
-      secure: true,
-      auth: { user, pass },
-    });
   }
 
+  /**
+   * Envía el magic link por correo.
+   * Si no hay API key o hay error al enviar,
+   * NO rompe el endpoint: solo hace fallback por consola.
+   */
   async sendMagicLink(email: string, magicLink: string): Promise<void> {
-    const from = process.env.EMAIL_FROM ?? `TeamSys <${process.env.GMAIL_USER}>`;
     const html = this.getEmailTemplate(magicLink);
 
-    if (!this.transporter) {
-      // Modo dev: no rompas el endpoint si quieres
-      console.log('\n📧 DEV Fallback - Magic Link');
-      console.log('Para:', email);
-      console.log('Link:', magicLink);
-      console.log('-----------------------------------\n');
+    // Modo DEV: sin API key, solo loguea
+    if (!this.apiKey) {
+      console.log("\n📧 DEV Fallback - Magic Link (sin Brevo)");
+      console.log("Para:", email);
+      console.log("Link:", magicLink);
+      console.log("-----------------------------------\n");
       return;
     }
 
     try {
-      const info = await this.transporter.sendMail({
-        from,
-        to: email,
-        subject: '🔗 Tu enlace mágico para TeamSys',
-        html,
-      });
-      console.log('✅ Email enviado (Gmail) -> MessageID:', info.messageId);
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      console.error('❌ Error enviando con Gmail SMTP:', msg);
+      await axios.post(
+        "https://api.brevo.com/v3/smtp/email",
+        {
+          sender: {
+            email: this.extractEmailFromFrom(this.from),
+            name: this.extractNameFromFrom(this.from),
+          },
+          to: [{ email }],
+          subject: "🔗 Tu enlace mágico para TeamSys",
+          htmlContent: html,
+        },
+        {
+          headers: {
+            "api-key": this.apiKey,
+            "Content-Type": "application/json",
+            accept: "application/json",
+          },
+        }
+      );
 
-      // Fallback dev visible en consola
-      console.log('\n📧 DEV Fallback - Magic Link');
-      console.log('Para:', email);
-      console.log('Link:', magicLink);
-      console.log('-----------------------------------\n');
+      console.log("✅ Magic link enviado con Brevo a", email);
+    } catch (err: any) {
+      console.error("❌ Error enviando con Brevo:", err?.response?.data ?? err?.message ?? err);
 
-      // Si no quieres romper el endpoint, no hagas throw:
-      // return;
-
-      throw new Error('No se pudo enviar el email: ' + msg);
+      // Fallback: NO lanzamos error para no devolver 500
+      console.log("\n📧 Fallback - Magic Link (error Brevo)");
+      console.log("Para:", email);
+      console.log("Link:", magicLink);
+      console.log("-----------------------------------\n");
+      return;
     }
   }
 
+  // "Nombre <correo@x.com>" -> "correo@x.com"
+  private extractEmailFromFrom(from: string): string {
+    const match = from.match(/<(.+?)>/);
+    return match ? match[1] : from;
+  }
+
+  // "Nombre <correo@x.com>" -> "Nombre"
+  private extractNameFromFrom(from: string): string {
+    const match = from.match(/^(.*?)</);
+    return match ? match[1].trim() : from;
+    }
+
+  // Usa aquí tu template de correo para el enlace mágico
   private getEmailTemplate(magicLink: string): string {
     return `
       <html>
         <body>
           <p>Hola,</p>
-          <p>Haz clic para iniciar sesión:</p>
+          <p>Haz clic para iniciar sesión en TeamSys:</p>
           <p><a href="${magicLink}">Iniciar sesión</a></p>
-          <p>Si no funciona, copia y pega: ${magicLink}</p>
+          <p>Si el botón no funciona, copia y pega este enlace en tu navegador:</p>
+          <p>${magicLink}</p>
+          <br />
+          <p>Si no solicitaste este correo, puedes ignorarlo.</p>
         </body>
       </html>
     `;
