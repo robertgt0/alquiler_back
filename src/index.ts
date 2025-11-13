@@ -64,3 +64,6 @@ app.listen(PORT, () => {
   console.log(`   - /api/bitCrew`);
   console.log(`\n ✅ Listo para recibir peticiones!\n`);
 });
+
+//(.env)
+//MONGODB_URI=mongodb+srv://isindira:j5z3oE8XJx4kQb8V@isindira.nqvltjf.mongodb.net/?retryWrites=true&w=majority

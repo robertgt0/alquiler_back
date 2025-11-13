@@ -40,29 +40,30 @@ export const pagarTrabajoEfectivo = async (trabajoId: string): Promise<ITrabajo>
       throw new Error('Billetera del fixer no encontrada.');
     }
 
-    // --- 3. NUEVA LÓGICA DE COMISIÓN ---
+    // --- 3. LÓGICA DE COMISIÓN ---
     const montoTotalDelTrabajo = trabajo.monto_a_pagar;
-    const montoComision = montoTotalDelTrabajo * TASA_COMISION; // ej. 100 * 0.05 = 5
+    const montoComision = montoTotalDelTrabajo * TASA_COMISION;
 
-    // 4. Verificar si el fixer tiene saldo para pagar la comisión
-    if (billetera.saldo < montoComision) {
-      throw new Error(`Saldo insuficiente (Bs. ${billetera.saldo.toFixed(2)}) para pagar la comisión (Bs. ${montoComision.toFixed(2)}).`);
+    // 4. --- ¡ MENSAJE ! --- 
+    if (billetera.saldo <= 0) { 
+      // Si el saldo es 0 o negativo, lanza tu error personalizado.
+      throw new Error("No se puede continuar el pago por falta de saldo. Su saldo debe ser mayor a 0 Bs");
     }
 
     // 5. Descontar la comisión de la billetera
     const saldoAnterior = billetera.saldo;
-    billetera.saldo -= montoComision; // ej. saldo = 50 - 5 = 45
+    billetera.saldo -= montoComision; 
     billetera.fecha_actualizacion = new Date();
 
     // 6. Crear la transacción de DÉBITO por la comisión
     const nuevaTransaccion = new TransaccionModel({
       fixer_id: trabajo.fixer_id,
       billetera_id: billetera._id,
-      tipo: 'debito', // Es un débito (salida de dinero) de la billetera del fixer
-      monto: montoComision, // El monto de la transacción es la comisión (ej. 5)
+      tipo: 'debito', 
+      monto: montoComision, 
       descripcion: `Comisión (${TASA_COMISION * 100}%) por trabajo: ${trabajo.descripcion.substring(0, 30)}...`,
       fecha: new Date(),
-      saldo_resultante: billetera.saldo // El saldo después del descuento
+      saldo_resultante: billetera.saldo 
     });
 
     // 7. Actualizar el estado del trabajo
