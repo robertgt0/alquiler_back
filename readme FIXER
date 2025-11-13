@@ -1,0 +1,428 @@
+Informe: Restricción por Saldo Negativo para Fixers
+Este informe detalla cómo el sistema implementa la restricción para que un Fixer no pueda aceptar nuevos trabajos ni publicar ofertas cuando su saldo de billetera sea negativo. El documento explica el código, demuestra cumplimiento de los criterios de aceptación y sirve como guía de funcionamiento y pruebas.
+Origen del Código y Artefacto Referenciado
+Se utiliza como base el artefacto HTML/JS proporcionado por el solicitante (panel de Fixer con lógica de restricción).
+Resumen Ejecutivo
+Resumen corto:
+- El sistema detecta saldo negativo y marca al fixer como 'restringido'.
+- Mientras el estado sea restringido: los botones 'Aceptar Trabajo', 'Publicar Oferta' y 'Crear Borrador' están deshabilitados; se muestra alerta en UI; se registra log y se persiste el estado en localStorage.
+- Al regularizar saldo (pago de comisiones), el sistema elimina la restricción automáticamente y registra el cambio en logs.
+
+Arquitectura y Componentes Relevantes
+Componentes principales:
+- UI (HTML/CSS): panel con balance, botones de acción, sección de borradores, logs y lista de criterios.
+- Lógica (JavaScript): estado global (initialState, state), funciones loadState/saveState, updateUI, reglas de verificación (acceptanceCriteria) y persistencia en localStorage.
+- Persistencia mínima: localStorage (simulación). En un sistema real, reemplazar por base de datos relacional o NoSQL y endpoints API.
+
+
+
+
+Fragmentos de Código Clave (extraídos del archivo)
+A continuación se incluyen los fragmentos más relevantes para entender la implementación. Estos fragmentos provienen del archivo proporcionado (fixer 2.html).
+
+1) Estado inicial y estructura de control (initialState):
+const initialState = {
+    balance: -450,
+    commission: 450,
+    isRestricted: true,
+    restrictionReason: "Saldo negativo",
+    restrictionDate: new Date().toISOString(),
+    sessionId: generateSessionId(),
+    logs: [
+        { timestamp: new Date().toISOString(), message: "Sistema inicializado con saldo negativo - Restricciones aplicadas" }
+    ],
+    drafts: [],
+    criteriaStatus: {},
+    fixerStatus: "restringido",
+    lastRestrictionDate: new Date().toISOString(),
+    mobileView: false
+};
+
+2) Regla principal que determina la restricción y actualización UI (resumen):
+function updateUI() {
+    // Actualizar estado basado en el saldo
+    state.isRestricted = state.balance < 0;
+    state.fixerStatus = state.isRestricted ? "restringido" : "activo";
+    ...
+    if (state.isRestricted) {
+        // mostrar alerta, deshabilitar botones y registrar restricción si corresponde
+        acceptJobBtn.disabled = true;
+        postOfferBtn.disabled = true;
+        createDraftBtn.disabled = true;
+        if (!state.restrictionDate) {
+            state.restrictionDate = new Date().toISOString();
+            state.lastRestrictionDate = new Date().toISOString();
+            addLog("Sistema: Restricción aplicada por saldo negativo");
+        }
+    } else {
+        // habilitar botones y eliminar restricción
+        acceptJobBtn.disabled = false;
+        postOfferBtn.disabled = false;
+        createDraftBtn.disabled = false;
+        if (state.restrictionDate) {
+            addLog("Sistema: Restricciones eliminadas - cuenta regularizada");
+            state.restrictionDate = null;
+        }
+    }
+    ...
+}
+
+3) Persistencia (localStorage) y logs:
+function saveState() {
+    localStorage.setItem('fixerPanelData', JSON.stringify(state));
+}
+function loadState() {
+    const savedData = localStorage.getItem('fixerPanelData');
+    if (savedData) {
+        const savedState = JSON.parse(savedData);
+        state = { ...state, ...savedState };
+        addLog("Sistema: Estado cargado desde almacenamiento persistente");
+    } else {
+        saveState();
+    }
+}
+
+4) Matriz de criterios de aceptación (aceptanceCriteria): contiene 25 criterios con tests y demostraciones automáticas.
+// Estado inicial y configuración
+        const initialState = {
+            balance: -450,
+            commission: 450,
+            isRestricted: true,
+            restrictionReason: "Saldo negativo",
+            restrictionDate: new Date().toISOString(),
+            sessionId: generateSessionId(),
+            logs: [
+                { timestamp: new Date().toISOString(), message: "Sistema inicializado con saldo negativo - Restricciones aplicadas" }
+            ],
+            drafts: [],
+            criteriaStatus: {},
+            fixerStatus: "restringido",
+            lastRestrictionDate: new Date().toISOString(),
+            mobileView: false
+        };
+
+        // Criterios de aceptación completos (25 criterios)
+        const acceptanceCriteria = [
+            {
+                id: "CA-001",
+                description: "El sistema detecta automáticamente cuando el saldo de la billetera del fixer sea negativo",
+                test: () => state.balance < 0,
+                demonstrate: () => showNotification(`✅ Sistema detectó saldo negativo: $${state.balance.toFixed(2)}`, 'info')
+            },
+            {
+                id: "CA-002", 
+                description: "El sist
+// (fragmento reducido por brevity)
+
+Demostración de Cumplimiento por Criterio
+A continuación se describe cómo se verifica cada criterio (resumen) y la evidencia en el código/UI para demostrar cumplimiento.
+CA-001 - Detecta automáticamente saldo negativo
+Evidencia técnica y cómo se demuestra:
+- Lógica: state.isRestricted = state.balance < 0; actualizado en updateUI().
+- UI: badge de estado y balance muestran clase 'balance-negative' y texto 'Restringido'.
+Prueba sugerida (manual):
+- Paso 1: Abrir panel; verificar saldo negativo mostrado y botones deshabilitados.
+- Paso 2: Intentar 'Simular Oferta' y verificar log y notificación de bloqueo.
+- Paso 3: Pulsar 'Pagar Comisiones' y verificar que los botones se habiliten y log registre la eliminación de la restricción.
+----
+CA-002 - Impedir aceptar trabajos cuando saldo negativo
+Evidencia técnica y cómo se demuestra:
+- Lógica: botones acceptJobBtn y postOfferBtn se ponen disabled cuando state.isRestricted es true.
+- Prueba: botón 'Simular Oferta' y 'Simular Envío' registran logs de bloqueo si está restringido.
+Prueba sugerida (manual):
+- Paso 1: Abrir panel; verificar saldo negativo mostrado y botones deshabilitados.
+- Paso 2: Intentar 'Simular Oferta' y verificar log y notificación de bloqueo.
+- Paso 3: Pulsar 'Pagar Comisiones' y verificar que los botones se habiliten y log registre la eliminación de la restricción.
+----
+CA-003 - Bloquear publicación de ofertas cuando saldo negativo
+Evidencia técnica y cómo se demuestra:
+- Lógica: postOfferBtn y createDraftBtn deshabilitados y bloqueados en updateUI().
+Prueba sugerida (manual):
+- Paso 1: Abrir panel; verificar saldo negativo mostrado y botones deshabilitados.
+- Paso 2: Intentar 'Simular Oferta' y verificar log y notificación de bloqueo.
+- Paso 3: Pulsar 'Pagar Comisiones' y verificar que los botones se habiliten y log registre la eliminación de la restricción.
+----
+CA-004 - Mostrar mensaje claro informando restricción
+Evidencia técnica y cómo se demuestra:
+- UI: elemento #restrictionAlert visible con mensaje que incluye motivo y acciones necesarias.
+Prueba sugerida (manual):
+- Paso 1: Abrir panel; verificar saldo negativo mostrado y botones deshabilitados.
+- Paso 2: Intentar 'Simular Oferta' y verificar log y notificación de bloqueo.
+- Paso 3: Pulsar 'Pagar Comisiones' y verificar que los botones se habiliten y log registre la eliminación de la restricción.
+----
+CA-005 - Mensaje indica motivo y acciones necesarias
+Evidencia técnica y cómo se demuestra:
+- UI: elemento #restrictionAlert visible con mensaje que incluye motivo y acciones necesarias.
+Prueba sugerida (manual):
+- Paso 1: Abrir panel; verificar saldo negativo mostrado y botones deshabilitados.
+- Paso 2: Intentar 'Simular Oferta' y verificar log y notificación de bloqueo.
+- Paso 3: Pulsar 'Pagar Comisiones' y verificar que los botones se habiliten y log registre la eliminación de la restricción.
+----
+CA-006 - Botón 'Aceptar trabajo' deshabilitado cuando saldo negativo
+Evidencia técnica y cómo se demuestra:
+- Lógica: botones acceptJobBtn y postOfferBtn se ponen disabled cuando state.isRestricted es true.
+- Prueba: botón 'Simular Oferta' y 'Simular Envío' registran logs de bloqueo si está restringido.
+Prueba sugerida (manual):
+- Paso 1: Abrir panel; verificar saldo negativo mostrado y botones deshabilitados.
+- Paso 2: Intentar 'Simular Oferta' y verificar log y notificación de bloqueo.
+- Paso 3: Pulsar 'Pagar Comisiones' y verificar que los botones se habiliten y log registre la eliminación de la restricción.
+----
+CA-007 - Botón 'Publicar oferta' no disponible o aviso
+Evidencia técnica y cómo se demuestra:
+- Lógica: postOfferBtn y createDraftBtn deshabilitados y bloqueados en updateUI().
+Prueba sugerida (manual):
+- Paso 1: Abrir panel; verificar saldo negativo mostrado y botones deshabilitados.
+- Paso 2: Intentar 'Simular Oferta' y verificar log y notificación de bloqueo.
+- Paso 3: Pulsar 'Pagar Comisiones' y verificar que los botones se habiliten y log registre la eliminación de la restricción.
+----
+CA-008 - Registrar en DB la causa de la restricción (simulado en logs/state)
+Evidencia técnica y cómo se demuestra:
+- Persistencia y logging: state.restrictionDate, lastRestrictionDate y addLog(...) registran causas y timestamps.
+Prueba sugerida (manual):
+- Paso 1: Abrir panel; verificar saldo negativo mostrado y botones deshabilitados.
+- Paso 2: Intentar 'Simular Oferta' y verificar log y notificación de bloqueo.
+- Paso 3: Pulsar 'Pagar Comisiones' y verificar que los botones se habiliten y log registre la eliminación de la restricción.
+----
+CA-009 - No permitir evadir la restricción actualizando perfil/sesión
+Evidencia técnica y cómo se demuestra:
+- Persistencia: loadState/saveState usan localStorage; reiniciar sesión o recargar mantiene estado restringido.
+- Contra-evasión: acciones de 'Actualizar Perfil' no alteran balance ni isRestricted.
+Prueba sugerida (manual):
+- Paso 1: Abrir panel; verificar saldo negativo mostrado y botones deshabilitados.
+- Paso 2: Intentar 'Simular Oferta' y verificar log y notificación de bloqueo.
+- Paso 3: Pulsar 'Pagar Comisiones' y verificar que los botones se habiliten y log registre la eliminación de la restricción.
+----
+CA-010 - Al regularizar saldo se eliminan restricciones automáticamente
+Evidencia técnica y cómo se demuestra:
+- Flujo de normalización: al pagar comisiones (botón 'Pagar Comisiones') se ajusta state.balance y state.commission y updateUI() libera restricciones; UI y logs se actualizan en tiempo real.
+Prueba sugerida (manual):
+- Paso 1: Abrir panel; verificar saldo negativo mostrado y botones deshabilitados.
+- Paso 2: Intentar 'Simular Oferta' y verificar log y notificación de bloqueo.
+- Paso 3: Pulsar 'Pagar Comisiones' y verificar que los botones se habiliten y log registre la eliminación de la restricción.
+----
+CA-011 - Saldo actualizado reflejado en tiempo real en la interfaz
+Evidencia técnica y cómo se demuestra:
+- Flujo de normalización: al pagar comisiones (botón 'Pagar Comisiones') se ajusta state.balance y state.commission y updateUI() libera restricciones; UI y logs se actualizan en tiempo real.
+Prueba sugerida (manual):
+- Paso 1: Abrir panel; verificar saldo negativo mostrado y botones deshabilitados.
+- Paso 2: Intentar 'Simular Oferta' y verificar log y notificación de bloqueo.
+- Paso 3: Pulsar 'Pagar Comisiones' y verificar que los botones se habiliten y log registre la eliminación de la restricción.
+----
+CA-012 - Registrar log del cambio de estado (restringida->activa)
+Evidencia técnica y cómo se demuestra:
+- Persistencia y logging: state.restrictionDate, lastRestrictionDate y addLog(...) registran causas y timestamps.
+Prueba sugerida (manual):
+- Paso 1: Abrir panel; verificar saldo negativo mostrado y botones deshabilitados.
+- Paso 2: Intentar 'Simular Oferta' y verificar log y notificación de bloqueo.
+- Paso 3: Pulsar 'Pagar Comisiones' y verificar que los botones se habiliten y log registre la eliminación de la restricción.
+----
+CA-013 - No permitir crear ofertas en borrador mientras saldo negativo
+Evidencia técnica y cómo se demuestra:
+- Lógica: postOfferBtn y createDraftBtn deshabilitados y bloqueados en updateUI().
+Prueba sugerida (manual):
+- Paso 1: Abrir panel; verificar saldo negativo mostrado y botones deshabilitados.
+- Paso 2: Intentar 'Simular Oferta' y verificar log y notificación de bloqueo.
+- Paso 3: Pulsar 'Pagar Comisiones' y verificar que los botones se habiliten y log registre la eliminación de la restricción.
+----
+CA-014 - Notificar al fixer por correo o alerta interna (simulado via logs/alert)
+Evidencia técnica y cómo se demuestra:
+- Notificación: el sistema simula notificaciones y registra mensajes en logs; en producción añadir endpoint de correo/notifications.
+Prueba sugerida (manual):
+- Paso 1: Abrir panel; verificar saldo negativo mostrado y botones deshabilitados.
+- Paso 2: Intentar 'Simular Oferta' y verificar log y notificación de bloqueo.
+- Paso 3: Pulsar 'Pagar Comisiones' y verificar que los botones se habiliten y log registre la eliminación de la restricción.
+----
+CA-015 - No permitir aceptar trabajos enviados por otros durante restricción
+Evidencia técnica y cómo se demuestra:
+- Lógica: botones acceptJobBtn y postOfferBtn se ponen disabled cuando state.isRestricted es true.
+- Prueba: botón 'Simular Oferta' y 'Simular Envío' registran logs de bloqueo si está restringido.
+Prueba sugerida (manual):
+- Paso 1: Abrir panel; verificar saldo negativo mostrado y botones deshabilitados.
+- Paso 2: Intentar 'Simular Oferta' y verificar log y notificación de bloqueo.
+- Paso 3: Pulsar 'Pagar Comisiones' y verificar que los botones se habiliten y log registre la eliminación de la restricción.
+----
+CA-016 - Restricción no afecta funciones no relacionadas (perfil, ver borradores)
+Evidencia técnica y cómo se demuestra:
+- UI: botones de perfil y ver borradores permanecen habilitados. Código habilita solo la parte de publicación/aceptación.
+Prueba sugerida (manual):
+- Paso 1: Abrir panel; verificar saldo negativo mostrado y botones deshabilitados.
+- Paso 2: Intentar 'Simular Oferta' y verificar log y notificación de bloqueo.
+- Paso 3: Pulsar 'Pagar Comisiones' y verificar que los botones se habiliten y log registre la eliminación de la restricción.
+----
+CA-017 - Persistencia de restricción tras logout/recarga (localStorage)
+Evidencia técnica y cómo se demuestra:
+- Persistencia: loadState/saveState usan localStorage; reiniciar sesión o recargar mantiene estado restringido.
+- Contra-evasión: acciones de 'Actualizar Perfil' no alteran balance ni isRestricted.
+Prueba sugerida (manual):
+- Paso 1: Abrir panel; verificar saldo negativo mostrado y botones deshabilitados.
+- Paso 2: Intentar 'Simular Oferta' y verificar log y notificación de bloqueo.
+- Paso 3: Pulsar 'Pagar Comisiones' y verificar que los botones se habiliten y log registre la eliminación de la restricción.
+----
+CA-018 - Mostrar correctamente saldo negativo en billetera
+Evidencia técnica y cómo se demuestra:
+- Lógica: state.isRestricted = state.balance < 0; actualizado en updateUI().
+- UI: badge de estado y balance muestran clase 'balance-negative' y texto 'Restringido'.
+Prueba sugerida (manual):
+- Paso 1: Abrir panel; verificar saldo negativo mostrado y botones deshabilitados.
+- Paso 2: Intentar 'Simular Oferta' y verificar log y notificación de bloqueo.
+- Paso 3: Pulsar 'Pagar Comisiones' y verificar que los botones se habiliten y log registre la eliminación de la restricción.
+----
+CA-019 - Validación se aplica en web y móvil (simulado vista móvil)
+Evidencia técnica y cómo se demuestra:
+- Implementado mediante las variables de estado y condicionales en updateUI() y control de eventos en los handlers de los botones.
+Prueba sugerida (manual):
+- Paso 1: Abrir panel; verificar saldo negativo mostrado y botones deshabilitados.
+- Paso 2: Intentar 'Simular Oferta' y verificar log y notificación de bloqueo.
+- Paso 3: Pulsar 'Pagar Comisiones' y verificar que los botones se habiliten y log registre la eliminación de la restricción.
+----
+CA-020 - Permitir aceptar/publicar al tener saldo positivo
+Evidencia técnica y cómo se demuestra:
+- Flujo de normalización: al pagar comisiones (botón 'Pagar Comisiones') se ajusta state.balance y state.commission y updateUI() libera restricciones; UI y logs se actualizan en tiempo real.
+Prueba sugerida (manual):
+- Paso 1: Abrir panel; verificar saldo negativo mostrado y botones deshabilitados.
+- Paso 2: Intentar 'Simular Oferta' y verificar log y notificación de bloqueo.
+- Paso 3: Pulsar 'Pagar Comisiones' y verificar que los botones se habiliten y log registre la eliminación de la restricción.
+----
+CA-021 - Actualizar estado del fixer a 'restringido' al detectar saldo negativo
+Evidencia técnica y cómo se demuestra:
+- Lógica: state.isRestricted = state.balance < 0; actualizado en updateUI().
+- UI: badge de estado y balance muestran clase 'balance-negative' y texto 'Restringido'.
+Prueba sugerida (manual):
+- Paso 1: Abrir panel; verificar saldo negativo mostrado y botones deshabilitados.
+- Paso 2: Intentar 'Simular Oferta' y verificar log y notificación de bloqueo.
+- Paso 3: Pulsar 'Pagar Comisiones' y verificar que los botones se habiliten y log registre la eliminación de la restricción.
+----
+CA-022 - Mantener restricción tras recargar/actualizar la página
+Evidencia técnica y cómo se demuestra:
+- Persistencia: loadState/saveState usan localStorage; reiniciar sesión o recargar mantiene estado restringido.
+- Contra-evasión: acciones de 'Actualizar Perfil' no alteran balance ni isRestricted.
+Prueba sugerida (manual):
+- Paso 1: Abrir panel; verificar saldo negativo mostrado y botones deshabilitados.
+- Paso 2: Intentar 'Simular Oferta' y verificar log y notificación de bloqueo.
+- Paso 3: Pulsar 'Pagar Comisiones' y verificar que los botones se habiliten y log registre la eliminación de la restricción.
+----
+CA-023 - Registrar fecha y hora de aplicación de restricción
+Evidencia técnica y cómo se demuestra:
+- Persistencia y logging: state.restrictionDate, lastRestrictionDate y addLog(...) registran causas y timestamps.
+Prueba sugerida (manual):
+- Paso 1: Abrir panel; verificar saldo negativo mostrado y botones deshabilitados.
+- Paso 2: Intentar 'Simular Oferta' y verificar log y notificación de bloqueo.
+- Paso 3: Pulsar 'Pagar Comisiones' y verificar que los botones se habiliten y log registre la eliminación de la restricción.
+----
+CA-024 - No permitir enviar solicitudes de trabajo mientras restringido
+Evidencia técnica y cómo se demuestra:
+- Lógica: botones acceptJobBtn y postOfferBtn se ponen disabled cuando state.isRestricted es true.
+- Prueba: botón 'Simular Oferta' y 'Simular Envío' registran logs de bloqueo si está restringido.
+Prueba sugerida (manual):
+- Paso 1: Abrir panel; verificar saldo negativo mostrado y botones deshabilitados.
+- Paso 2: Intentar 'Simular Oferta' y verificar log y notificación de bloqueo.
+- Paso 3: Pulsar 'Pagar Comisiones' y verificar que los botones se habiliten y log registre la eliminación de la restricción.
+----
+CA-025 - Mostrar motivo en sección de billetera
+Evidencia técnica y cómo se demuestra:
+- UI: elemento #restrictionAlert visible con mensaje que incluye motivo y acciones necesarias.
+Prueba sugerida (manual):
+- Paso 1: Abrir panel; verificar saldo negativo mostrado y botones deshabilitados.
+- Paso 2: Intentar 'Simular Oferta' y verificar log y notificación de bloqueo.
+- Paso 3: Pulsar 'Pagar Comisiones' y verificar que los botones se habiliten y log registre la eliminación de la restricción.
+----
+Pruebas Automatizadas y Casos de Prueba
+Se sugieren casos de prueba automatizados (pueden implementarse con Cypress, Selenium o Jest+Puppeteer):
+- TC-01: Carga con saldo negativo -> verificar isRestricted=true, botones deshabilitados, alerta visible y registro de restricción con timestamp.
+- TC-02: Pago de comisiones -> verificar balance >=0, isRestricted=false, botones habilitados, log de 'Restricciones eliminadas'.
+- TC-03: Persistencia tras recarga -> set localStorage con estado restringido y recargar, verificar que sigue restringido.
+- TC-04: Intento de evasión -> simular actualización de perfil y verificar que isRestricted no cambia.
+
+Mapeo a Base de Datos y Recomendaciones (producción)
+En el prototipo se usa localStorage. En producción se recomienda:
+- Tabla 'fixers' con campos: id, balance (decimal), commission_due (decimal), status ENUM('activo','restringido'), restriction_reason, restriction_applied_at (datetime), restriction_cleared_at (datetime), last_updated_at.
+- Tabla 'logs' o 'account_events' para registrar eventos (timestamp, fixer_id, event_type, details).
+- API endpoints: GET /fixers/{id}/wallet, POST /fixers/{id}/pay_commissions, GET /fixers/{id}/events.
+- Middleware en backend que valide balance antes de operaciones críticas (aceptar trabajo, publicar oferta, crear borrador) y retorne 403 con mensaje cuando esté restringido.
+
+Consideraciones de Seguridad y Evitación de Evasión
+- No confiar solo en validación del frontend. Implementar validación en backend y en la base de datos.
+- Registrar cada intento bloqueado con usuario, IP y timestamp para auditoría.
+- Asegurar que los endpoints críticos revisen el campo 'status' del fixer y rechacen operaciones si status='restringido'.
+
+Cómo usar esta guía para pruebas y despliegue
+- Instrucciones rápidas para QA: abrir la UI (archivo local), usar el selector 'Simular estado' o 'Pagar Comisiones' y ejecutar los TC listados.
+- Para integración: trasladar la lógica de state.isRestricted al servidor, exponer endpoints y notificar por email/alert interna cuando se aplique la restricción.
+
+Anexos: Código JS completo (extracto del script)
+Se agrega a continuación un extracto más amplio del script para referencia y pruebas. (Fragmento extraído del archivo proporcionado).
+// Estado inicial y configuración
+        const initialState = {
+            balance: -450,
+            commission: 450,
+            isRestricted: true,
+            restrictionReason: "Saldo negativo",
+            restrictionDate: new Date().toISOString(),
+            sessionId: generateSessionId(),
+            logs: [
+                { timestamp: new Date().toISOString(), message: "Sistema inicializado con saldo negativo - Restricciones aplicadas" }
+            ],
+            drafts: [],
+            criteriaStatus: {},
+            fixerStatus: "restringido",
+            lastRestrictionDate: new Date().toISOString(),
+            mobileView: false
+        };
+
+        // Criterios de aceptación completos (25 criterios)
+        const acceptanceCriteria = [
+            {
+                id: "CA-001",
+                description: "El sistema detecta automáticamente cuando el saldo de la billetera del fixer sea negativo",
+                test: () => state.balance < 0,
+                demonstrate: () => showNotification(`✅ Sistema detectó saldo negativo: $${state.balance.toFixed(2)}`, 'info')
+            },
+            {
+                id: "CA-002", 
+                description: "El sistema impide al fixer aceptar nuevos trabajos mientras tenga saldo negativo",
+                test: () => state.isRestricted && document.getElementById('acceptJobBtn').disabled,
+                demonstrate: () => showNotification(state.isRestricted ? 
+                    '❌ Aceptar trabajos BLOQUEADO por saldo negativo' : 
+                    '✅ Aceptar trabajos PERMITIDO', state.isRestricted ? 'error' : 'success')
+            },
+            {
+                id: "CA-003",
+                description: "El sistema bloqueea la opción de publicar nuevas ofertas con saldo negativo",
+                test: () => state.isRestricted && document.getElementById('postOfferBtn').disabled,
+                demonstrate: () => showNotification(state.isRestricted ? 
+                    '❌ Publicar ofertas BLOQUEADO por saldo negativo' : 
+                    '✅ Publicar ofertas PERMITIDO', state.isRestricted ? 'error' : 'success')
+            },
+            {
+                id: "CA-004",
+                description: "Se muestre un mensaje claro informando que el saldo negativo impide realizar acciones",
+                test: () => state.isRestricted && !document.getElementById('restrictionAlert').classList.contains('hidden'),
+                demonstrate: () => showNotification('📢 Mostrando mensaje de restricción al usuario', 'info')
+            },
+            {
+                id: "CA-005",
+                description: "El mensaje de advertencia indique el motivo y las acciones necesarias para resolverlo",
+                test: () => {
+                    const alert = document.getElementById('restrictionAlert');
+                    return alert.textContent.includes('saldo negativo') && 
+                           alert.textContent.includes('liquidar las comisiones') &&
+                           alert.textContent.includes('aceptar nuevos trabajos');
+                },
+                demonstrate: () => showNotification('📝 Mensaje muestra motivo y solución: "Saldo negativo - Liquidar comisiones"', 'info')
+            },
+            {
+                id: "CA-006",
+                description: "El botón 'Aceptar trabajo' esté deshabilitado cuando el saldo sea negativo",
+                test: () => state.isRestricted && document.getElementById('acceptJobBtn').disabled,
+                demonstrate: () => showNotification(state.isRestricted ? 
+                    '🔒 Botón "Aceptar trabajo" DESHABILITADO' : 
+                    '🔓 Botón "Aceptar trabajo" HABILITADO', state.isRestricted ? 'error' : 'success')
+            },
+            {
+                id: "CA-007", 
+                description: "El botón 'Publicar oferta' no esté disponible o muestre un aviso de restricción",
+                test: () => state.isRestricted && document.getElementById('postOfferBtn').disabled,
+Conclusión
+El prototipo implementa y demuestra los 25 criterios de aceptación solicitados. La simulación cubre detección, bloqueo UI, persistencia, notificaciones internas y logging. Para un sistema productivo, las recomendaciones incluyen mover la lógica a backend, usar una base de datos para persistencia, y agregar notificaciones por correo y pruebas automatizadas.
+
+Documento generado automáticamente en formato Word. Consulte las secciones de 'Pruebas' y 'Mapeo a Base de Datos' para los pasos de integración y QA final.
