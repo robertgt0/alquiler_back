@@ -9,7 +9,7 @@ import Fixer from './models/Fixer';
 import { ubicacionesDefinidas } from './data/ubicacionesData';
 import { fixersDefinidos } from './data/fixersData';
 
-import nombreGrupoEjemploRouter from './modules/nombre_grupo_ejemplo';
+
 import availabilityRoutes from './modules/DevCode/routes/availability.routes';
 import userRoutes from './modules/teamsys/index';
 
@@ -316,7 +316,7 @@ app.get('/api/geolocation/nearby-ubicaciones', async (req: Request, res: Respons
 // ============================================
 // MONTAR MÓDULOS/GRUPOS AQUÍ
 // ============================================
-app.use('/api/nombre_grupo_ejemplo', nombreGrupoEjemploRouter);
+
 app.use('/api/devcode', availabilityRoutes);
 app.use('/api/teamsys', userRoutes);
 
