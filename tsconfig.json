@@ -1,4 +1,5 @@
 {
+  "//": "tsconfig-schema:ignore",
   "compilerOptions": {
     /* === Salida y estructura === */
     "outDir": "./dist",
