@@ -21,6 +21,15 @@ function normalizeCI(raw: unknown) {
   return ci;
 }
 
+// ✅ Bug 3.1.4 CORREGIDO: Nueva función para validar city obligatorio
+function normalizeCity(raw: unknown): string {
+  const city = String(raw ?? "").trim();
+  if (!city) throw new Error("El campo Ciudad es obligatorio");
+  if (city.length < 2) throw new Error("La ciudad debe tener al menos 2 caracteres");
+  if (city.length > 120) throw new Error("La ciudad no puede tener más de 120 caracteres");
+  return city;
+}
+
 function normalizeLocation(raw: any) {
   if (!raw) return undefined;
   const lat = Number(raw.lat);
@@ -129,6 +138,10 @@ export const createFixer = async (req: Request, res: Response) => {
 
     const userIdStr = String(userId);
     const ci = normalizeCI(req.body?.ci);
+    
+    // ✅ Bug 3.1.4 CORREGIDO: Validar city obligatorio
+    const city = normalizeCity(req.body?.city);
+    
     const existingFixer = await service.getByUserId(userIdStr);
     const ciUnique = await service.isCIUnique(ci, existingFixer?.id);
     if (!ciUnique) {
@@ -154,7 +167,7 @@ export const createFixer = async (req: Request, res: Response) => {
       paymentAccounts: accounts,
       termsAccepted: termsAcceptedValue,
       name: typeof req.body?.name === "string" ? req.body.name.trim() || undefined : undefined,
-      city: typeof req.body?.city === "string" ? req.body.city.trim() || undefined : undefined,
+      city, // ✅ Ahora es obligatorio y validado
       photoUrl:
         typeof req.body?.photoUrl === "string" ? req.body.photoUrl.trim() || undefined : undefined,
       whatsapp:
