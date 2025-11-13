@@ -44,5 +44,11 @@
     "incremental": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts", "src/modules/nombre_grupo_ejemplo/**"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.test.ts",
+    "src/modules/nombre_grupo_ejemplo/**",
+    "src/utils/**" // 👈 CORRECCIÓN: Añadido para ignorar el seeder en el build
+  ]
 }
