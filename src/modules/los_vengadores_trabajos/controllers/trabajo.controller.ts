@@ -115,8 +115,12 @@ export const eliminarTrabajoController = async (req: Request, res: Response) => 
 export const obtenerTrabajoProveedorController = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const resultado = await DetallesTrabajo.obtenerTrabajoProveedor(id);
-    if ("mensaje" in resultado) return res.status(404).json({ message: resultado.mensaje });
+    const resultado = await DetallesTrabajo.obtenerTrabajoVistaProveedor(id);
+
+    if ("mensaje" in resultado) {
+      return res.status(404).json({ message: resultado.mensaje });
+    }
+
     res.status(200).json(resultado);
   } catch (error: any) {
     res.status(500).json({ message: "Error al obtener detalles del trabajo", error: error.message });
@@ -126,8 +130,12 @@ export const obtenerTrabajoProveedorController = async (req: Request, res: Respo
 export const obtenerTrabajoClienteController = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const resultado = await DetallesTrabajo.obtenerTrabajoCliente(id);
-    if ("mensaje" in resultado) return res.status(404).json({ message: resultado.mensaje });
+    const resultado = await DetallesTrabajo.obtenerTrabajoVistaCliente(id);
+
+    if ("mensaje" in resultado) {
+      return res.status(404).json({ message: resultado.mensaje });
+    }
+
     res.status(200).json(resultado);
   } catch (error: any) {
     res.status(500).json({ message: "Error al obtener detalles del trabajo", error: error.message });
