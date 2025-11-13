@@ -124,7 +124,7 @@ export class SessionService {
 		if ((!mongoose.Types.ObjectId.isValid(currentSessionId))) {
 			throw new Error('ID de sesion invalido');
 		}
-
+		
 		await Session.find({
 			userId: new mongoose.Types.ObjectId(userId),
 			_id: { $ne: new mongoose.Types.ObjectId(currentSessionId) },
@@ -140,12 +140,12 @@ export class SessionService {
 		// 	$set: { isActive: false }
 		// });
 
-		await Session.deleteMany({
+		const result = await Session.deleteMany({
 			userId: new mongoose.Types.ObjectId(userId),
 			_id: { $ne: new mongoose.Types.ObjectId(currentSessionId) },
 		});
 
-		return 1;
+		return result.deletedCount;
 	}
 	/**
     * Eliminar sesiones de usuario Miguel H3 "cambiar contraseña"

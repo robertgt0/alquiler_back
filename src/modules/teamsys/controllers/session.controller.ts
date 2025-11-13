@@ -72,17 +72,7 @@ export class SessionController {
 	deleteAllSessionsExceptCurrent = async (req: Request, res: Response): Promise<void> => {
 		try {
 			const { email, userId } = req.authuser as JWTPayload;
-
-			const authHeader = req.headers.authorization as string;
-			if (!authHeader || !authHeader.startsWith('Bearer ')) {
-				res.status(401).json({
-					success: false,
-					'message': 'Unauthorized'
-				});
-				return;
-			}
-
-			const token = authHeader.split(' ')[1];
+			const token = req.token!;
 
 			const session = await this.sessionService.getSessionByToken(token);
 
