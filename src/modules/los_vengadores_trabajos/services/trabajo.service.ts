@@ -5,7 +5,7 @@ import ClienteModel from '../models/cliente.model';
 import ProveedorModel from '../models/proveedor.model';
 
 /* -------------------------------------------------------------------------- */
-/* 🔹 NUEVAS FUNCIONES PARA HU 1 (Aceptar / Rechazar trabajo)                */
+/* 🔹 NUEVAS FUNCIONES PARA HU 1 (Confirmar / Rechazar trabajo)              */
 /* -------------------------------------------------------------------------- */
 
 /**
@@ -15,7 +15,6 @@ export const confirmarTrabajoService = async (id: string) => {
   const trabajo = await TrabajoModel.findById(id);
   if (!trabajo) throw new Error('Trabajo no encontrado');
 
-  // Solo puede confirmar si está pendiente
   if (trabajo.estado !== 'pendiente') {
     throw new Error('Solo se pueden confirmar trabajos pendientes');
   }
@@ -25,7 +24,7 @@ export const confirmarTrabajoService = async (id: string) => {
 
   return {
     success: true,
-    message: 'Trabajo confirmado correctamente',
+    message: '✅ Trabajo confirmado correctamente',
     data: trabajo,
   };
 };
@@ -37,7 +36,6 @@ export const rechazarTrabajoService = async (id: string) => {
   const trabajo = await TrabajoModel.findById(id);
   if (!trabajo) throw new Error('Trabajo no encontrado');
 
-  // Solo puede rechazar si está pendiente
   if (trabajo.estado !== 'pendiente') {
     throw new Error('Solo se pueden rechazar trabajos pendientes');
   }
@@ -47,7 +45,7 @@ export const rechazarTrabajoService = async (id: string) => {
 
   return {
     success: true,
-    message: 'Trabajo rechazado correctamente',
+    message: '❌ Trabajo rechazado correctamente',
     data: trabajo,
   };
 };
