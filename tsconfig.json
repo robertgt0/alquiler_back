@@ -1,4 +1,5 @@
 {
+  "//": "tsconfig-schema:ignore",
   "compilerOptions": {
     /* === Salida y estructura === */
     "outDir": "./dist",
@@ -25,25 +26,23 @@
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
 
-    /* === Alias === */
-    "baseUrl": "./src",
+    /* === Alias - VERSIÓN ACTUALIZADA === */
     "paths": {
-      "@/*": ["*"],
-      "@config/*": ["config/*"],
-      "@modules/*": ["modules/*"],
-      "@controllers/*": ["modules/*"],
-      "@services/*": ["modules/*"],
-      "@models/*": ["models/*", "modules/*"],
-      "@utils/*": ["utils/*"]
+      "@/*": ["./src/*"],
+      "@config/*": ["./src/config/*"],
+      "@modules/*": ["./src/modules/*"],
+      "@controllers/*": ["./src/modules/*"],
+      "@services/*": ["./src/modules/*"],
+      "@models/*": ["./src/models/*", "./src/modules/*"],
+      "@utils/*": ["./src/utils/*"]
     },
 
     /* === Nueva opción para desarrolladores === */
-    "noEmit":true,
+    "noEmit": true,
     "allowImportingTsExtensions": true,
     "noUncheckedIndexedAccess": false,
     "incremental": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts",
-    "src/modules/nombre_grupo_ejemplo/**"]
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "src/modules/nombre_grupo_ejemplo/**"]
 }
