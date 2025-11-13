@@ -2,6 +2,7 @@ import { Router, type Request } from "express";
 import mongoose from "mongoose";
 import { OfferModel } from "../models/Offer";
 import { seedAll } from "../scripts/seed";
+import { FixerModel } from "../modules/fixer/models/Fixer";
 
 const router = Router();
 
@@ -103,6 +104,73 @@ router.get("/seed", async (_req, res) => {
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: "No se pudo realizar el seed" });
+  }
+});
+
+// ✅ NUEVO ENDPOINT PARA EL MAPA - Obtiene ofertas con datos de fixers
+router.get("/map-data", async (req, res) => {
+  try {
+    const includeInactive = String(req.query.includeInactive ?? "false") !== "false";
+    
+    // Filtro para ofertas activas
+    const filter: any = { status: { $ne: "deleted" } };
+    if (!includeInactive) {
+      filter.$or = [{ status: "active" }, { status: { $exists: false } }];
+    }
+
+    // Obtener todas las ofertas activas
+    const ofertas = await OfferModel.find(filter).lean();
+
+    // Obtener todos los ownerIds únicos
+    const ownerIds = [...new Set(ofertas.map(o => o.ownerId).filter(Boolean))];
+
+    // Obtener todos los fixers en una sola query
+    const fixers = await FixerModel.find({
+      fixerId: { $in: ownerIds }
+    }).lean();
+
+    // Crear un mapa de fixers por ID para búsqueda rápida
+    const fixerMap = new Map(fixers.map(f => [f.fixerId, f]));
+
+    // Combinar ofertas con datos de fixers
+    const result = ofertas
+      .map(oferta => {
+        const fixer = fixerMap.get(oferta.ownerId);
+        
+        // Si no hay fixer o no tiene ubicación, saltar esta oferta
+        if (!fixer || !fixer.location) return null;
+
+        return {
+          id: String(oferta.id ?? oferta._id),
+          title: oferta.title ?? oferta.descripcion ?? "Oferta sin título",
+          description: oferta.description ?? oferta.descripcion ?? "",
+          category: oferta.category ?? oferta.categoria ?? "General",
+          price: 150, // Valor por defecto, cambiar según tu lógica
+          rating: fixer.ratingAvg ?? 0,
+          fixerName: fixer.name ?? "Fixer sin nombre",
+          fixerId: fixer.fixerId,
+          whatsapp: fixer.whatsapp ?? oferta.contact?.whatsapp ?? "+591 000-0000",
+          location: {
+            lat: fixer.location.lat,
+            lng: fixer.location.lng,
+            address: fixer.location.address
+          },
+          images: Array.isArray(oferta.images) 
+            ? oferta.images.filter((x: any) => typeof x === "string")
+            : [],
+          isActive: oferta.status !== "inactive",
+          createdAt: oferta.createdAt
+        };
+      })
+      .filter(Boolean); // Eliminar nulls
+
+    res.json({
+      total: result.length,
+      offers: result
+    });
+  } catch (e) {
+    console.error("Error en /map-data:", e);
+    res.status(500).json({ error: "Error al obtener datos para el mapa" });
   }
 });
 
