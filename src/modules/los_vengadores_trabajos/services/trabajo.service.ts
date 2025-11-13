@@ -1,4 +1,3 @@
-// src/modules/los_vengadores_trabajos/services/trabajo.service.ts
 import mongoose from 'mongoose';
 import TrabajoModel from '../models/trabajo.model';
 import ClienteModel from '../models/cliente.model';
@@ -9,43 +8,65 @@ import ProveedorModel from '../models/proveedor.model';
 /* -------------------------------------------------------------------------- */
 
 /**
- * Cambia el estado de un trabajo a "confirmado".
+ * Cambia el estado de un trabajo a "Confirmado".
  */
 export const confirmarTrabajoService = async (id: string) => {
   const trabajo = await TrabajoModel.findById(id);
   if (!trabajo) throw new Error('Trabajo no encontrado');
 
-  if (trabajo.estado !== 'pendiente') {
+  console.log("🔍 Estado actual del trabajo (confirmar):", trabajo.estado);
+
+  // Normalizamos el estado a minúsculas para comparar
+  const estado = (trabajo.estado || '').toLowerCase();
+
+  // ✅ Solo si está "pendiente" (cualquier combinación de mayúsculas)
+  if (estado !== 'pendiente') {
     throw new Error('Solo se pueden confirmar trabajos pendientes');
   }
 
-  trabajo.estado = 'confirmado';
+  // ✅ Corregimos el valor exacto según el enum del modelo
+  trabajo.estado = 'Confirmado';
+
+  // ✅ Evita error de validación si numero_estrellas está en 0
+  if (trabajo.numero_estrellas !== undefined && trabajo.numero_estrellas < 1) {
+    trabajo.numero_estrellas = 1;
+  }
+
   await trabajo.save();
 
   return {
     success: true,
-    message: '✅ Trabajo confirmado correctamente',
+    message: 'Trabajo confirmado correctamente',
     data: trabajo,
   };
 };
 
 /**
- * Cambia el estado de un trabajo a "cancelado".
+ * Cambia el estado de un trabajo a "Cancelado".
  */
 export const rechazarTrabajoService = async (id: string) => {
   const trabajo = await TrabajoModel.findById(id);
   if (!trabajo) throw new Error('Trabajo no encontrado');
 
-  if (trabajo.estado !== 'pendiente') {
+  console.log("🔍 Estado actual del trabajo (rechazar):", trabajo.estado);
+
+  const estado = (trabajo.estado || '').toLowerCase();
+
+  if (estado !== 'pendiente') {
     throw new Error('Solo se pueden rechazar trabajos pendientes');
   }
 
-  trabajo.estado = 'cancelado';
+  trabajo.estado = 'Cancelado';
+
+  if (trabajo.numero_estrellas !== undefined && trabajo.numero_estrellas < 1) {
+    trabajo.numero_estrellas = 1;
+  }
+
   await trabajo.save();
 
   return {
     success: true,
-    message: '❌ Trabajo rechazado correctamente',
+    message: 'Trabajo rechazado correctamente',
     data: trabajo,
   };
 };
@@ -58,7 +79,7 @@ export const getTrabajosProveedorService = async (
   proveedorId: string,
   estado?: string
 ) => {
-  const filtro: any = {
+  const filtro: Record<string, unknown> = {
     id_proveedor: new mongoose.Types.ObjectId(proveedorId),
   };
   if (estado) filtro.estado = estado;
@@ -72,7 +93,7 @@ export const getTrabajosClienteService = async (
   clienteId: string,
   estado?: string
 ) => {
-  const filtro: any = {
+  const filtro: Record<string, unknown> = {
     id_cliente: new mongoose.Types.ObjectId(clienteId),
   };
   if (estado) filtro.estado = estado;
@@ -86,7 +107,7 @@ export const getTrabajosClienteService = async (
 /* 🔹 FUNCIONES EXISTENTES                                                   */
 /* -------------------------------------------------------------------------- */
 
-export const crearTrabajo = async (data: any) => {
+export const crearTrabajo = async (data: Record<string, unknown>) => {
   const cliente = await ClienteModel.findById(data.id_cliente);
   const proveedor = await ProveedorModel.findById(data.id_proveedor);
 
@@ -105,6 +126,12 @@ export const crearTrabajo = async (data: any) => {
     );
 
   const nuevoTrabajo = new TrabajoModel(data);
+
+  // Evita validación por defecto
+  if (!nuevoTrabajo.numero_estrellas || nuevoTrabajo.numero_estrellas < 1) {
+    nuevoTrabajo.numero_estrellas = 1;
+  }
+
   return await nuevoTrabajo.save();
 };
 

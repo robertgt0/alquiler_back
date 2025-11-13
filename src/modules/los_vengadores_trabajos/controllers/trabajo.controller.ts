@@ -1,4 +1,3 @@
-// src/modules/los_vengadores_trabajos/controllers/trabajo.controller.ts
 import { Request, Response, NextFunction } from 'express';
 import {
   crearTrabajo,
@@ -17,12 +16,16 @@ export const confirmarTrabajoController = async (req: Request, res: Response) =>
   try {
     const { id } = req.params;
     const resultado = await confirmarTrabajoService(id);
-    res.status(200).json(resultado);
+    res.status(200).json({
+      success: true,
+      message: resultado.message,
+      data: resultado.data,
+    });
   } catch (error: any) {
-    res.status(500).json({
+    console.error("❌ Error al confirmar trabajo:", error);
+    res.status(404).json({
       success: false,
-      message: "Error al confirmar trabajo",
-      error: error.message,
+      message: error.message || "Error al confirmar trabajo",
     });
   }
 };
@@ -31,12 +34,16 @@ export const rechazarTrabajoController = async (req: Request, res: Response) => 
   try {
     const { id } = req.params;
     const resultado = await rechazarTrabajoService(id);
-    res.status(200).json(resultado);
+    res.status(200).json({
+      success: true,
+      message: resultado.message,
+      data: resultado.data,
+    });
   } catch (error: any) {
-    res.status(500).json({
+    console.error("❌ Error al rechazar trabajo:", error);
+    res.status(404).json({
       success: false,
-      message: "Error al rechazar trabajo",
-      error: error.message,
+      message: error.message || "Error al rechazar trabajo",
     });
   }
 };
@@ -173,4 +180,3 @@ export const TerminarTrabajoController = async (req: Request, res: Response) => 
     res.status(500).json({ mensaje: "Error al marcar el trabajo como terminado.", error: error.message });
   }
 };
-
