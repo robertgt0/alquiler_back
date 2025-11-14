@@ -21,3 +21,8 @@
 {"ts":"2025-11-14T22:04:51.541Z","level":"INFO","message":"request:finish","id":"85ea4c05-977d-4145-a1db-614062f36bac","status":200,"method":"GET","url":"/api/devcode/servicios","duration":643}
 {"ts":"2025-11-14T22:04:55.897Z","level":"INFO","message":"request:start","id":"b1618063-580c-43ee-bc13-32f881ff9cd0","method":"GET","url":"/api/devcode/servicios","ip":"::1"}
 {"ts":"2025-11-14T22:04:56.368Z","level":"INFO","message":"request:finish","id":"b1618063-580c-43ee-bc13-32f881ff9cd0","status":200,"method":"GET","url":"/api/devcode/servicios","duration":472}
+{"ts":"2025-11-14T22:44:56.864Z","level":"INFO","message":"🚀 Servidor corriendo en puerto 5000"}
+{"ts":"2025-11-14T22:44:56.868Z","level":"INFO","message":"🔧 Modo: development"}
+{"ts":"2025-11-14T22:44:56.870Z","level":"INFO","message":"🌐 URL: http://localhost:5000"}
+{"ts":"2025-11-14T22:44:56.871Z","level":"INFO","message":"📦 Módulos activos: \n/gmail-notifications, \n/api/gmail-notifications, \n/whatsapp-notifications, \n/api/whatsapp-notifications"}
+{"ts":"2025-11-14T22:44:56.872Z","level":"INFO","message":"✅ Listo para recibir peticiones!"}
