@@ -30,6 +30,6 @@
       "@utils/*": ["utils/*"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "modules/**/*"],
   "exclude": ["node_modules", "dist"]
 }
