@@ -1,0 +1,23 @@
+{"ts":"2025-11-14T22:03:59.895Z","level":"INFO","message":"🚀 Servidor corriendo en puerto 5000"}
+{"ts":"2025-11-14T22:03:59.901Z","level":"INFO","message":"🔧 Modo: development"}
+{"ts":"2025-11-14T22:03:59.903Z","level":"INFO","message":"🌐 URL: http://localhost:5000"}
+{"ts":"2025-11-14T22:03:59.904Z","level":"INFO","message":"📦 Módulos activos: \n/gmail-notifications, \n/api/gmail-notifications, \n/whatsapp-notifications, \n/api/whatsapp-notifications"}
+{"ts":"2025-11-14T22:03:59.905Z","level":"INFO","message":"✅ Listo para recibir peticiones!"}
+{"ts":"2025-11-14T22:04:24.251Z","level":"INFO","message":"request:start","id":"67097742-8b8a-4ece-9937-40f4dd573bc7","method":"GET","url":"/api/devcode/servicios","ip":"::1"}
+{"ts":"2025-11-14T22:04:24.739Z","level":"INFO","message":"request:finish","id":"67097742-8b8a-4ece-9937-40f4dd573bc7","status":200,"method":"GET","url":"/api/devcode/servicios","duration":489}
+{"ts":"2025-11-14T22:04:29.225Z","level":"INFO","message":"request:start","id":"c6d5c61c-e687-4fe8-9057-41a4a17258fa","method":"GET","url":"/api/devcode/servicios","ip":"::1"}
+{"ts":"2025-11-14T22:04:29.581Z","level":"INFO","message":"request:finish","id":"c6d5c61c-e687-4fe8-9057-41a4a17258fa","status":200,"method":"GET","url":"/api/devcode/servicios","duration":356}
+{"ts":"2025-11-14T22:04:34.253Z","level":"INFO","message":"request:start","id":"e92727de-ff36-48e9-a2f0-0dd03318608c","method":"GET","url":"/api/devcode/servicios","ip":"::1"}
+{"ts":"2025-11-14T22:04:34.768Z","level":"INFO","message":"request:finish","id":"e92727de-ff36-48e9-a2f0-0dd03318608c","status":200,"method":"GET","url":"/api/devcode/servicios","duration":515}
+{"ts":"2025-11-14T22:04:39.223Z","level":"INFO","message":"request:start","id":"f710fc6e-0dab-4fa0-a5a5-58eb921a348e","method":"GET","url":"/api/devcode/servicios","ip":"::1"}
+{"ts":"2025-11-14T22:04:39.774Z","level":"INFO","message":"request:finish","id":"f710fc6e-0dab-4fa0-a5a5-58eb921a348e","status":200,"method":"GET","url":"/api/devcode/servicios","duration":551}
+{"ts":"2025-11-14T22:04:40.896Z","level":"INFO","message":"request:start","id":"49944a34-3eba-4e3b-b79b-a3761fd5ee9d","method":"GET","url":"/api/devcode/servicios","ip":"::1"}
+{"ts":"2025-11-14T22:04:40.911Z","level":"INFO","message":"request:start","id":"73eaab63-356b-4591-adf5-8f9e0a090095","method":"GET","url":"/api/devcode/servicios","ip":"::1"}
+{"ts":"2025-11-14T22:04:41.270Z","level":"INFO","message":"request:finish","id":"49944a34-3eba-4e3b-b79b-a3761fd5ee9d","status":200,"method":"GET","url":"/api/devcode/servicios","duration":374}
+{"ts":"2025-11-14T22:04:41.283Z","level":"INFO","message":"request:finish","id":"73eaab63-356b-4591-adf5-8f9e0a090095","status":200,"method":"GET","url":"/api/devcode/servicios","duration":373}
+{"ts":"2025-11-14T22:04:45.895Z","level":"INFO","message":"request:start","id":"b65b1a0d-6c41-4771-b0eb-0322176d45f8","method":"GET","url":"/api/devcode/servicios","ip":"::1"}
+{"ts":"2025-11-14T22:04:46.531Z","level":"INFO","message":"request:finish","id":"b65b1a0d-6c41-4771-b0eb-0322176d45f8","status":200,"method":"GET","url":"/api/devcode/servicios","duration":636}
+{"ts":"2025-11-14T22:04:50.898Z","level":"INFO","message":"request:start","id":"85ea4c05-977d-4145-a1db-614062f36bac","method":"GET","url":"/api/devcode/servicios","ip":"::1"}
+{"ts":"2025-11-14T22:04:51.541Z","level":"INFO","message":"request:finish","id":"85ea4c05-977d-4145-a1db-614062f36bac","status":200,"method":"GET","url":"/api/devcode/servicios","duration":643}
+{"ts":"2025-11-14T22:04:55.897Z","level":"INFO","message":"request:start","id":"b1618063-580c-43ee-bc13-32f881ff9cd0","method":"GET","url":"/api/devcode/servicios","ip":"::1"}
+{"ts":"2025-11-14T22:04:56.368Z","level":"INFO","message":"request:finish","id":"b1618063-580c-43ee-bc13-32f881ff9cd0","status":200,"method":"GET","url":"/api/devcode/servicios","duration":472}
