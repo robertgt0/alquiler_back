@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./",
+    "rootDir": "./src",
     "sourceMap": true,
     "target": "ES2022",
     "module": "CommonJS",
     "moduleResolution": "Node",
-    "lib": ["ES2022", "DOM"],
+    "lib": ["ES2022"],
 
     "strict": false,
     "skipLibCheck": true,
@@ -15,19 +15,25 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
-    "forceConsistentCasingInFileNames": false,
 
-    "baseUrl": "./",
+    "baseUrl": "./src",
     "paths": {
-      "@/*": ["src/*"],
-      "@config/*": ["src/config/*"],
-      "@utils/*": ["src/utils/*"],
+      "@/*": ["*"],
+      "@config/*": ["config/*"],
+      "@utils/*": ["utils/*"],
       "@modules/*": ["modules/*"],
       "@controllers/*": ["modules/DevCode/controllers/*"],
       "@services/*": ["modules/DevCode/services/*"],
       "@models/*": ["modules/DevCode/models/*"]
-    }
+    },
+
+    "plugins": [
+      {
+        "transform": "typescript-transform-paths",
+        "afterDeclarations": true
+      }
+    ]
   },
-  "include": ["src/**/*", "modules/**/*"],
+  "include": ["src"],
   "exclude": ["node_modules", "dist"]
 }

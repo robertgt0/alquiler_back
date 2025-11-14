@@ -5,8 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/index.ts",
-    "build": "tsc",
-    "start": "node -r tsconfig-paths/register dist/index.js",
+    "build": "ttsc",
+    "start": "node dist/index.js",
     "clean": "rimraf dist"
   },
   "repository": {
@@ -49,6 +49,8 @@
     "rimraf": "^6.0.1",
     "ts-node-dev": "^2.0.0",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.4.5"
+    "ttypescript": "^1.5.15",
+    "typescript": "^5.4.5",
+    "typescript-transform-paths": "^3.5.5"
   }
 }

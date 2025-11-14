@@ -189,6 +189,8 @@ npm install uuid
 
 npm install --save-dev @types/uuid
 
+npm install --save-dev ttypescript typescript-transform-paths
+
 
 **Body definidos para hacer las respectivas peticiones**
 estructura del payload para enviar correo de Backend --> n8n clouod --> Gmail API
