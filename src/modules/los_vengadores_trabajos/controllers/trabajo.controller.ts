@@ -4,6 +4,7 @@ import {
   obtenerTrabajos,
   obtenerTrabajoPorId,
   eliminarTrabajo,
+
   getTrabajosProveedorService,
   getTrabajosClienteService,
   confirmarTrabajoService,
@@ -186,5 +187,76 @@ export const TerminarTrabajoController = async (req: Request, res: Response) => 
     res.json({ mensaje: "El trabajo ha sido marcado como terminado correctamente." });
   } catch (error: any) {
     res.status(500).json({ mensaje: "Error al marcar el trabajo como terminado.", error: error.message });
+  }
+};
+import TrabajoModel from "../models/trabajo.model";
+export const getCalificacionesPorProveedorController = async (req: Request, res: Response) => {
+  const { proveedorId } = req.params; // ⚡ coincide con la ruta
+
+  try {
+    const trabajos = await TrabajoModel.find({ 
+      id_proveedor: proveedorId,
+      estado: "Terminado" // <-- Solo trabajos terminados
+    })
+    .populate("id_cliente", "nombre")
+    .exec();
+  
+
+    if (!trabajos || trabajos.length === 0) {
+      return res.status(404).json({ success: false, message: "No hay calificaciones" });
+    }
+
+    // Convertimos los trabajos en una lista de calificaciones
+    const calificaciones = trabajos
+      .filter(t => t.numero_estrellas !== undefined)
+      .map(t => {
+        const cliente = t.id_cliente as unknown as { nombre: string } | null;
+        return {
+          id: t._id,
+          client: cliente?.nombre || "Desconocido",
+          score: t.numero_estrellas,
+          comment: t.comentario_calificacion,
+          date: t.fecha,
+        };
+      });
+
+    res.json({ success: true, calificaciones });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Error al obtener calificaciones", error });
+  }
+};
+
+export const guardarCalificacionController = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { numero_estrellas, comentario_calificacion } = req.body;
+
+  try {
+    const trabajo = await TrabajoModel.findById(id);
+
+    if (!trabajo) {
+      return res.status(404).json({ success: false, message: "Trabajo no encontrado" });
+    }
+
+    trabajo.numero_estrellas = numero_estrellas;
+    trabajo.comentario_calificacion = comentario_calificacion;
+    trabajo.estado = "Terminado";
+
+    await trabajo.save();
+
+    res.json({
+      success: true,
+      message: "Calificación guardada",
+      trabajo
+    });
+  } catch (error: any) {
+    console.error("Error al guardar calificación:", error);
+
+    // 🔹 Aquí convertimos el error a algo serializable
+    res.status(500).json({
+      success: false,
+      message: "Error al guardar calificación",
+      error: error.message || String(error),
+    });
   }
 };

@@ -15,7 +15,9 @@ import {
   cancelarTrabajoClienteController,
   TerminarTrabajoController,
   obtenerTrabajoProveedorController,
-  obtenerTrabajoClienteController
+  obtenerTrabajoClienteController,
+  getCalificacionesPorProveedorController,
+  guardarCalificacionController
 } from '../controllers/trabajo.controller';
 
 // 🔹 Confirmar o rechazar trabajo (HU1)
@@ -32,6 +34,11 @@ router.put("/terminar/:trabajoId", TerminarTrabajoController);
 // --- RUTAS PARA HU 1.7 y 1.8 ---
 router.get('/proveedor', getTrabajosProveedor);
 router.get('/cliente/:clienteId', getTrabajosCliente);
+
+//--- RUTAS PARA HU 5 y 6 ---
+router.get('/proveedor/:proveedorId/calificaciones', getCalificacionesPorProveedorController);
+router.put("/trabajo/:id/calificar", guardarCalificacionController);
+
 
 // --- RUTAS EXISTENTES ---
 router.get('/', obtenerTrabajosController);
