@@ -68,11 +68,11 @@ router.get('/exists', existsByEmail);
 /**
  * Auth routes
  */
-router.post('/auth-Method/:id',agregarAutentificacion);
-router.delete('/auth-Method/:id',eliminarAutentificacion);
-router.get('/auth-Method/:id',getAuthById);
-router.post('/usuario/telefono/:id',updateTelefono);
-router.post('/usuario/ubicacion/:id',updateMapa);
+router.post('/auth-Method/:id', authMiddleware, agregarAutentificacion);
+router.delete('/auth-Method/:id', authMiddleware, eliminarAutentificacion);
+router.get('/auth-Method/:id', authMiddleware, getAuthById);
+router.post('/usuario/telefono/:id', authMiddleware, updateTelefono);
+router.post('/usuario/ubicacion/:id', authMiddleware, updateMapa);
 router.post("/google/callback", authController.googleCallback);
 router.get("/me", authMiddleware, authController.getCurrentUser);
 
@@ -82,7 +82,7 @@ router.get("/me", authMiddleware, authController.getCurrentUser);
  */
 router.get("/sessions/user/:userId", authMiddleware, sessionController.getSessionsByUserId);
 router.delete("/sessions/:sessionId/", authMiddleware, sessionController.deleteSession);
-//router.delete("/sessions/user/all-except-current", authMiddleware, sessionController.deleteAllSessionsExceptCurrent);
+router.delete("/sessions/user/all-except-current", authMiddleware, sessionController.deleteAllSessionsExceptCurrent);
 
 router.post("/2fa/setup", authMiddleware, twofactorController.setupTwoFactor);
 router.post("/2fa/verify", authMiddleware, twofactorController.verifyAndEnable);
