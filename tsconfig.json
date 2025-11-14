@@ -5,6 +5,7 @@
     "sourceMap": true,
     "declaration": false,
     "removeComments": true,
+    "noEmitOnError": false,
     "target": "ES2022",
     "module": "CommonJS",
     "moduleResolution": "Node",
