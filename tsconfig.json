@@ -3,37 +3,34 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "sourceMap": true,
+    "declaration": false,
+    "removeComments": true,
     "target": "ES2022",
     "module": "CommonJS",
     "moduleResolution": "Node",
-    "lib": ["ES2022"],
-
-    "strict": false,
+    "lib": ["ES2022", "DOM"],
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "noEmitOnError": false,
-
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
-
     "baseUrl": "./src",
     "paths": {
       "@/*": ["*"],
       "@config/*": ["config/*"],
-      "@utils/*": ["utils/*"],
       "@modules/*": ["modules/*"],
       "@controllers/*": ["modules/DevCode/controllers/*"],
       "@services/*": ["modules/DevCode/services/*"],
-      "@models/*": ["modules/DevCode/models/*"]
+      "@models/*": ["modules/DevCode/models/*"],
+      "@utils/*": ["utils/*"]
     },
-
-    "plugins": [
-      {
-        "transform": "typescript-transform-paths",
-        "afterDeclarations": true
-      }
-    ]
+    "allowImportingTsExtensions": false,
+    "noUncheckedIndexedAccess": false,
+    "incremental": true
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }
