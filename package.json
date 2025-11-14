@@ -1,45 +1,60 @@
 {
   "name": "alquiler_back",
   "version": "1.0.0",
-  "description": "API Alquiler - lista para Render",
+  "description": "Backend de alquiler con TypeScript, Express y Mongoose",
   "type": "commonjs",
   "engines": {
     "node": ">=18"
   },
   "main": "dist/index.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/index.ts",
     "seed": "ts-node-dev --transpile-only src/seed/seedOffers.ts",
-    "build": "rimraf dist && tsc",
+    "build": "rimraf dist && tsc -p tsconfig.json",
     "start": "node dist/index.js",
     "start:dev": "npm run build && npm start",
     "clean": "rimraf dist"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/robertgt0/alquiler_back.git"
+    "url": "https://github.com/robertgt0/alquiler_back.git"
   },
   "license": "ISC",
   "dependencies": {
+    "@google-cloud/pubsub": "^5.2.0",
+    "@types/helmet": "^0.0.48",
+    "@types/node-fetch": "^2.6.13",
+    "axios": "^1.12.2",
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dayjs": "^1.11.18",
+    "dotenv": "^16.4.5",
+    "express": "^5.1.0",
+    "googleapis": "^161.0.0",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.8.0",
+    "multer": "^2.0.2",
+    "node-fetch": "^2.7.0",
+    "nodemailer": "^7.0.9",
+    "uuid": "^9.0.1",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "@types/axios": "^0.14.0",
     "@types/connect": "^3.4.38",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
-    "@types/jsonwebtoken": "^9.0.6",
-    "@types/mongoose": "^5.11.96",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/mongoose": "^5.11.97",
     "@types/multer": "^2.0.0",
     "@types/node": "^24.8.0",
-    "cors": "^2.8.5",
-    "dotenv": "^16.6.1",
-    "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.2",
-    "mogoose": "^0.0.1-security",
-    "mongoose": "^8.19.1",
-    "multer": "^2.0.2",
-    "rimraf": "^6.0.1",
-    "typescript": "^5.9.3"
-  },
-  "devDependencies": {
+    "@types/uuid": "^10.0.0",
     "nodemon": "^3.1.10",
-    "ts-node-dev": "^2.0.0"
+    "rimraf": "^6.0.1",
+    "ts-node-dev": "^2.0.0",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.4.5"
   }
 }

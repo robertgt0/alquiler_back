@@ -1,34 +1,37 @@
 {
   "compilerOptions": {
-    /* === Salida y estructura === */
     "outDir": "./dist",
     "rootDir": "./src",
     "sourceMap": true,
     "declaration": false,
     "removeComments": true,
-
-    /* === Módulos y compatibilidad === */
     "target": "ES2022",
     "module": "commonjs",
     "moduleResolution": "node",
     "lib": ["ES2022", "DOM"],
-
-    /* === Comportamiento del compilador === */
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-
-    /* === Imports === */
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
-
-    /* === Opciones adicionales === */
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["*"],
+      "@config/*": ["config/*"],
+      "@modules/*": ["modules/*"],
+      "@routes/*": ["routes/*"],
+      "@models/*": ["models/*"],
+      "@controllers/*": ["controllers/*"],
+      "@services/*": ["services/*"],
+      "@utils/*": ["utils/*"]
+    },
+    "allowImportingTsExtensions": false,
     "noUncheckedIndexedAccess": false,
     "incremental": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }

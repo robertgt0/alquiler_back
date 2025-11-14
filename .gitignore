@@ -2,6 +2,13 @@ node_modules/
 dist/
 .env
 .DS_Store
-*.log
+#*.log
 build/
+coverage/
 coverage/.env
+.idea/
+workspace.xml
+logs/
+send_log/
+tsconfig.tsbuildinfo
+src_ultimo.zip

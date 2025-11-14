@@ -104,5 +104,10 @@ const FixerSchema = new Schema<FixerDoc>(
 FixerSchema.set("toJSON", { virtuals: true, versionKey: false });
 FixerSchema.set("toObject", { virtuals: true, versionKey: false });
 
-export const FixerModel = models.Fixer ?? model<FixerDoc>("Fixer", FixerSchema);
+// Usa nombres unicos para no colisionar con otros modelos `Fixer` definidos por otros equipos.
+const FIXER_MODEL_NAME = "FixerProfile";
+const FIXER_COLLECTION_NAME = "fixer_profiles";
+
+export const FixerModel =
+  models[FIXER_MODEL_NAME] ?? model<FixerDoc>(FIXER_MODEL_NAME, FixerSchema, FIXER_COLLECTION_NAME);
 
