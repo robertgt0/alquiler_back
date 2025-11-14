@@ -151,3 +151,41 @@ export const obtenerTrabajoPorId = async (id: string) => {
 export const eliminarTrabajo = async (id: string) => {
   return await TrabajoModel.findByIdAndDelete(id);
 };
+
+/* -------------------------------------------------------------------------- */
+/* 🔹 NUEVAS FUNCIONES HU 1.7 -Sprint 2 (Detalles y Cancelar con Justificación)         */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Obtener detalles completos de un trabajo por ID.
+ * Popula los datos del cliente y del proveedor para mostrar nombres.
+ */
+export const obtenerDetallesTrabajoService = async (id: string) => {
+  const trabajo = await TrabajoModel.findById(id)
+    .populate('id_cliente', 'nombre email')
+    .populate('id_proveedor', 'nombre');
+    
+  if (!trabajo) throw new Error('Trabajo no encontrado');
+  
+  return trabajo;
+};
+
+/**
+ * Cancelar un trabajo por parte del proveedor, guardando la justificación.
+ */
+export const cancelarTrabajoProveedorService = async (id: string, justificacion: string) => {
+  const trabajo = await TrabajoModel.findById(id);
+  if (!trabajo) throw new Error('Trabajo no encontrado');
+
+  // Actualizamos el estado y guardamos la justificación
+  trabajo.estado = 'Cancelado'; // Asegúrate de usar la mayúscula/minúscula que prefieras en tu BD
+  trabajo.justificacion_cancelacion = justificacion;
+  trabajo.cancelado_por = 'Proveedor';
+
+  // ✅ Corrección de validación de estrellas (igual que en tus otras funciones)
+  if (trabajo.numero_estrellas !== undefined && trabajo.numero_estrellas < 1) {
+    trabajo.numero_estrellas = 1;
+  }
+
+  return await trabajo.save();
+};
