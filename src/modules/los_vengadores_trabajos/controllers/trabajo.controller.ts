@@ -8,12 +8,12 @@ import {
   getTrabajosClienteService,
   confirmarTrabajoService,
   rechazarTrabajoService,
-  obtenerDetallesTrabajoService,   // ✅ Nuestra función nueva
-  cancelarTrabajoProveedorService  // ✅ Nuestra función nueva
+  obtenerDetallesTrabajoService,
+  cancelarTrabajoProveedorService
 } from '../services/trabajo.service';
 
-// Importamos los servicios de tus compañeros para no romper su código
 import { DetallesTrabajo, CancelacionTrabajo, TerminarTrabajo } from "../services/cancelar-trabajo.service";
+import TrabajoModel from "../models/trabajo.model"; // ✅ Import movido arriba
 
 // --- NUEVAS FUNCIONES PARA HU 1 (Confirmar / Rechazar) ---
 export const confirmarTrabajoController = async (req: Request, res: Response) => {
@@ -55,7 +55,6 @@ export const rechazarTrabajoController = async (req: Request, res: Response) => 
 // --- HU 1.7 (VISTA PROVEEDOR - LISTA) ---
 export const getTrabajosProveedor = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // ID de prueba (Juan D)
     const proveedorId = '6902c43438df4e88b6680640'; 
     const estado = req.query.estado as string | undefined;
     const trabajos = await getTrabajosProveedorService(proveedorId, estado);
@@ -78,8 +77,6 @@ export const getTrabajosCliente = async (req: Request, res: Response, next: Next
 };
 
 // --- HU 1.6 / 1.7 (VER DETALLES Y CANCELAR) ---
-
-// ✅ Nueva función para ver detalles (usada por tu frontend)
 export const getDetallesTrabajoController = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -93,7 +90,6 @@ export const getDetallesTrabajoController = async (req: Request, res: Response) 
       descripcion: (trabajo as any).descripcion_trabajo,
       costo: (trabajo as any).costo,
       estado: (trabajo as any).estado,
-      // Añadimos estos para que se vean en el detalle
       justificacion_cancelacion: (trabajo as any).justificacion_cancelacion,
       cancelado_por: (trabajo as any).cancelado_por
     };
@@ -104,26 +100,23 @@ export const getDetallesTrabajoController = async (req: Request, res: Response) 
   }
 };
 
-// ✅ Actualizada: Cancelar trabajo (Proveedor) usando nuestro servicio real
 export const cancelarTrabajoProveedorController = async (req: Request, res: Response) => {
   try {
-    const { trabajoId } = req.params; // Asegúrate de que la ruta use :trabajoId
+    const { trabajoId } = req.params;
     const { justificacion } = req.body;
 
     if (!justificacion) {
       return res.status(400).json({ message: 'La justificación es requerida' });
     }
 
-    // Usamos el servicio conectado a la BD real
     const trabajoCancelado = await cancelarTrabajoProveedorService(trabajoId, justificacion);
-    
     res.json({ message: 'Trabajo cancelado exitosamente', trabajo: trabajoCancelado });
   } catch (error: any) {
     res.status(500).json({ message: 'Error al cancelar el trabajo', error: error.message });
   }
 };
 
-// --- FUNCIONES CRUD BÁSICAS (Se mantienen) ---
+// --- FUNCIONES CRUD BÁSICAS ---
 export const crearTrabajoController = async (req: Request, res: Response) => {
   try {
     const trabajo = await crearTrabajo(req.body);
@@ -162,8 +155,7 @@ export const eliminarTrabajoController = async (req: Request, res: Response) => 
   }
 };
 
-// --- CÓDIGO DE TUS COMPAÑEROS (Conservado) ---
-
+// --- CONTROLADORES DE OTROS COMPAÑEROS ---
 export const obtenerTrabajoProveedorController = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -209,5 +201,73 @@ export const TerminarTrabajoController = async (req: Request, res: Response) => 
     res.json({ mensaje: "El trabajo ha sido marcado como terminado correctamente." });
   } catch (error: any) {
     res.status(500).json({ mensaje: "Error al marcar el trabajo como terminado.", error: error.message });
+  }
+};
+
+// --- NUEVAS FUNCIONES DE CALIFICACIÓN ---
+export const getCalificacionesPorProveedorController = async (req: Request, res: Response) => {
+  const { proveedorId } = req.params;
+
+  try {
+    const trabajos = await TrabajoModel.find({ 
+      id_proveedor: proveedorId,
+      estado: "Terminado" 
+    })
+    .populate("id_cliente", "nombre")
+    .exec();
+
+    if (!trabajos || trabajos.length === 0) {
+      return res.status(404).json({ success: false, message: "No hay calificaciones" });
+    }
+
+    const calificaciones = trabajos
+      .filter(t => t.numero_estrellas !== undefined)
+      .map(t => {
+        const cliente = t.id_cliente as unknown as { nombre: string } | null;
+        return {
+          id: t._id,
+          client: cliente?.nombre || "Desconocido",
+          score: t.numero_estrellas,
+          comment: t.comentario_calificacion,
+          date: t.fecha,
+        };
+      });
+
+    res.json({ success: true, calificaciones });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Error al obtener calificaciones", error });
+  }
+};
+
+export const guardarCalificacionController = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { numero_estrellas, comentario_calificacion } = req.body;
+
+  try {
+    const trabajo = await TrabajoModel.findById(id);
+
+    if (!trabajo) {
+      return res.status(404).json({ success: false, message: "Trabajo no encontrado" });
+    }
+
+    trabajo.numero_estrellas = numero_estrellas;
+    trabajo.comentario_calificacion = comentario_calificacion;
+    trabajo.estado = "Terminado";
+
+    await trabajo.save();
+
+    res.json({
+      success: true,
+      message: "Calificación guardada",
+      trabajo
+    });
+  } catch (error: any) {
+    console.error("Error al guardar calificación:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error al guardar calificación",
+      error: error.message || String(error),
+    });
   }
 };
