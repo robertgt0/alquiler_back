@@ -17,8 +17,10 @@ const connectDB = async (): Promise<void> => {
     });
     console.log('✅ MongoDB conectado exitosamente a bitCrew'); // Puedes ajustar el log
   } catch (error) {
-    console.error('❌ Error al conectar MongoDB:', error);
+    console.error("❌ Error al conectar MongoDB:", error);
     process.exit(1);
   }
 };
+
+
 export default connectDB;
