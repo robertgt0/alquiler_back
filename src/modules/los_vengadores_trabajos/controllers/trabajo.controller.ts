@@ -85,6 +85,7 @@ export const getDetallesTrabajoController = async (req: Request, res: Response) 
     const respuestaFrontend = {
       Id: (trabajo as any)._id,
       cliente: (trabajo as any).id_cliente?.nombre || 'Cliente Desconocido',
+      proveedor: (trabajo as any).id_proveedor?.nombre || 'Proveedor Desconocido',
       fecha: (trabajo as any).fecha,
       horario: `${(trabajo as any).hora_inicio} - ${(trabajo as any).hora_fin}`,
       descripcion: (trabajo as any).descripcion_trabajo,
