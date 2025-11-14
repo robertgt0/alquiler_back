@@ -1,7 +1,0 @@
-2025-10-29T02:44:29.514Z | TxID: N/A | To: N/A | Estado: ERROR | Error: NOT_FOUND: Ruta no encontrada: /api/notifications/gmail
-2025-10-29T02:44:47.036Z | TxID: N/A | To: N/A | Estado: ERROR | Error: NOT_FOUND: Ruta no encontrada: /api/notifications/gmail
-2025-10-29T02:47:08.755Z | TxID: N/A | To: N/A | Estado: ERROR | Error: NOT_FOUND: Ruta no encontrada: /api/notifications/gmail
-2025-11-06T04:57:01.773Z | TxID: N/A | To: N/A | Estado: ERROR | Error: NOT_FOUND: Ruta no encontrada: /api/devcode/users
-2025-11-06T05:03:15.724Z | TxID: N/A | To: N/A | Estado: ERROR | Error: NOT_FOUND: Ruta no encontrada: /api/devcode/users
-2025-11-06T05:39:20.010Z | TxID: N/A | To: N/A | Estado: ERROR | Error: NOT_FOUND: Ruta no encontrada: /api/devcode/citas/
-2025-11-06T05:39:29.362Z | TxID: N/A | To: N/A | Estado: ERROR | Error: NOT_FOUND: Ruta no encontrada: /api/devcode/citas/
