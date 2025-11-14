@@ -542,6 +542,22 @@ class FixersService {
     return this.hydrateSingle(await attachUserData(toRecord(doc)));
   }
 
+  async updateSkillsAndBio(
+    id: string, 
+    categories: string[], 
+    skills: FixerSkillInput[], 
+    bio?: string
+  ) {
+    const updateData: UpdateFixerDTO = { categories, skills };
+    
+    // ✅ Solo incluir bio si fue proporcionado explícitamente
+    if (bio !== undefined) {
+      updateData.bio = bio;
+    }
+    
+    return this.update(id, updateData);
+  }
+
   async getById(id: string) {
     const doc = await FixerModel.findOne(buildIdQuery(id));
     return this.hydrateSingle(await attachUserData(toRecord(doc)));
