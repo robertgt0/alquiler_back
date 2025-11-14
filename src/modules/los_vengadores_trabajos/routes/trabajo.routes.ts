@@ -8,7 +8,9 @@ import {
   obtenerTrabajoPorIdController,
   eliminarTrabajoController,
   getTrabajosProveedor,
-  getTrabajosCliente
+  getTrabajosCliente,
+  getCalificacionesPorProveedorController,
+  guardarCalificacionController
 } from '../controllers/trabajo.controller';
 import {cancelarTrabajoProveedorController,cancelarTrabajoClienteController,TerminarTrabajoController,obtenerTrabajoProveedorController,obtenerTrabajoClienteController} from "../controllers/trabajo.controller";
 
@@ -27,6 +29,11 @@ router.put("/terminar/:trabajoId", TerminarTrabajoController);
 // --- RUTAS PARA HU 1.7 y 1.8 ---
 router.get('/proveedor', getTrabajosProveedor);
 router.get('/cliente/:clienteId', getTrabajosCliente);
+
+
+router.get('/proveedor/:proveedorId/calificaciones', getCalificacionesPorProveedorController);
+router.put("/trabajo/:id/calificar", guardarCalificacionController);
+
 
 // --- TUS RUTAS EXISTENTES ---
 router.get('/', obtenerTrabajosController);
