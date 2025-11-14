@@ -7,8 +7,12 @@ import {
   getTrabajosProveedorService,
   getTrabajosClienteService,
   confirmarTrabajoService,
-  rechazarTrabajoService
+  rechazarTrabajoService,
+  obtenerDetallesTrabajoService,   // ✅ Nuestra función nueva
+  cancelarTrabajoProveedorService  // ✅ Nuestra función nueva
 } from '../services/trabajo.service';
+
+// Importamos los servicios de tus compañeros para no romper su código
 import { DetallesTrabajo, CancelacionTrabajo, TerminarTrabajo } from "../services/cancelar-trabajo.service";
 
 // --- NUEVAS FUNCIONES PARA HU 1 (Confirmar / Rechazar) ---
@@ -48,9 +52,10 @@ export const rechazarTrabajoController = async (req: Request, res: Response) => 
   }
 };
 
-// --- NUEVA FUNCIÓN PARA HU 1.7 (VISTA PROVEEDOR) ---
+// --- HU 1.7 (VISTA PROVEEDOR - LISTA) ---
 export const getTrabajosProveedor = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    // ID de prueba (Juan D)
     const proveedorId = '6902c43438df4e88b6680640'; 
     const estado = req.query.estado as string | undefined;
     const trabajos = await getTrabajosProveedorService(proveedorId, estado);
@@ -60,7 +65,7 @@ export const getTrabajosProveedor = async (req: Request, res: Response, next: Ne
   }
 };
 
-// --- NUEVA FUNCIÓN PARA HU 1.8 (VISTA CLIENTE) ---
+// --- HU 1.8 (VISTA CLIENTE - LISTA) ---
 export const getTrabajosCliente = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { clienteId } = req.params;
@@ -72,7 +77,53 @@ export const getTrabajosCliente = async (req: Request, res: Response, next: Next
   }
 };
 
-// --- FUNCIONES EXISTENTES ---
+// --- HU 1.6 / 1.7 (VER DETALLES Y CANCELAR) ---
+
+// ✅ Nueva función para ver detalles (usada por tu frontend)
+export const getDetallesTrabajoController = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const trabajo = await obtenerDetallesTrabajoService(id);
+    
+    const respuestaFrontend = {
+      Id: (trabajo as any)._id,
+      cliente: (trabajo as any).id_cliente?.nombre || 'Cliente Desconocido',
+      fecha: (trabajo as any).fecha,
+      horario: `${(trabajo as any).hora_inicio} - ${(trabajo as any).hora_fin}`,
+      descripcion: (trabajo as any).descripcion_trabajo,
+      costo: (trabajo as any).costo,
+      estado: (trabajo as any).estado,
+      // Añadimos estos para que se vean en el detalle
+      justificacion_cancelacion: (trabajo as any).justificacion_cancelacion,
+      cancelado_por: (trabajo as any).cancelado_por
+    };
+
+    res.json(respuestaFrontend);
+  } catch (error: any) {
+    res.status(500).json({ message: 'Error al obtener detalles', error: error.message });
+  }
+};
+
+// ✅ Actualizada: Cancelar trabajo (Proveedor) usando nuestro servicio real
+export const cancelarTrabajoProveedorController = async (req: Request, res: Response) => {
+  try {
+    const { trabajoId } = req.params; // Asegúrate de que la ruta use :trabajoId
+    const { justificacion } = req.body;
+
+    if (!justificacion) {
+      return res.status(400).json({ message: 'La justificación es requerida' });
+    }
+
+    // Usamos el servicio conectado a la BD real
+    const trabajoCancelado = await cancelarTrabajoProveedorService(trabajoId, justificacion);
+    
+    res.json({ message: 'Trabajo cancelado exitosamente', trabajo: trabajoCancelado });
+  } catch (error: any) {
+    res.status(500).json({ message: 'Error al cancelar el trabajo', error: error.message });
+  }
+};
+
+// --- FUNCIONES CRUD BÁSICAS (Se mantienen) ---
 export const crearTrabajoController = async (req: Request, res: Response) => {
   try {
     const trabajo = await crearTrabajo(req.body);
@@ -111,16 +162,13 @@ export const eliminarTrabajoController = async (req: Request, res: Response) => 
   }
 };
 
-// --- Controladores existentes (HU2, HU3) ---
+// --- CÓDIGO DE TUS COMPAÑEROS (Conservado) ---
+
 export const obtenerTrabajoProveedorController = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const resultado = await DetallesTrabajo.obtenerTrabajoVistaProveedor(id);
-
-    if ("mensaje" in resultado) {
-      return res.status(404).json({ message: resultado.mensaje });
-    }
-
+    if ("mensaje" in resultado) return res.status(404).json({ message: resultado.mensaje });
     res.status(200).json(resultado);
   } catch (error: any) {
     res.status(500).json({ message: "Error al obtener detalles del trabajo", error: error.message });
@@ -131,32 +179,10 @@ export const obtenerTrabajoClienteController = async (req: Request, res: Respons
   try {
     const { id } = req.params;
     const resultado = await DetallesTrabajo.obtenerTrabajoVistaCliente(id);
-
-    if ("mensaje" in resultado) {
-      return res.status(404).json({ message: resultado.mensaje });
-    }
-
+    if ("mensaje" in resultado) return res.status(404).json({ message: resultado.mensaje });
     res.status(200).json(resultado);
   } catch (error: any) {
     res.status(500).json({ message: "Error al obtener detalles del trabajo", error: error.message });
-  }
-};
-
-export const cancelarTrabajoProveedorController = async (req: Request, res: Response) => {
-  try {
-    const { trabajoId } = req.params;
-    const { justificacion } = req.body;
-
-    if (!justificacion || justificacion.trim() === "") {
-      return res.status(400).json({ mensaje: "Debe ingresar una justificación antes de cancelar." });
-    }
-
-    const trabajoCancelado = await CancelacionTrabajo.cancelarTrabajoProveedor(trabajoId, justificacion);
-    if (!trabajoCancelado) return res.status(404).json({ mensaje: "Trabajo no encontrado." });
-
-    res.json({ mensaje: "Tu cancelación ha sido enviada al proveedor correctamente." });
-  } catch (error: any) {
-    res.status(500).json({ mensaje: "Error al procesar la cancelación.", error: error.message });
   }
 };
 
@@ -164,10 +190,7 @@ export const cancelarTrabajoClienteController = async (req: Request, res: Respon
   try {
     const { trabajoId } = req.params;
     const { justificacion } = req.body;
-
-    if (!justificacion || justificacion.trim() === "") {
-      return res.status(400).json({ mensaje: "Debe ingresar una justificación antes de cancelar." });
-    }
+    if (!justificacion || justificacion.trim() === "") return res.status(400).json({ mensaje: "Debe ingresar una justificación." });
 
     const trabajoCancelado = await CancelacionTrabajo.cancelarTrabajoCliente(trabajoId, justificacion);
     if (!trabajoCancelado) return res.status(404).json({ mensaje: "Trabajo no encontrado." });

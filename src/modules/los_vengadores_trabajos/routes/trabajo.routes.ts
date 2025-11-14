@@ -15,7 +15,8 @@ import {
   cancelarTrabajoClienteController,
   TerminarTrabajoController,
   obtenerTrabajoProveedorController,
-  obtenerTrabajoClienteController
+  obtenerTrabajoClienteController,
+  getDetallesTrabajoController // 1. ✅ IMPORTAMOS TU NUEVO CONTROLADOR
 } from '../controllers/trabajo.controller';
 
 // 🔹 Confirmar o rechazar trabajo (HU1)
@@ -23,7 +24,10 @@ router.put("/:id/confirmar", confirmarTrabajoController);
 router.put("/:id/rechazar", rechazarTrabajoController);
 
 // --- RUTAS PARA HU 2 y HU 3 ---
-router.get("/detalles/proveedor/:id", obtenerTrabajoProveedorController);
+
+// 2. ✅ CAMBIO AQUÍ: Usamos tu controlador que conecta a la BD real
+router.get("/detalles/proveedor/:id", getDetallesTrabajoController);
+
 router.get("/detalles/cliente/:id", obtenerTrabajoClienteController);
 router.put("/cancelar/proveedor/:trabajoId", cancelarTrabajoProveedorController);
 router.put("/cancelar/cliente/:trabajoId", cancelarTrabajoClienteController);
