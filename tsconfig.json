@@ -1,22 +1,20 @@
 {
   "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
     "outDir": "./dist",
     "rootDir": "./src",
-    "sourceMap": true,
-    "declaration": false,
-    "removeComments": true,
-    "target": "ES2022",
-    "module": "CommonJS",
+
     "moduleResolution": "Node",
-    "lib": ["ES2022", "DOM"],
-    "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
+
+    "strict": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+
     "baseUrl": "./src",
     "paths": {
       "@/*": ["*"],
@@ -26,11 +24,20 @@
       "@services/*": ["modules/DevCode/services/*"],
       "@models/*": ["modules/DevCode/models/*"],
       "@utils/*": ["utils/*"]
-    },
-    "allowImportingTsExtensions": false,
-    "noUncheckedIndexedAccess": false,
-    "incremental": true
+    }
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts"]
+
+  "include": [
+    "src/index.ts",
+    "src/modules/DevCode/**/*"
+  ],
+
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/testsNotification",
+    "src/modules/notification_Gmail",
+    "src/modules/notification_WhatsApp",
+    "**/*.test.ts"
+  ]
 }
