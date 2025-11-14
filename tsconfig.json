@@ -33,5 +33,10 @@
     "incremental": true
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts", "src/modules/DevCode/**/*", "src/modules/notification_WhatsApp/**/*"]
+  "exclude": ["node_modules", "dist", "**/*.test.ts",
+    "src/modules/DevCode",
+    "src/modules/DevCode/**/*",
+    "src/modules/notification_WhatsApp",
+    "src/modules/notification_WhatsApp/**/*"
+  ]
 }
