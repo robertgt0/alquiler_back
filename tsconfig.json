@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": "./",
     "sourceMap": true,
     "target": "ES2022",
     "module": "CommonJS",
@@ -9,25 +9,23 @@
     "lib": ["ES2022", "DOM"],
 
     "strict": false,
-    "noImplicitAny": false,
-    "strictNullChecks": false,
     "skipLibCheck": true,
     "noEmitOnError": false,
 
-    "forceConsistentCasingInFileNames": false,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
-    "baseUrl": "./src",
+    "forceConsistentCasingInFileNames": false,
 
+    "baseUrl": "./",
     "paths": {
-      "@/*": ["*"],
-      "@config/*": ["config/*"],
+      "@/*": ["src/*"],
+      "@config/*": ["src/config/*"],
+      "@utils/*": ["src/utils/*"],
       "@modules/*": ["modules/*"],
       "@controllers/*": ["modules/DevCode/controllers/*"],
       "@services/*": ["modules/DevCode/services/*"],
-      "@models/*": ["modules/DevCode/models/*"],
-      "@utils/*": ["utils/*"]
+      "@models/*": ["modules/DevCode/models/*"]
     }
   },
   "include": ["src/**/*", "modules/**/*"],
