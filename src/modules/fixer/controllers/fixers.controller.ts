@@ -248,16 +248,55 @@ export const updateCategories = async (req: Request, res: Response) => {
     const categories = normalizeCategories(req.body?.categories);
     const skills = normalizeSkills(req.body?.skills);
     const merged = mergeCategoryIds(categories, skills);
-    if (!merged.length) return res.status(400).json({ success: false, message: "Debes indicar al menos una categoria" });
+    
+    if (!merged.length) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Debes indicar al menos una categoria" 
+      });
+    }
 
-    const updated =
-      skills !== undefined
-        ? await service.updateSkills(id, merged, skills)
-        : await service.updateCategories(id, merged);
-    if (!updated) return res.status(404).json({ success: false, message: "Fixer no encontrado" });
+    // ✅ BUG 1.1.1 FIX: Extraer bio de la misma forma que createFixer
+    const bio = typeof req.body?.bio === "string" 
+      ? req.body.bio.trim() || undefined 
+      : undefined;
+
+    // Validar bio si fue proporcionada
+    if (bio !== undefined && bio.length > 0) {
+      if (bio.length < 20) {
+        return res.status(400).json({
+          success: false,
+          message: "El 'Sobre mí' debe tener al menos 20 caracteres"
+        });
+      }
+      if (bio.length > 500) {
+        return res.status(400).json({
+          success: false,
+          message: "El 'Sobre mí' no puede exceder 500 caracteres"
+        });
+      }
+    }
+
+    // ✅ Usar service.update() directamente (igual que createFixer)
+    const updateData: any = { categories: merged };
+    if (skills !== undefined) updateData.skills = skills;
+    if (bio !== undefined) updateData.bio = bio;
+
+    const updated = await service.update(id, updateData);
+
+    if (!updated) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Fixer no encontrado" 
+      });
+    }
+
     res.json({ success: true, data: updated });
   } catch (err: any) {
-    res.status(400).json({ success: false, message: String(err.message || "Error") });
+    res.status(400).json({ 
+      success: false, 
+      message: String(err.message || "Error") 
+    });
   }
 };
 
