@@ -48,7 +48,6 @@
   "devDependencies": {
     "@types/axios": "^0.14.0",
     "@types/connect": "^3.4.38",
-    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/mongoose": "^5.11.97",
     "@types/multer": "^2.0.0",
