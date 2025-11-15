@@ -3,7 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/database';
 import userRoutes from './modules/teamsys/index';
-
+import { initTeamsysSocketServer } from "./modules/teamsys/utils/socket";
 dotenv.config();
 
 const app = express();
@@ -71,7 +71,7 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 // 🚀 Start
 const PORT = Number(process.env.PORT) || 5000;
 const HOST = '0.0.0.0'; // importante en Render
-app.listen(PORT, HOST, () => {
+const server=app.listen(PORT, HOST, () => {
   // Render expone esta var con la URL pública del servicio
   const publicURL = process.env.RENDER_EXTERNAL_URL;
   const localURL = `http://localhost:${PORT}`;
@@ -82,3 +82,4 @@ app.listen(PORT, HOST, () => {
   console.log(`   - /api/teamsys`);
   console.log(`\n Listo para recibir peticiones!\n`);
 });
+initTeamsysSocketServer(server, allowedOrigins);

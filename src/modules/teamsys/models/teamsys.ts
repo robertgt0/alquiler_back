@@ -128,6 +128,10 @@ const userAuthSchema = new Schema(
       type:Number,
       default:3,
       required:true
+    },
+    historialPassword:{
+      type:[String],
+      default:[]
     }
   },
   { timestamps: true }

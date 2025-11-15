@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { SessionService } from "../services/session.service";
 import { JWTPayload } from "../types/auth.types";
+import { forceLogoutUser } from "../utils/socket";
 
 export class SessionController {
 	private sessionService: SessionService;
@@ -70,32 +71,56 @@ export class SessionController {
 	* DELETE /api/sessions/user/all-except-current
 	*/
 	deleteAllSessionsExceptCurrent = async (req: Request, res: Response): Promise<void> => {
-		try {
-			const { email, userId } = req.authuser as JWTPayload;
-			const token = req.token!;
+  try {
+    const { email, userId } = req.authuser as JWTPayload;
 
-			const session = await this.sessionService.getSessionByToken(token);
+    const authHeader = req.headers.authorization as string;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      res.status(401).json({
+        success: false,
+        message: 'Unauthorized'
+      });
+      return;
+    }
 
-			if (!session) {
-				throw new Error('Session no encontrada');
-			}
+    const token = authHeader.split(' ')[1];
 
-			await this.sessionService.deleteAllSessionsExceptCurrent(userId, session._id.toString());
+    const session = await this.sessionService.getSessionByToken(token);
 
-			res.status(200).json({
-				success: true,
-				message: 'Sesiónes eliminadas exitosamente',
-			});
-		} catch (error) {
-			const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    if (!session) {
+      throw new Error('Session no encontrada');
+    }
 
-			res.status(400).json({
-				success: false,
-				message: 'Error al eliminar sessiones',
-				error: errorMessage
-			});
-		}
-	};
+    // 1) Borrar todas las sesiones menos la actual (tu lógica actual)
+    await this.sessionService.deleteAllSessionsExceptCurrent(
+      userId,
+      session._id.toString()
+    );
+
+    // 2) WebSockets: expulsar al resto de dispositivos del usuario
+    //    El front enviará el id del socket actual en este header:
+    //    "x-socket-id": socket.id
+    const currentSocketId =
+      (req.headers["x-socket-id"] as string | undefined) || undefined;
+
+    forceLogoutUser(userId, currentSocketId);
+
+    // 3) Respuesta igual que antes (puedes mejorar mensaje luego si quieres)
+    res.status(200).json({
+      success: true,
+      message: 'Sesiónes eliminadas exitosamente',
+    });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+
+    res.status(400).json({
+      success: false,
+      message: 'Error al eliminar sessiones',
+      error: errorMessage
+    });
+  }
+};
+
 
 }
 

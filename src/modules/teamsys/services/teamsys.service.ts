@@ -17,10 +17,12 @@ export class UsuarioService {
     if (existe) {
       throw new Error('El correo electrónico ya está registrado');
     }
+    
     if (data.password!=null) {
     if (!validarPassword(data.password)) {
       throw new Error('La contraseña no cumple con los requisitos mínimos');
     }
+    
     }
     const userData = {
       ...data,
@@ -33,7 +35,7 @@ export class UsuarioService {
 
     await UserAuthModel.create({
       userId: usuarioCreado._id,
-      authProvider: [usuarioCreado.authProvider],
+      authProvider: [usuarioCreado.authProvider]
       // mapaModificacion usa el default=3 del schema
     });
   } catch (err) {
@@ -186,15 +188,13 @@ async cambiarContraseña(
   contraseñaActual: string, 
   nuevaContraseña: string
 ): Promise<UserDocument> {
-  // Convertir el string userId a ObjectId
   let usuario;
-  
+
+  // Buscar usuario por ID
   try {
-    // Si userId es un ObjectId válido, convertirlo
     if (mongoose.Types.ObjectId.isValid(userId)) {
       usuario = await Usuario.findById(new mongoose.Types.ObjectId(userId));
     } else {
-      // Si no es ObjectId válido, buscar por otros campos
       usuario = await Usuario.findOne({ correo: userId });
     }
   } catch (error) {
@@ -205,22 +205,47 @@ async cambiarContraseña(
     throw new Error('Usuario no encontrado');
   }
 
-  // Verificar contraseña actual (solo para usuarios locales)
+  // 1️⃣ Verificar contraseña actual (solo usuarios 'local')
   if (usuario.authProvider === 'local' && usuario.password) {
     if (usuario.password !== contraseñaActual) {
       throw new Error('La contraseña actual es incorrecta');
     }
   }
 
-  // Validar nueva contraseña
-  if (!validarPassword(nuevaContraseña)) {
-    throw new Error('La nueva contraseña no cumple con los requisitos de seguridad');
+  // 2️⃣ Validar que la nueva contraseña NO esté en el historial
+  const userAuth = await UserAuthModel.findOne({ userId: usuario._id });
+
+  if (userAuth && Array.isArray(userAuth.historialPassword)) {
+    const yaUsada = userAuth.historialPassword.includes(nuevaContraseña);
+
+    if (yaUsada) {
+      throw new Error('No se pueden repetir contraseñas antiguas');
+    }
   }
 
-  // Actualizar contraseña
+  // 3️⃣ Validar nueva contraseña con tus reglas
+  if (!validarPassword(nuevaContraseña)) {
+    throw new Error(
+      'La nueva contraseña no cumple con los requisitos de seguridad'
+    );
+  }
+
+  // 4️⃣ Guardar nueva contraseña
   usuario.password = nuevaContraseña;
-  return await usuario.save();
+  const usuarioGuardado = await usuario.save();
+
+  // 5️⃣ Actualizar historial y añadir método local si no existe
+  await UserAuthModel.findOneAndUpdate(
+    { userId: usuario._id },
+    {
+      $push: { historialPassword: contraseñaActual }
+    },
+    { new: true, upsert: true }
+  );
+
+  return usuarioGuardado;
 }
+
 
 
 /**

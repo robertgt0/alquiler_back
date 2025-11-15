@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { AuthService } from "../services/auth.service";
 import { JWTPayload } from "../types/auth.types";
-import { SessionService } from "../services/session.service";
 
 declare global {
     namespace Express {
@@ -24,16 +23,6 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
         }
 
         const token = authHeader.split(' ')[1];
-
-        const sessionService = new SessionService();
-        const session = await sessionService.getSessionByToken(token);
-
-        if (!session) {
-            res.status(401).json({
-                success: false,
-                message: 'Token invalido o sesion expirada'
-            });
-        }
 
         const authService = new AuthService();
         const payload = authService.verifyAccessToken(token);

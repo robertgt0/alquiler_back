@@ -9,6 +9,7 @@ import { validarPassword } from '../utils/validaciones';
 import { AuthService } from '../services/auth.service';
 //import { JWTPayload } from '../types/auth.types';
 import mongoose from 'mongoose';
+import { forceLogoutUser } from "../utils/socket";
 
 // Extender el tipo Request para este archivo
 declare module 'express' {
@@ -588,19 +589,49 @@ export const cambiarContraseña = async (req: Request, res: Response): Promise<v
 
     // Cerrar todas las sesiones del usuario (usando el servicio existente)
     const sessionService = new SessionService();
-    await sessionService.deleteAllSessionsExceptCurrentM(userId);
 
-    res.json({
-      success: true,
-      message: 'Contraseña cambiada exitosamente. Todas las sesiones han sido cerradas por seguridad.',
-      data: {
-        usuario: {
-          id: usuarioActualizado._id,
-          correo: usuarioActualizado.correo,
-          nombre: usuarioActualizado.nombre
-        }
-      }
-    });
+// El token actual ya lo puso el authMiddleware
+const token = req.token;
+if (!token) {
+  res.status(401).json({
+    success: false,
+    message: 'Token no encontrado en la petición',
+  });
+  return;
+}
+
+// Buscar la sesión actual a partir del token
+const session = await sessionService.getSessionByToken(token);
+
+if (!session) {
+  throw new Error('Session no encontrada');
+}
+const closedCount = await sessionService.deleteAllSessionsExceptCurrentM(
+  userId,
+  session._id.toString()
+);
+console.log("🔐 Sesiones cerradas (BD) al cambiar contraseña:", closedCount);
+
+// 2️⃣ Leer el socketId que mandó el front
+const currentSocketId =
+  (req.headers["x-socket-id"] as string | undefined) || undefined;
+console.log("🛰️ x-socket-id en cambiarContraseña:", currentSocketId);
+
+// 3️⃣ Mandar evento por socket a los otros dispositivos
+forceLogoutUser(userId, currentSocketId);
+
+res.json({
+  success: true,
+  message: 'Contraseña cambiada exitosamente. Todas las sesiones han sido cerradas por seguridad.',
+  data: {
+    usuario: {
+      id: usuarioActualizado._id,
+      correo: usuarioActualizado.correo,
+      nombre: usuarioActualizado.nombre
+    }
+  }
+});
+
   } catch (error) {
     handleError(error, res);
   }
