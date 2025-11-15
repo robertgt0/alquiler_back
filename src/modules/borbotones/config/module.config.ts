@@ -1,9 +1,8 @@
-// Configuración específica de este módulo
 
 export const moduleConfig = {
-  moduleName: 'nombre_grupo_ejemplo',
+  moduleName: 'Borbotones',
   version: '1.0.0',
-  prefix: '/api/nombre_grupo_ejemplo',
+  prefix: '/api/los_borbotones',
   features: {
     ejemplo: true,
     // Agrega más features aquí

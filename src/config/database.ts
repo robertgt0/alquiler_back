@@ -1,13 +1,25 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose"; // Importa Mongoose, la libreria para conectarse y trabajar con MongoDB
+import { config } from 'dotenv';
 
+// Cargar variables de entorno
+config();
+
+// Función asincrona para conectar la base de datos
 const connectDB = async (): Promise<void> => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI as string);
-    console.log(' MongoDB conectado exitosamente');
+    // Intenta conectarse a MongoDB usando la variable de entorno MONGO_URI
+    const conn = await mongoose.connect(process.env.MONGO_URI as string);
+    // Si la conexión es exitosa, muestra en consola el host al que se conectó
+    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
-    console.error('❌ Error al conectar MongoDB:', error);
+    // Si ocurre un error durante la conexión, lo muestra en consola
+    console.error('❌ MongoDB connection error:', error);
+    // Finaliza el proceso con un código de error (1 indica fallo)
     process.exit(1);
   }
 };
 
+// Exporta la función para que pueda ser usada en otros archivos (por ejemplo, index.ts o app.ts)
 export default connectDB;
+
+
