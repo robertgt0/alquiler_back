@@ -32,11 +32,21 @@
     "noUncheckedIndexedAccess": false,
     "incremental": true
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts",
+
+  "include": [
+    "src/index.ts",
+    "src/modules/**/*.ts",
+    "src/config/**/*.ts",
+    "src/utils/**/*.ts"
+  ],
+
+  "exclude": [
+    "node_modules",
+    "dist",
     "src/modules/DevCode",
     "src/modules/DevCode/**/*",
     "src/modules/notification_WhatsApp",
-    "src/modules/notification_WhatsApp/**/*"
+    "src/modules/notification_WhatsApp/**/*",
+    "**/*.test.ts"
   ]
 }

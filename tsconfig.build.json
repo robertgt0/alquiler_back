@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "./dist"
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": [
+    "src/modules/DevCode",
+    "src/modules/DevCode/**/*",
+    "src/modules/notification_WhatsApp",
+    "src/modules/notification_WhatsApp/**/*",
+    "**/*.test.ts"
+  ]
+}
