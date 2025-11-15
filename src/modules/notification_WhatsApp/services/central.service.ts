@@ -13,6 +13,9 @@ interface Destination {
 }
 
 interface CreateNotificationInput {
+  channel: string;
+  subject: string;
+  fromName: string;
   message: string;
   destinations: Destination[];
 }

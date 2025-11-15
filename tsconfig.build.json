@@ -6,9 +6,7 @@
   },
   "include": ["src/**/*.ts"],
   "exclude": [
-    "src/modules/DevCode",
     "src/modules/DevCode/**/*",
-    "src/modules/notification_WhatsApp",
     "src/modules/notification_WhatsApp/**/*",
     "**/*.test.ts"
   ]
