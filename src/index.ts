@@ -7,22 +7,16 @@ import dotenv from "dotenv";
 import helmet from "helmet";
 import path from "path";
 
-// 🔹 Cargar variables de entorno antes de cualquier import dinámico
-
-
 dotenv.config({ path: path.resolve(process.cwd(), ".env") });
-//import routesDevcode from "./modules/DevCode/routes"
-// Cargar variables de entorno
 
 // ============================================
-// BASE DE DATOS (solo si se usa Gmail o registro de notificaciones)
+// BASE DE DATOS
 // ============================================
 import connectDB from "./config/database";
 
 connectDB().catch((err) => {
-  console.error("❌ Error al conectar con la base de datos:", err.message);
+  console.error("Error al conectar con la base de datos:", err.message);
 });
-
 
 // ============================================
 // MIDDLEWARES GLOBALES
@@ -32,13 +26,12 @@ import { notFoundHandler } from "./modules/notification_Gmail/middlewares/notFou
 import { globalErrorHandler } from "./modules/notification_Gmail/middlewares/error.middleware";
 
 // ============================================
-// IMPORT UTILIDADES INTERNAS (LOCAL LOGGER)
+// UTILIDADES
 // ============================================
 import { logSystem } from "./modules/notification_Gmail/utils/loggerExtended";
-import { generateCode } from "./modules/notification_Gmail/utils/helpers";
 
 // ============================================
-// RUTAS: NOTIFICACIONES
+// RUTAS DE NOTIFICACIONES
 // ============================================
 import gmailRoutes from "./modules/notification_Gmail/routes/notification.routes";
 import gmailCentralRouter from "./modules/notification_Gmail/routes/central.router";
@@ -46,7 +39,7 @@ import whatsappRoutes from "./modules/notification_WhatsApp/routes/notification.
 import whatsappCentralRouter from "./modules/notification_WhatsApp/routes/central.router";
 
 // ============================================
-// RUTAS GENERALES PARA EL PROYECTO - BACKEND
+// RUTAS GENERALES
 // ============================================
 import citaRoutes from "./routes/cita.routes";
 import ciudadRoutes from "./routes/ciudad.routes";
@@ -66,37 +59,76 @@ import userRoutes from "./routes/user.routes";
 import userAuthRoutes from "./routes/userAuth.routes";
 import walletRoutes from "./routes/wallet.routes";
 
+// ============================================
+// RUTAS DEL EQUIPO (OFERTAS / FIXERS / CATEGORIES / TEAMSYS)
+// ============================================
+import offersRouter from "./routes/offers";
+import fixerModule from "./modules/fixer";
+import categoriesModule from "./modules/categories";
+import teamsysModule from "./modules/teamsys";
 
 // ============================================
-// INICIALIZACIÓN DE APP
+// APP SETUP
 // ============================================
 const app = express();
 
-// --- Middlewares base ---
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+const corsOrigins = [
+  ...(process.env.ALLOWED_ORIGINS ?? "").split(","),
+  ...(process.env.CORS_ORIGIN ?? "").split(","),
+]
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+app.use(
+  cors({
+    origin: corsOrigins.length ? corsOrigins : true,
+    credentials: true,
+  })
+);
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(helmet());
 app.use(requestLogger);
 
-
-
-// Ruta raíz
-app.get('/', (req: Request, res: Response) => {
+// ============================================
+// RUTAS PÚBLICAS
+// ============================================
+app.get("/", (_req: Request, res: Response) => {
   res.json({
-    message: "API Backend de Notificaciones",
+    message: "API Backend Servineo",
     status: "OK",
     version: "1.0.0",
     timestamp: new Date().toISOString(),
     modules: {
-      gmail: ["/api/gmail-notifications", "/gmail-notifications"],
-      whatsapp: ["/api/whatsapp-notifications", "/whatsapp-notifications"],
+      notifications: {
+        gmail: ["/api/gmail-notifications", "/gmail-notifications"],
+        whatsapp: ["/api/whatsapp-notifications", "/whatsapp-notifications"],
+      },
+      general: [
+        "/api/cita",
+        "/api/ciudad",
+        "/api/cliente",
+        "/api/especialidad",
+        "/api/fixer",
+        "/api/historial",
+        "/api/horario-disponible",
+        "/api/magiclink",
+        "/api/notificacion-gmail",
+        "/api/notificacion-whatsapp",
+        "/api/provincia",
+        "/api/servicio",
+        "/api/session",
+        "/api/trabajo",
+        "/api/user",
+        "/api/auth",
+        "/api/wallet",
+      ],
+      teamScrumPiones: ["/api/offers", "/api/fixers", "/api/categories", "/api/teamsys"],
     },
   });
 });
 
-// Health check
-app.get("/api/health", (req: Request, res: Response) => {
+app.get("/api/health", (_req: Request, res: Response) => {
   res.json({
     status: "healthy",
     database: "connected",
@@ -105,19 +137,13 @@ app.get("/api/health", (req: Request, res: Response) => {
 });
 
 // ============================================
-// MÓDULOS ACTIVOS
+// RUTAS DE MODULOS
 // ============================================
-
-// --- Gmail Notifications ---
 app.use("/gmail-notifications", gmailRoutes);
 app.use("/api/gmail-notifications", gmailCentralRouter);
-
-// --- WhatsApp Notifications ---
 app.use("/whatsapp-notifications", whatsappRoutes);
 app.use("/api/whatsapp-notifications", whatsappCentralRouter);
 
-
-// --- Rutas Generales del Proyecto ---
 app.use("/api/cita", citaRoutes);
 app.use("/api/ciudad", ciudadRoutes);
 app.use("/api/cliente", clienteRoutes);
@@ -136,10 +162,12 @@ app.use("/api/user", userRoutes);
 app.use("/api/auth", userAuthRoutes);
 app.use("/api/wallet", walletRoutes);
 
-// app.use('/api/nombre_grupo_ejemplo', nombreGrupoEjemploRouter);
+// Rutas del equipo
+app.use("/api/offers", offersRouter);
+app.use("/api/fixers", fixerModule);
+app.use("/api/categories", categoriesModule);
+app.use("/api/teamsys", teamsysModule);
 
-// ROUTES DEVCODE
-//app.use('/api/devcode', routesDevcode)
 // ============================================
 // MANEJO DE ERRORES
 // ============================================
@@ -147,45 +175,13 @@ app.use(notFoundHandler);
 app.use(globalErrorHandler);
 
 // ============================================
-// INICIO DEL SERVIDOR
+// SERVIDOR
 // ============================================
-const PORT = process.env.PORT || 5000;
+const PORT = Number(process.env.PORT ?? 5000);
 
 app.listen(PORT, () => {
   const baseUrl = `http://localhost:${PORT}`;
-
-  const modules = [
-    "📩 Gmail Notifications:",
-    "   - /gmail-notifications",
-    "   - /api/gmail-notifications",
-    "",
-    "💬 WhatsApp Notifications:",
-    "   - /whatsapp-notifications",
-    "   - /api/whatsapp-notifications",
-    "",
-    "🗂️ Rutas Generales del Proyecto:",
-    "   - /api/cita",
-    "   - /api/ciudad",
-    "   - /api/cliente",
-    "   - /api/especialidad",
-    "   - /api/fixer",
-    "   - /api/historial",
-    "   - /api/horario-disponible",
-    "   - /api/magiclink",
-    "   - /api/notificacion-gmail",
-    "   - /api/notificacion-whatsapp",
-    "   - /api/provincia",
-    "   - /api/servicio",
-    "   - /api/session",
-    "   - /api/trabajo",
-    "   - /api/user",
-    "   - /api/auth",
-    "   - /api/wallet",
-  ];
-
-  logSystem("INFO", `🚀 Servidor corriendo en puerto ${PORT}`);
-  logSystem("INFO", `🔧 Modo: ${process.env.NODE_ENV}`);
-  logSystem("INFO", `🌐 URL base: ${baseUrl}`);
-  logSystem("INFO", "📦 Módulos activos:\n" + modules.join("\n"));
-  logSystem("INFO", "✅ Listo para recibir peticiones!");
+  logSystem("INFO", `Servidor corriendo en puerto ${PORT}`);
+  logSystem("INFO", `Modo: ${process.env.NODE_ENV}`);
+  logSystem("INFO", `URL base: ${baseUrl}`);
 });

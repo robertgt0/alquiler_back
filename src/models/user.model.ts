@@ -1,4 +1,4 @@
-import { Schema, model, Document } from "mongoose";
+import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface IUser extends Document {
   nombre: string;
@@ -6,18 +6,22 @@ export interface IUser extends Document {
   telefono?: string;
   correo: string;
   password?: string;
-  fotoPerfil: string;
-  ubicacion: {
+  contraseña?: string;
+  fotoPerfil?: string;
+  foto_perfil?: string;
+  ubicacion?: {
     type: "Point";
     coordinates: [number, number];
   };
   terminosYCondiciones?: boolean;
   authProvider?: string;
   googleId?: string;
-  rol: string[];
+  rol?: "cliente" | "proveedor" | "admin" | string;
+  roles?: string[];
   twoFactorSecret?: string;
   twoFactorEnabled?: boolean;
   twoFactorBackupCodes?: string[];
+  fecha_creacion?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -27,9 +31,13 @@ const userSchema = new Schema<IUser>(
     nombre: { type: String, required: true },
     apellido: { type: String },
     telefono: { type: String },
-    correo: { type: String, required: true, unique: true },
-    password: { type: String },
-    fotoPerfil: { type: String, required: true },
+    correo: { type: String, required: true, unique: true, trim: true },
+
+    password: { type: String, select: false },
+    contraseña: { type: String, select: false },
+
+    fotoPerfil: { type: String },
+    foto_perfil: { type: String },
 
     ubicacion: {
       type: {
@@ -39,7 +47,7 @@ const userSchema = new Schema<IUser>(
       },
       coordinates: {
         type: [Number],
-        required: true,
+        default: undefined,
       },
     },
 
@@ -48,18 +56,26 @@ const userSchema = new Schema<IUser>(
     googleId: { type: String },
 
     rol: {
+      type: String,
+      enum: ["cliente", "proveedor", "admin"],
+      default: "cliente",
+    },
+
+    roles: {
       type: [String],
       enum: ["cliente", "fixer", "admin"],
-      required: true,
+      default: undefined,
     },
 
     twoFactorSecret: { type: String },
     twoFactorEnabled: { type: Boolean, default: false },
     twoFactorBackupCodes: [{ type: String }],
+
+    fecha_creacion: { type: Date, default: Date.now },
   },
-  { timestamps: true } // genera createdAt y updatedAt automáticos
+  { timestamps: true }
 );
 
-userSchema.index({ ubicacion: "2dsphere" }); // índice geoespacial
+userSchema.index({ ubicacion: "2dsphere" });
 
-export const User = model<IUser>("User", userSchema);
+export const User: Model<IUser> = mongoose.models.User ?? mongoose.model<IUser>("User", userSchema);

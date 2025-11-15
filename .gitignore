@@ -5,6 +5,10 @@ dist/
 #*.log
 build/
 coverage/
-.idea
-#logs
+coverage/.env
+.idea/
 workspace.xml
+logs/
+send_log/
+tsconfig.tsbuildinfo
+src_ultimo.zip
