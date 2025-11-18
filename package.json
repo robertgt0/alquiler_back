@@ -1,46 +1,63 @@
 {
-   "name": "alquiler_back",
-   "version": "1.0.0",
-   "description": "\r backend/\r ├── src/\r │   ├── config/              # Configuración global (DB, etc)\r │   ├── types/               # Tipos globales compartidos\r │   ├── utils/               # Utilidades globales\r │   ├── middlewares/         # Middlewares globales\r │   ├── modules/             # Módulos/Grupos independientes\r │   │   └── nombre_grupo_ejemplo/  # Ejemplo de módulo\r │   │       ├── config/\r │   │       ├── controllers/\r │   │       ├── routes/\r │   │       ├── services/\r │   │       ├── middlewares/\r │   │       ├── models/\r │   │       ├── types/\r │   │       ├── utils/\r │   │       ├── errors/\r │   │       └── index.ts\r │   └── index.ts             # Punto de entrada principal\r ├── dist/                    # Código compilado\r ├── .env                     # Variables de entorno\r ├── tsconfig.json           # Configuración TypeScript\r └── package.json            # Dependencias\r ",
-   "main": "index.js",
-   "scripts": {
-      "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
-      "build": "tsc",
-      "seed:import": "ts-node src/utils/seeder.ts -i",
-      "seed:delete": "ts-node src/utils/seeder.ts -d"
-   },
-   "repository": {
-      "type": "git",
-      "url": "git+https://github.com/EDSON-CHAMBI-QUISPE/alquiler_back.git"
-   },
-   "keywords": [],
-   "author": "",
-   "license": "ISC",
-   "bugs": {
-      "url": "https://github.com/EDSON-CHAMBI-QUISPE/alquiler_back/issues"
-   },
-   "homepage": "https://github.com/EDSON-CHAMBI-QUISPE/alquiler_back#readme",
-   "dependencies": {
-      "axios": "^1.12.2",
-      "body-parser": "^2.2.0",
-      "cors": "^2.8.5",
-      "dotenv": "^17.2.3",
-      "express": "^5.1.0",
-      "jsonwebtoken": "^9.0.2",
-      "mogoose": "^0.0.1-security",
-      "mongoose": "^8.19.2"
-   },
-   "devDependencies": {
-      "@types/cors": "^2.8.19",
-      "@types/express": "^5.0.3",
-      "@types/jsonwebtoken": "^9.0.10",
-      "@types/node": "^24.9.1",
-      "nodemon": "^3.1.10",
-      "rimraf": "^6.0.1",
-      "ts-node-dev": "^2.0.0",
-      "typescript": "^5.9.3"
-   },
-   "engines": {
-      "node": "22.x"
-   }
+  "name": "alquiler_back",
+  "version": "1.0.0",
+  "description": "Backend de alquiler con TypeScript, Express y Mongoose",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18"
+  },
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/index.ts",
+    "seed": "ts-node-dev --transpile-only src/seed/seedOffers.ts",
+    "build": "rimraf dist && tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "start:dev": "npm run build && npm start",
+    "clean": "rimraf dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/robertgt0/alquiler_back.git"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "@google-cloud/pubsub": "^5.2.0",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node-fetch": "^2.6.13",
+    "@types/uuid": "^10.0.0",
+    "axios": "^1.12.2",
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dayjs": "^1.11.18",
+    "dotenv": "^16.6.1",
+    "express": "^5.1.0",
+    "googleapis": "^161.0.0",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.20.0",
+    "multer": "^2.0.2",
+    "node-fetch": "^2.7.0",
+    "nodemailer": "^7.0.9",
+    "rimraf": "^6.0.1",
+    "uuid": "^9.0.1",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "@types/axios": "^0.14.0",
+    "@types/connect": "^3.4.38",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.5",
+    "@types/helmet": "^0.0.48",
+    "@types/mongoose": "^5.11.97",
+    "@types/multer": "^2.0.0",
+    "@types/node": "^24.10.1",
+    "nodemon": "^3.1.10",
+    "ts-node-dev": "^2.0.0",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.9.3"
+  },
+  "optionalDependencies": {
+    "fsevents": "^2.3.3"
+  }
 }

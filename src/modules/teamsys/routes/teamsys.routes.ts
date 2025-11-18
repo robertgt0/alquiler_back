@@ -13,7 +13,6 @@ import {
   googleCallback      // NUEVO
 } from '../controllers/teamsys.controller';
 import { validateData } from '../middlewares/validate.middleware';
-import { authController } from '../controllers/auth.controller';
 
 const router = Router();
 
@@ -37,7 +36,5 @@ router.get('/exists', existsByEmail);
 /**
  * Auth routes (manteniendo compatibilidad)
  */
-router.post("/auth/google/callback", authController.googleCallback); // Ruta alternativa
-router.get("/auth/me", authController.getCurrentUser);
 
 export default router;

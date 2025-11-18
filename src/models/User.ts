@@ -1,32 +1,62 @@
-import { Schema, model, InferSchemaType, HydratedDocument } from 'mongoose';
+import mongoose, { Schema, Document } from "mongoose";
+import { env } from "../config/env";
 
-const usuarioSchema = new Schema(
+export interface UserLocation {
+  direccion?: string;
+  ciudad?: string;
+  departamento?: string;
+  provincia?: string;
+  lat?: number;
+  lng?: number;
+}
+
+export interface UserDoc extends Document {
+  nombre?: string;
+  apellido?: string;
+  telefono?: string;
+  correo?: string;
+  ci?: string;
+  fotoPerfil?: string;
+  ubicacion?: UserLocation;
+  terminosYCondiciones?: boolean;
+  rol?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+  [key: string]: any;
+}
+
+const usersDbName = env.MONGODB_USERS_DB;
+const baseConnection = mongoose.connection;
+const usersConnection = usersDbName
+  ? baseConnection.useDb(usersDbName, { useCache: true })
+  : baseConnection;
+
+const UserSchema = new Schema<UserDoc>(
   {
-    nombre: { type: String, required: [true, 'El nombre es requerido'], trim: true },
+    nombre: { type: String, trim: true },
     apellido: { type: String, trim: true },
     telefono: { type: String, trim: true },
-    correoElectronico: {
-      type: String,
-      required: [true, 'El correo electrónico es requerido'],
-      unique: true,
-      trim: true,
-      lowercase: true,
-    },
-    password: { type: String, minlength: [6, 'La contraseña debe tener al menos 6 caracteres'] },
-    fotoPerfil: { type: Buffer }, // binario
+    correo: { type: String, trim: true },
+    ci: { type: String, trim: true },
+    fotoPerfil: { type: String, trim: true },
     ubicacion: {
-      type: { type: String, enum: ['Point'], default: 'Point' },
-      coordinates: { type: [Number], default: [0, 0] }, // [long, lat]
+      direccion: { type: String, trim: true },
+      ciudad: { type: String, trim: true },
+      departamento: { type: String, trim: true },
+      provincia: { type: String, trim: true },
+      lat: { type: Number },
+      lng: { type: Number },
     },
-    terminosYCondiciones: { type: Boolean, required: [true, 'Debes aceptar los términos y condiciones'] },
+    terminosYCondiciones: { type: Boolean },
+    rol: { type: String, trim: true },
   },
-  { timestamps: true }
+  {
+    collection: "users",
+    timestamps: true,
+    strict: false,
+  }
 );
 
-// índice geoespacial
-usuarioSchema.index({ ubicacion: '2dsphere' });
+UserSchema.index({ ci: 1 }, { unique: true, sparse: true });
 
-export type Usuario = InferSchemaType<typeof usuarioSchema>;
-export type UsuarioDocument = HydratedDocument<Usuario>;
-
-export default model<Usuario>('Usuario', usuarioSchema, 'usuarios');
+export const UserModel = usersConnection.models.User ?? usersConnection.model<UserDoc>("User", UserSchema);

@@ -3,7 +3,6 @@ import teamsysService from '../services/teamsys.service';
 import { ApiResponse} from '../types/index';
 import Usuario, { UserDocument } from '../models/teamsys';
 import { handleError } from '../errors/errorHandler';
-import { authController } from './auth.controller';
 
 /* Endpoint de debug para Google Auth */
 export const debugGoogleAuth = async (req: Request, res: Response): Promise<void> => {
@@ -77,7 +76,6 @@ export const testGoogleAuth = async (req: Request, res: Response): Promise<void>
 export const googleCallback = async (req: Request, res: Response): Promise<void> => {
   try {
     console.log('🔄 Iniciando callback de Google desde controller...');
-    await authController.googleCallback(req, res);
   } catch (error) {
     console.error('❌ Error en googleCallback controller:', error);
     handleError(error, res);

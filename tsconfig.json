@@ -1,54 +1,37 @@
 {
-  "//": "tsconfig-schema:ignore",
   "compilerOptions": {
-    /* === Salida y estructura === */
     "outDir": "./dist",
     "rootDir": "./src",
     "sourceMap": true,
     "declaration": false,
     "removeComments": true,
-
-    /* === Módulos y compatibilidad === */
     "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "lib": ["ES2022", "DOM"],
-
-    /* === Comportamiento del compilador === */
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "lib": ["ES2022"],
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-
-    /* === Imports === */
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
-
-    /* === Alias - VERSIÓN ACTUALIZADA === */
+    "baseUrl": "./src",
     "paths": {
-      "@/*": ["./src/*"],
-      "@config/*": ["./src/config/*"],
-      "@modules/*": ["./src/modules/*"],
-      "@controllers/*": ["./src/modules/*"],
-      "@services/*": ["./src/modules/*"],
-      "@models/*": ["./src/models/*", "./src/modules/*"],
-      "@utils/*": ["./src/utils/*"]
+      "@/*": ["*"],
+      "@config/*": ["config/*"],
+      "@modules/*": ["modules/*"],
+      "@routes/*": ["routes/*"],
+      "@models/*": ["models/*"],
+      "@controllers/*": ["controllers/*"],
+      "@services/*": ["services/*"],
+      "@utils/*": ["utils/*"]
     },
-
-    /* === Nueva opción para desarrolladores === */
-    // "noEmit": true, // (Esto ya lo habíamos borrado, está bien)
-    // "allowImportingTsExtensions": true, // 👈 CORRECCIÓN: Borramos esta línea
+    "allowImportingTsExtensions": false,
     "noUncheckedIndexedAccess": false,
     "incremental": true
   },
-  "include": ["src/**/*"],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "**/*.test.ts",
-    "src/modules/nombre_grupo_ejemplo/**",
-    "src/utils/**"
-  ]
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }

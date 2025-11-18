@@ -1,21 +1,14 @@
-import { Request } from 'express';
-
+// src/types/index.ts
 export interface IUser {
-  _id?: string;
   name: string;
   email: string;
-  password: string;
-  createdAt?: Date;
-  updatedAt?: Date;
+  password?: string;
+  ci?: string;
 }
 
-export interface ApiResponse<T> {
+export interface ApiResponse<T = any> {
   success: boolean;
   data?: T;
   message?: string;
-  count?: number;
-}
-
-export interface CustomRequest extends Request {
-  user?: IUser;
+  error?: string;
 }

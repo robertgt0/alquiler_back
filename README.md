@@ -88,6 +88,10 @@ Cada equipo trabaja en su propio módulo sin interferir con otros:
 
 Una vez terminado, cada equipo monta su módulo en `src/index.ts`
 
+<<<<<<< HEAD
+esto no estaba en el git
+=======
 
 ## DevCode
 - Johan
+>>>>>>> org/dev/dev-code
