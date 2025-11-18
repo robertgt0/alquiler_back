@@ -128,8 +128,9 @@ router.post("/auth/login", async (req, res) => {
     }
 
     const secret: Secret = process.env.JWT_SECRET || "servineoapptest123";
-    const signOptions: SignOptions = {};
-    signOptions.expiresIn = (process.env.JWT_EXPIRES_IN as any) || "1h";
+    const signOptions: SignOptions = {
+      expiresIn: process.env.JWT_EXPIRES_IN as "1h" | "2h" | "24h" | number || "1h"
+    };
 
     const token = jwt.sign(
       {
@@ -206,7 +207,9 @@ router.post("/google/callback", async (req, res) => {
 
     // Generar token JWT
     const secret: Secret = process.env.JWT_SECRET || "servineoapptest123";
-    const signOptions: SignOptions = { expiresIn: process.env.JWT_EXPIRES_IN || "1h" };
+    const signOptions: SignOptions = {
+      expiresIn: process.env.JWT_EXPIRES_IN as "1h" | "2h" | "24h" | number || "1h"
+    };
 
     const token = jwt.sign(
       { 

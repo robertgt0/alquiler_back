@@ -1,72 +1,75 @@
 // ============================================
-// IMPORTS BASE
+// IMPORTS BASE - COMMONJS
 // ============================================
-import express, { Request, Response } from "express";
-import cors from "cors";
-import dotenv from "dotenv";
-import helmet from "helmet";
-import path from "path";
-import ubicacionesRoutes from "./routes/ubicaciones.routes";
+const express = require("express");
+const cors = require("cors");
+const dotenv = require("dotenv");
+const helmet = require("helmet");
+const path = require("path");
+
+// Módulos locales con require
+const ubicacionesRoutes = require("./routes/ubicaciones.routes");
+const connectDB = require("./config/database"); // ✅ Este es el import
 
 dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 
 // ============================================
-// BASE DE DATOS
+// BASE DE DATOS - ✅ CORREGIR NOMBRE DE VARIABLE
 // ============================================
-import connectDB from "./config/database";
+const databaseConnection = connectDB; // ✅ Renombrar la variable
 
-connectDB().catch((err) => {
+databaseConnection().catch((err: any) => {
   console.error("Error al conectar con la base de datos:", err.message);
 });
 
 // ============================================
-// MIDDLEWARES GLOBALES
+// MIDDLEWARES GLOBALES - COMMONJS
 // ============================================
-import { requestLogger } from "./modules/notification_Gmail/middlewares/request.middleware";
-import { notFoundHandler } from "./modules/notification_Gmail/middlewares/notFound.middleware";
-import { globalErrorHandler } from "./modules/notification_Gmail/middlewares/error.middleware";
+const { requestLogger } = require("./modules/notification_Gmail/middlewares/request.middleware");
+const { notFoundHandler } = require("./modules/notification_Gmail/middlewares/notFound.middleware");
+const { globalErrorHandler } = require("./modules/notification_Gmail/middlewares/error.middleware");
 
 // ============================================
-// UTILIDADES
+// UTILIDADES - COMMONJS
 // ============================================
-import { logSystem } from "./modules/notification_Gmail/utils/loggerExtended";
+const { logSystem } = require("./modules/notification_Gmail/utils/loggerExtended");
 
 // ============================================
-// RUTAS DE NOTIFICACIONES
+// RUTAS DE NOTIFICACIONES - COMMONJS
 // ============================================
-import gmailRoutes from "./modules/notification_Gmail/routes/notification.routes";
-import gmailCentralRouter from "./modules/notification_Gmail/routes/central.router";
-import whatsappRoutes from "./modules/notification_WhatsApp/routes/notification.routes";
-import whatsappCentralRouter from "./modules/notification_WhatsApp/routes/central.router";
+const gmailRoutes = require("./modules/notification_Gmail/routes/notification.routes");
+const gmailCentralRouter = require("./modules/notification_Gmail/routes/central.router");
+const whatsappRoutes = require("./modules/notification_WhatsApp/routes/notification.routes");
+const whatsappCentralRouter = require("./modules/notification_WhatsApp/routes/central.router");
 
 // ============================================
-// RUTAS GENERALES
+// RUTAS GENERALES - COMMONJS
 // ============================================
-import citaRoutes from "./routes/cita.routes";
-import ciudadRoutes from "./routes/ciudad.routes";
-import clienteRoutes from "./routes/cliente.routes";
-import especialidadRoutes from "./routes/especialidad.routes";
-import fixerRoutes from "./routes/fixer.routes";
-import historialRoutes from "./routes/historial.routes";
-import horarioDisponibleRoutes from "./routes/horario_disponible.routes";
-import notificacionGmailRoutes from "./routes/notificacionGmail.routes";
-import notificacionWhatsAppRoutes from "./routes/notificacionWhatsApp.routes";
-import magiclinkRoutes from "./routes/magiclink.routes";
-import provinciaRoutes from "./routes/provincia.routes";
-import servicioRoutes from "./routes/servicio.routes";
-import sessionRoutes from "./routes/session.routes";
-import trabajoRoutes from "./routes/trabajo.routes";
-import userRoutes from "./routes/user.routes";
-import userAuthRoutes from "./routes/userAuth.routes";
-import walletRoutes from "./routes/wallet.routes";
+const citaRoutes = require("./routes/cita.routes");
+const ciudadRoutes = require("./routes/ciudad.routes");
+const clienteRoutes = require("./routes/cliente.routes");
+const especialidadRoutes = require("./routes/especialidad.routes");
+const fixerRoutes = require("./routes/fixer.routes");
+const historialRoutes = require("./routes/historial.routes");
+const horarioDisponibleRoutes = require("./routes/horario_disponible.routes");
+const notificacionGmailRoutes = require("./routes/notificacionGmail.routes");
+const notificacionWhatsAppRoutes = require("./routes/notificacionWhatsApp.routes");
+const magiclinkRoutes = require("./routes/magiclink.routes");
+const provinciaRoutes = require("./routes/provincia.routes");
+const servicioRoutes = require("./routes/servicio.routes");
+const sessionRoutes = require("./routes/session.routes");
+const trabajoRoutes = require("./routes/trabajo.routes");
+const userRoutes = require("./routes/user.routes");
+const userAuthRoutes = require("./routes/userAuth.routes");
+const walletRoutes = require("./routes/wallet.routes");
 
 // ============================================
-// RUTAS DEL EQUIPO (OFERTAS / FIXERS / CATEGORIES / TEAMSYS)
+// RUTAS DEL EQUIPO - COMMONJS
 // ============================================
-import offersRouter from "./routes/offers";
-import fixerModule from "./modules/fixer";
-import categoriesModule from "./modules/categories";
-import teamsysModule from "./modules/teamsys";
+const offersRouter = require("./routes/offers");
+const fixerModule = require("./modules/fixer");
+const categoriesModule = require("./modules/categories");
+const teamsysModule = require("./modules/teamsys");
 
 // ============================================
 // APP SETUP
@@ -80,7 +83,7 @@ const corsOrigins = [
   ...(process.env.ALLOWED_ORIGINS ?? "").split(","),
   ...(process.env.CORS_ORIGIN ?? "").split(","),
 ]
-  .map((origin) => origin.trim())
+  .map((origin: string) => origin.trim())
   .filter(Boolean);
 
 app.use(
@@ -97,7 +100,7 @@ app.use(requestLogger);
 // ============================================
 // RUTAS PÚBLICAS
 // ============================================
-app.get("/", (_req: Request, res: Response) => {
+app.get("/", (_req: any, res: any) => {
   res.json({
     message: "API Backend Servineo",
     status: "OK",
@@ -126,13 +129,14 @@ app.get("/", (_req: Request, res: Response) => {
         "/api/user",
         "/api/auth",
         "/api/wallet",
+        "/api/ubicaciones"
       ],
       teamScrumPiones: ["/api/offers", "/api/fixers", "/api/categories", "/api/teamsys"],
     },
   });
 });
 
-app.get("/api/health", (_req: Request, res: Response) => {
+app.get("/api/health", (_req: any, res: any) => {
   res.json({
     status: "healthy",
     database: "connected",
