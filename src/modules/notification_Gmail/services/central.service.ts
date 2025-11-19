@@ -1,7 +1,7 @@
 // src/modules/notification_Gmail/services/central.service.ts
 import { v4 as uuidv4 } from "uuid";
 import { notificacionGmailController } from "../../../controllers/notificacionGmail.controller";
-import connectDB from "../../../config/database";
+const connectDB = require("../../../config/database");
 import {
   InvalidNotificationDataError,
   NotificationCreationError,

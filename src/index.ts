@@ -9,16 +9,14 @@ const path = require("path");
 
 // Módulos locales con require
 const ubicacionesRoutes = require("./routes/ubicaciones.routes");
-const connectDB = require("./config/database"); // ✅ Este es el import
+const connectToDB = require("./config/database"); // ✅ Nombre corregido
 
 dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 
 // ============================================
-// BASE DE DATOS - ✅ CORREGIR NOMBRE DE VARIABLE
+// BASE DE DATOS
 // ============================================
-const databaseConnection = connectDB; // ✅ Renombrar la variable
-
-databaseConnection().catch((err: any) => {
+connectToDB().catch((err: any) => {
   console.error("Error al conectar con la base de datos:", err.message);
 });
 

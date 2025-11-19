@@ -1,7 +1,7 @@
 // src/modules/notification_WhatsApp/services/central.service.ts
 import { v4 as uuidv4 } from "uuid";
 import { notificacionWhatsAppController } from "../../../controllers/notificacionWhatsApp.controller";
-import connectDB from "../../../config/database";
+const connectDB = require("../../../config/database");
 import {
   InvalidNotificationDataError,
   NotificationProviderError,
